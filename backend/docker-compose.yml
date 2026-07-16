@@ -1,0 +1,45 @@
+services:
+  fastapi_app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      - postgres
+    volumes:
+      - .:/code
+      - /code/.venv
+    ports:
+      - "8000:8000"
+    restart: always
+    container_name: fastapi_app
+    command: uv run uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+
+  postgres:
+    image: postgres:17
+    restart: always
+    volumes:
+      - pgData:/var/lib/postgresql/data
+    env_file:
+      - .env
+    container_name: postgres
+
+    ports:
+      - "5432:5432"
+
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+
+  redis:
+    image: redis:8
+    restart: always
+    volumes:
+      - redisData:/var/lib/redis/data
+    container_name: redis
+    ports:
+      - "6379:6379"
+
+volumes:
+  pgData:
+  redisData:
