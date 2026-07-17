@@ -1,0 +1,48 @@
+{% extends "email/base.html" %}
+
+{% block content %}
+
+<h2>
+
+Verify Your Email
+
+</h2>
+
+<p>
+
+Hello {{ name }},
+
+</p>
+
+<p>
+
+Use this OTP
+
+</p>
+
+<div
+style="
+
+font-size:42px;
+
+font-weight:bold;
+
+letter-spacing:10px;
+
+text-align:center;
+
+margin:40px;
+
+">
+
+{{ otp }}
+
+</div>
+
+<p>
+
+Expires in 5 minutes.
+
+</p>
+
+{% endblock %}

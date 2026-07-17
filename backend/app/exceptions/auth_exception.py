@@ -41,3 +41,14 @@ class InvaidOrExpiredToken(AppException):
         error_code: str = "INVALID_OR_EXPIRED_TOKEN",
     ):
         super().__init__(message, status_code, error_code)
+
+
+
+class PasswordMismatched(AppException):
+    def __init__(
+        self,
+        message: str = "Password mismatched",
+        status_code: int = status.HTTP_400_BAD_REQUEST,
+        error_code: str = "PASSWORD_MISMATCHED",
+    ):
+        super().__init__(message, status_code, error_code)

@@ -12,7 +12,24 @@ services:
       - "8000:8000"
     restart: always
     container_name: fastapi_app
+    env_file:
+      - .env
     command: uv run uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+  celery:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      - redis
+      - fastapi_app
+    volumes:
+      - .:/code
+      - /code/.venv
+    restart: always
+    container_name: celery_container
+    env_file:
+      - .env
+    command: uv run celery -A app.core.celery_app.celery_app worker --loglevel=info
 
   postgres:
     image: postgres:17

@@ -3,6 +3,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from rich.panel import Panel
 
+from app import api
 from app.core.logger import console
 from app.core.middleware import LoggingMiddleware
 from app.exceptions.exception_handler import exception_handler
@@ -32,7 +33,7 @@ app.add_middleware(LoggingMiddleware)
 
 # Def to handle the exception
 exception_handler(app)
-
+app.include_router(api.auth_router,prefix="/api/v1")
 
 # Test
 @app.get("/")

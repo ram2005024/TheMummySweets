@@ -17,7 +17,8 @@ class UserRole(Enum):
 
 class User(BaseModel):
     __tablename__ = "users"
-
+    first_name:Mapped[str]
+    last_name:Mapped[str]=mapped_column(nullable=True)
     email: Mapped[str] = mapped_column(unique=True, nullable=True)
     password: Mapped[str] = mapped_column(nullable=True)
     phone_no: Mapped[str] = mapped_column(unique=True, nullable=True)
@@ -28,7 +29,7 @@ class User(BaseModel):
     is_authenticated: Mapped[bool] = mapped_column(default=False)
     login_attempts: Mapped[int] = mapped_column(default=0)
     last_login_at: Mapped[datetime] = mapped_column(nullable=True)
-    profile: Mapped["Profile"] = relationship(
+    profile: Mapped["Profile"] = relationship("Profile",
         uselist=False, cascade="all,delete-orphan", back_populates="user"
     )
 
@@ -36,9 +37,9 @@ class User(BaseModel):
 class Profile(BaseModel):
     __tablename__ = "profiles"
 
-    user_id: Mapped[UUID] = mapped_column(ForeignKey("users.id"))
+    user_id: Mapped[UUID] = mapped_column(ForeignKey("users.id",ondelete="CASCADE"))
     user: Mapped["User"] = relationship(
-        "users", foreign_keys=[user_id], back_populates="profile"
+        "User", foreign_keys=[user_id], back_populates="profile"
     )
     full_name: Mapped[str]
     image: Mapped[str] = mapped_column(nullable=True)
