@@ -130,3 +130,27 @@ def exception_handler(app: FastAPI):
                 message="Something went wrong on the server",
             ).model_dump(),
         )
+
+    @app.exception_handler(ValueError)
+    async def handle_value_error(request:Request,exc:ValueError):
+         rid = _req_id(request)
+         console.print(
+            Panel(
+                f"[warning]🌐  Value Error[/]\n\n"
+                f"[bold white]Route  :[/]  {request.method} {request.url.path}\n"
+                f"[bold white]Code   :[/]  {400}\n"
+                f"[bold white]Detail :[/]  {exc}\n"
+                f"[bold white]Req ID :[/]  [dim]{rid}[/]",
+                title="[yellow]HTTP Error[/]",
+                border_style="yellow",
+                expand=False,
+            )
+        )
+         return JSONResponse(
+            status_code=400,
+            content=ErrorResponse(
+                error_code="VALUE_ERROR",
+                message="Invalid input provided",
+                details={"reason":f"{str(exc)}"}
+            ).model_dump(),
+        )

@@ -28,6 +28,12 @@ class Settings(BaseSettings):
     MAIL_STARTTLS:bool=False
     MAIL_SSL_TLS:bool=False
 
+    WHATSAPP_TOKEN:str=""
+    WHATSAPP_PHONE_NUMBER_ID:str=""
+
+    DEBUG:bool=True
+
+
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
 

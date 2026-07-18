@@ -5,6 +5,7 @@ from fastapi.exceptions import HTTPException
 from pydantic import BaseModel, EmailStr, field_validator, model_validator
 
 from app.exceptions.auth_exception import PasswordMismatched
+from app.utils.normalize_phone import normalize_phone
 
 
 class UserRegiser(BaseModel):
@@ -21,6 +22,8 @@ class UserRegiser(BaseModel):
 
     @field_validator("email",mode="before")
     def normalize_email(cls,value:str)->str:
+        if not value:
+            return value
         return value.strip().lower()
 
     @model_validator(mode="after")
@@ -28,13 +31,24 @@ class UserRegiser(BaseModel):
         if self.password_1!=self.password_2:
             raise PasswordMismatched
         return self
+
+
     @model_validator(mode="after")
     def validate_email_phone(self):
         if self.email and self.mobile_number:
             raise HTTPException(status_code=400,detail="Either email or phone number can be registered")
         if not self.email and not self.mobile_number:
             raise HTTPException(status_code=400,detail="Either email or phone number should be provided")
+
         return self
+
+    @field_validator("mobile_number",mode="before")
+    def normalize_mobile(cls,value):
+        if not value:
+            return value
+        value=normalize_phone(value)
+        return value
+
 
     # For form field
     @staticmethod

@@ -11,11 +11,13 @@ dependencies = [
     "cloudinary>=1.45.0",
     "fastapi-mail>=1.6.5",
     "fastapi[standard]>=0.139.0",
+    "httpx>=0.28.1",
     "psycopg2-binary>=2.9.12",
     "pwdlib[argon2]>=0.3.0",
     "redis>=8.0.1",
     "rich>=15.0.0",
     "sentry-sdk>=2.65.0",
     "sqlalchemy>=2.0.51",
+    "twilio>=9.10.9",
     "uvicorn[standard]>=0.51.0",
 ]
