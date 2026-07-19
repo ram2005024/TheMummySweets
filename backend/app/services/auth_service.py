@@ -10,7 +10,10 @@ from app.core.security import Auth
 from app.exceptions.auth_exception import (
     InvalidEmailOrPassword,
     InvalidOrExpiredOtp,
+    InvalidOrExpiredToken,
+    InvalidSession,
     ManyAttemptsError,
+    MissingToken,
     UserAlreadyExists,
     UserDoesnotExist,
     UserNotAuthenticated,
@@ -147,12 +150,46 @@ class AuthService:
         new_otp=Auth().generate_otp()
         await Auth().delete_previous_otp_key(data.user_id)
         await Auth().set_otp_key(new_otp,str(user.id))
-        source=data.field_name
-        source_value=data.field_value
+        source="email" if user.email else "phone"
+        source_value=user.email if user.email else user.phone_no
         send_otp.delay(new_otp,source,[source_value],user.first_name)
         await Auth().set_resend_key(str(user.id))
 
         return SuccessResponse(data=None,message="Please check your email for new otp")
+
+    async def refresh(self,request:Request):
+        token=request.cookies.get("refresh")
+        if not token:
+            raise MissingToken
+        payload=Auth().verify_token(token)
+        session_id=payload["session_id"]
+        session=await self.session_repo.get_session_by_id(session_id)
+        if not session:
+            raise InvalidSession
+        if session.is_revoked:
+            raise InvalidSession
+        redis_refresh_jti=await Auth().get_refresh_from_redis(str(payload["jti"]))
+        if  redis_refresh_jti is None:
+            # For concurrency in React strict mode
+            if  await Auth().get_old_rotation_into_redis(payload["jti"]) is None:
+                raise InvalidOrExpiredToken
+            return SuccessResponse(data={"message":"Rotation handeled already"})
+
+        old_jti=payload["jti"]
+        new_jti=uuid.uuid4()
+        payload["jti"]=str(new_jti)
+        await self.session_repo.put_jti_into_session(new_jti,session)
+        new_refresh=Auth().generate_refresh(payload)
+        await Auth().set_old_rotation_into_redis(old_jti,str(new_jti))
+        await Auth().delete_refresh_from_redis(old_jti)
+        await Auth().set_refresh_into_redis(str(new_jti))
+        new_access=Auth().generate_access(payload)
+        response=JSONResponse(status_code=200,content=SuccessResponse(data={"access":new_access}).model_dump())
+        response.set_cookie("refresh",new_refresh,httponly=True,secure=settings.SECURE,samesite=settings.SAMESITE)
+        return response
+
+
+
 
 
 

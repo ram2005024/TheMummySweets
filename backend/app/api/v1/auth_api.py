@@ -34,4 +34,9 @@ async def verify_user_token(data:OtpVerifySchema,service:Annotated[AuthService,D
 async def resend_otp_endpoint(data:RegisterSuccessResponseSchema,service:Annotated[AuthService,Depends(get_auth_service)]):
     return await service.resend_otp(data)
 
+# Refresh endpoint
+@auth_router.post("/refresh",response_model=SuccessResponse[dict])
+async def refresh_endpoint(request:Request,service:Annotated[AuthService,Depends(get_auth_service)]):
+    return await service.refresh(request)
+
 

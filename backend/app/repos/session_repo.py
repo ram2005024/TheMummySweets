@@ -51,5 +51,9 @@ class SessionRepo:
             await self.db.rollback()
             raise e
 
+    async def get_session_by_id(self,id:str):
+        session=(await self.db.execute(select(Session).where(Session.id==UUID(id)))).scalar_one_or_none()
+        return session
+
 
 

@@ -2,10 +2,12 @@ import random
 from datetime import datetime, timedelta
 
 import jwt
+from jwt.exceptions import PyJWTError
 from pwdlib import PasswordHash
 
 from app.core.config import settings
 from app.core.redis import redis
+from app.exceptions.auth_exception import InvalidOrExpiredToken
 
 
 class Auth:
@@ -113,8 +115,26 @@ class Auth:
         token_data["exp"]=datetime.now()+timedelta(days=settings.REFRESH_EXPIRY)
         return jwt.encode(token_data, settings.JWT_SECRET_KEY, algorithm="HS256")
 
+    def verify_token(self,token:str):
+        try:
+            payload=jwt.decode(token,settings.JWT_SECRET_KEY,algorithms=["HS256"])
+            return payload
+        except PyJWTError:
+            raise InvalidOrExpiredToken
+
     async def set_refresh_into_redis(self,jti:str):
         return await redis.setex(name=f"refresh:{jti}",time=settings.REFRESH_EXPIRY*24*60*60,value="True")
+
+    async def set_old_rotation_into_redis(self,prev:str,new:str):
+        return await redis.setex(name=f"rotation:{prev}",time=30,value=new)
+    async def get_old_rotation_into_redis(self,prev:str):
+        return await redis.get(f"rotation:{prev}")
+
+    async def get_refresh_from_redis(self,jti:str):
+        return await redis.get(f"refresh:{jti}")
+    async def delete_refresh_from_redis(self,jti:str):
+        return await redis.delete(f"refresh:{jti}")
+
 
 
 
