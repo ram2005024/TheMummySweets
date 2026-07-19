@@ -1,3 +1,5 @@
+from typing import Any
+
 from fastapi import status
 
 from app.exceptions.base_custom_exception import AppException
@@ -42,6 +44,15 @@ class InvaidOrExpiredToken(AppException):
     ):
         super().__init__(message, status_code, error_code)
 
+class InvalidOrExpiredOtp(AppException):
+    def __init__(
+        self,
+        message: str = "Invalid or Expired otp",
+        status_code: int = status.HTTP_401_UNAUTHORIZED,
+        error_code: str = "INVALID_OR_EXPIRED_OTP",
+    ):
+        super().__init__(message, status_code, error_code)
+
 
 
 class PasswordMismatched(AppException):
@@ -59,5 +70,14 @@ class UserNotAuthenticated(AppException):
         message: str = "Please verify your account",
         status_code: int = status.HTTP_401_UNAUTHORIZED,
         error_code: str = "USER_UNAUTHENTICATED",
+        details:Any=None
+    ):
+        super().__init__(message, status_code, error_code,details=details)
+class UserDoesnotExist(AppException):
+    def __init__(
+        self,
+        message: str = "User doesn't exist",
+        status_code: int = status.HTTP_401_UNAUTHORIZED,
+        error_code: str = "USER_NOT_FOUND",
     ):
         super().__init__(message, status_code, error_code)

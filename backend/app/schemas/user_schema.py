@@ -94,3 +94,14 @@ class UserLogin(BaseModel):
             return value
         value=normalize_phone(value)
         return value
+
+class OtpVerifySchema(BaseModel):
+    field_name:str
+    field_value:str
+    user_id:str
+    otp:str
+
+class RegisterSuccessResponseSchema(BaseModel):
+    field_name:str
+    field_value:str
+    user_id:str

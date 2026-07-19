@@ -11,13 +11,17 @@ from app.core.redis import redis
 class Auth:
     def __init__(self,
                  hash=PasswordHash.recommended(),
-                 otp_expires_in=3000,
+                 otp_expires_in=300,
                  login_limit=300,
-                 max_login_attempt=5
+                 max_login_attempt=5,
+                 max_otp_attempt=5,
+                 resend_time_limit=60
                  ):
         self.hash=hash
         self.MAXIMUM_LOGIN_ATTEMPT=max_login_attempt
         self.MAXIMUM_LOGIN_LIMIT=login_limit
+        self.MAXIMUM_OTP_ATTEMPT=max_otp_attempt
+        self.RESEND_AFTER=resend_time_limit
         self.otp_expires_in=otp_expires_in
 
     def hash_content(self,content:str):
@@ -32,10 +36,50 @@ class Auth:
         return otp
 
     def get_otp_key(self,user_id:str):
-        return f"otp-{user_id}"
+        return f"otp:{user_id}"
+
+    def get_otp_attempt_key(self,user_id:str):
+        return f"otp:attempt:{user_id}"
 
     async def set_otp_key(self,value,user_id):
         return await redis.setex(self.get_otp_key(user_id),self.otp_expires_in,value)
+    async def set_otp_attempt(self,user_id:str):
+        attempt=await redis.incr(self.get_otp_attempt_key(user_id))
+        if attempt==1:
+            await redis.expire(self.get_otp_attempt_key(user_id),300)
+        return attempt
+    async def is_locked_otp(self,user_id:str):
+        attempt_raw=await redis.get(self.get_otp_attempt_key(user_id))
+        attempt=int(attempt_raw) if attempt_raw else 0
+        if attempt>=self.MAXIMUM_OTP_ATTEMPT:
+            ttl=await redis.ttl(self.get_otp_attempt_key(user_id))
+            if ttl<0:
+                ttl=0
+            return True,ttl
+        return False,0
+
+    async def get_otp_value(self,user_id):
+        otp=await redis.get(self.get_otp_key(user_id))
+        return otp
+
+    # Resend Redis
+    def get_resend_key(self,user_id:str):
+        return f"otp:resend:{user_id}"
+
+    async def set_resend_key(self,user_id):
+        return await redis.setex(self.get_resend_key(user_id),self.RESEND_AFTER,"1")
+
+    async  def can_resend(self,user_id:str):
+        key=self.get_resend_key(user_id)
+        resend=await redis.get(key)
+        if resend:
+            ttl=await redis.ttl(key)
+            return False,ttl
+        return True,0
+
+    async def delete_previous_otp_key(self,user_id:str):
+        return await redis.delete(self.get_otp_key(user_id))
+
 
     def generate_key_login(self,field):
         return f"login:{field}"

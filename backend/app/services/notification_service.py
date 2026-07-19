@@ -23,17 +23,18 @@ class NotificationService:
 
     # Send otp
     @classmethod
-    async def send_sms_otp(
+    def send_sms_otp(
         cls,
         phone_number: str,
         otp: str,
+        name:str
     ):
         # Development Mode
         if settings.DEBUG:
             console.print("=" * 60, style="info")
             console.print("📱 DEVELOPMENT SMS", style="success")
             console.print(f"Phone : {phone_number}", style="warning")
-            console.print(f"OTP   : {otp}", style="error")
+            console.print(f"Hi {name}.Your OTP is {otp}", style="error")
             console.print("=" * 60, style="info")
 
             return
@@ -41,7 +42,7 @@ class NotificationService:
         # Production Mode
         message = f"""
 🍰 The Mummy Sweets
-
+Hi, {name}
 Your verification code is
 
 {otp}
@@ -70,8 +71,8 @@ Do not share it with anyone.
             },
         }
 
-        async with httpx.AsyncClient() as client:
-            response = await client.post(
+        with httpx.Client() as client:
+            response =client.post(
                 url,
                 json=payload,
                 headers=headers,

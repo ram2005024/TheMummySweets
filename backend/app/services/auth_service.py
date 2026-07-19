@@ -9,17 +9,23 @@ from app.core.config import settings
 from app.core.security import Auth
 from app.exceptions.auth_exception import (
     InvalidEmailOrPassword,
+    InvalidOrExpiredOtp,
     ManyAttemptsError,
     UserAlreadyExists,
+    UserDoesnotExist,
     UserNotAuthenticated,
 )
 from app.repos.session_repo import SessionRepo
 from app.repos.user_repo import UserRepo
 from app.schemas.common import SuccessResponse
-from app.schemas.user_schema import UserLogin, UserRegiser
-from app.services.notification_service import NotificationService
+from app.schemas.user_schema import (
+    OtpVerifySchema,
+    RegisterSuccessResponseSchema,
+    UserLogin,
+    UserRegiser,
+)
 from app.tasks.auth_task import upload_user_image
-from app.tasks.email_task import send_email_otp
+from app.tasks.email_task import send_otp
 
 
 class AuthService:
@@ -57,13 +63,11 @@ class AuthService:
         # Generate the otp
         otp=Auth().generate_otp()
         await Auth().set_otp_key(otp,str(new_user.id))
-        if data.email:
-            send_email_otp.delay(email=[new_user.email],name=new_user.first_name,otp=str(otp))
-            return SuccessResponse(message="User created.Please verify your email",data={"register_field":"email","email":new_user.email})
-
-        if data.mobile_number:
-            await NotificationService.send_sms_otp(otp=str(otp),phone_number=data.mobile_number)
-            return SuccessResponse(message="User created.Please verify your phone number",data={"register_field":"phone","phone":new_user.phone_no})
+        source="email" if data.email else "phone_no"
+        source_value=[data.email] if data.email else [data.mobile_number]
+        send_otp.delay(otp,source,source_value,new_user.first_name)
+        await Auth().set_resend_key(str(new_user.id))
+        return SuccessResponse(message="User created.Please verify your email",data={"field_name":"email","field_value":new_user.email,"user_id":str(new_user.id)})
 
     async def login_user(self,data:UserLogin,request:Request):
         is_locked,time=await Auth().is_locked(data.mobile_number if data.mobile_number else data.email)
@@ -76,7 +80,12 @@ class AuthService:
             await Auth().increase_attempt(value)
             raise InvalidEmailOrPassword
         if not user.is_authenticated:
-            raise UserNotAuthenticated
+            login_otp=Auth().generate_otp()
+            source="email" if data.email else "phone_no"
+            source_value=[data.email] if data.email else [data.mobile_number]
+            send_otp.delay(login_otp,source,source_value,user.first_name)
+            await Auth().set_resend_key(str(user.id))
+            raise UserNotAuthenticated(details={"field_name":source,"field_value":source_value,"user_id":str(user.id)})
         if user.provider and user.provider_id:
             raise HTTPException(status_code=400,detail="This account has different provider")
 
@@ -84,7 +93,9 @@ class AuthService:
             await Auth().increase_attempt(value)
             raise InvalidEmailOrPassword
         jti=uuid.uuid4()
-        device_id=f"{user.id}-{request.client.host}" # type: ignore
+        device_id=request.headers.get("X-Device-ID") # type: ignore
+        if not device_id:
+            raise HTTPException(status_code=400,detail="Missing device ID")
         # Check if the session exist or not
         session=await self.session_repo.get_session_by_device_id(device_id)
         if session:
@@ -102,6 +113,47 @@ class AuthService:
         response=JSONResponse(status_code=200,content=SuccessResponse(data={"access":access},message="Welcome to the mummy sweets").model_dump())
         response.set_cookie("refresh",refresh,httponly=True,secure=settings.SECURE,samesite=settings.SAMESITE)
         return response
+
+    async def verify_otp(self,data:OtpVerifySchema):
+        user=await self.repo.get_user_by_field("id",uuid.UUID(data.user_id))
+        if not user:
+            raise UserDoesnotExist
+        if user.is_authenticated:
+            raise HTTPException(status_code=400,detail="You are already verfied")
+        is_locked,ttl=await Auth().is_locked_otp(data.user_id)
+        if is_locked:
+            ttl_min=ttl//60
+            raise ManyAttemptsError(message=f"To many attempts.Please try again in {ttl_min if ttl_min!=0 else ttl} {"minutes" if ttl_min>1 else "second" if ttl<1 else "seconds"}")
+        user_otp=await Auth().get_otp_value(data.user_id)
+        if not user_otp:
+            await Auth().set_otp_attempt(data.user_id)
+            raise InvalidOrExpiredOtp
+        is_matched=user_otp==data.otp
+        if not is_matched:
+            await Auth().set_otp_attempt(data.user_id)
+            raise InvalidOrExpiredOtp
+        await Auth().delete_previous_otp_key(data.user_id)
+        user=await self.repo.authenticate_user(user)
+        return SuccessResponse(message="You are now verified",data=None)
+
+    async def resend_otp(self,data:RegisterSuccessResponseSchema):
+        user=await self.repo.get_user_by_field("id",uuid.UUID(data.user_id))
+        if not user:
+            raise UserDoesnotExist
+        can_resend,ttl=await Auth().can_resend(data.user_id)
+        if not can_resend:
+            raise HTTPException(status_code=400,detail=f"You can resend otp in {ttl} {"seconds" if ttl > 1 else "second"}")
+        new_otp=Auth().generate_otp()
+        await Auth().delete_previous_otp_key(data.user_id)
+        await Auth().set_otp_key(new_otp,str(user.id))
+        source=data.field_name
+        source_value=[data.field_value]
+        send_otp.delay(new_otp,source,source_value,user.first_name)
+        await Auth().set_resend_key(str(user.id))
+
+        return SuccessResponse(data=None,message="Please check your email for new otp")
+
+
 
 
 

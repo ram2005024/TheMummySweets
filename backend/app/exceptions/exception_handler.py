@@ -37,6 +37,7 @@ def exception_handler(app: FastAPI):
             content=ErrorResponse(
                 error_code=exc.error_code,
                 message=exc.message,
+                details=exc.details
             ).model_dump(),
         )
 

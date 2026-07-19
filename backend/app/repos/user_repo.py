@@ -1,3 +1,4 @@
+
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -29,6 +30,12 @@ class UserRepo:
         self.db.add(profile)
         await self.db.commit()
         return profile
+
+    async def authenticate_user(self,user:User):
+        user.is_authenticated=True
+        await self.db.commit()
+        return user
+
 
 
 
