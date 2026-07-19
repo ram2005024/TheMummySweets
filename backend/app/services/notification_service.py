@@ -36,11 +36,7 @@ class NotificationService:
             console.print(f"OTP   : {otp}", style="error")
             console.print("=" * 60, style="info")
 
-            return {
-                "success": True,
-                "mode": "development",
-                "otp": otp,
-            }
+            return
 
         # Production Mode
         message = f"""

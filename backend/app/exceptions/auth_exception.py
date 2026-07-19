@@ -3,7 +3,7 @@ from fastapi import status
 from app.exceptions.base_custom_exception import AppException
 
 
-class UserDoesnotExist(AppException):
+class InvalidEmailOrPassword(AppException):
     def __init__(
         self,
         message: str = "Invalid email or password",
@@ -26,7 +26,7 @@ class UserAlreadyExists(AppException):
 class ManyAttemptsError(AppException):
     def __init__(
         self,
-        message: str = "Too many attempts",
+        message: str ="Too many attempts",
         status_code: int = status.HTTP_409_CONFLICT,
         error_code: str = "TOO_MANY_ATTEMPTS",
     ):
@@ -50,5 +50,14 @@ class PasswordMismatched(AppException):
         message: str = "Password mismatched",
         status_code: int = status.HTTP_400_BAD_REQUEST,
         error_code: str = "PASSWORD_MISMATCHED",
+    ):
+        super().__init__(message, status_code, error_code)
+
+class UserNotAuthenticated(AppException):
+    def __init__(
+        self,
+        message: str = "Please verify your account",
+        status_code: int = status.HTTP_401_UNAUTHORIZED,
+        error_code: str = "USER_UNAUTHENTICATED",
     ):
         super().__init__(message, status_code, error_code)

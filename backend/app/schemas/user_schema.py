@@ -77,7 +77,20 @@ class UserLogin(BaseModel):
     @model_validator(mode="after")
     def validate_email_phone(self):
         if self.email and self.mobile_number:
-            raise HTTPException(status_code=400,detail="Either email or phone number can be registered")
+            raise HTTPException(status_code=400,detail="Either email or phone number can be used for login")
         if not self.email and not self.mobile_number:
             raise HTTPException(status_code=400,detail="Either email or phone number should be provided")
         return self
+
+    @field_validator("email",mode="after")
+    def normalize_email(cls,value:str):
+        if not value:
+            return value
+        return value.strip().lower()
+
+    @field_validator("mobile_number",mode="before")
+    def normalize_mobile(cls,value:str):
+        if not value:
+            return value
+        value=normalize_phone(value)
+        return value

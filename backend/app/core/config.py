@@ -1,3 +1,5 @@
+from typing import Literal
+
 import cloudinary
 import cloudinary.uploader
 from pydantic import SecretStr
@@ -32,6 +34,13 @@ class Settings(BaseSettings):
     WHATSAPP_PHONE_NUMBER_ID:str=""
 
     DEBUG:bool=True
+    ACCESS_EXPIRY:int=10
+    REFRESH_EXPIRY:int=7
+    JWT_SECRET_KEY:str=""
+
+    # Cookie
+    SECURE:bool=True
+    SAMESITE:Literal["lax","none","strict"]="none"
 
 
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
