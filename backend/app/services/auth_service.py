@@ -64,10 +64,10 @@ class AuthService:
         otp=Auth().generate_otp()
         await Auth().set_otp_key(otp,str(new_user.id))
         source="email" if data.email else "phone_no"
-        source_value=[data.email] if data.email else [data.mobile_number]
-        send_otp.delay(otp,source,source_value,new_user.first_name)
+        source_value=data.email if data.email else data.mobile_number
+        send_otp.delay(otp,source,[source_value],new_user.first_name)
         await Auth().set_resend_key(str(new_user.id))
-        return SuccessResponse(message="User created.Please verify your email",data={"field_name":"email","field_value":new_user.email,"user_id":str(new_user.id)})
+        return SuccessResponse(message="User created.Please verify your email",data={"field_name":source,"field_value":source_value,"user_id":str(new_user.id)})
 
     async def login_user(self,data:UserLogin,request:Request):
         is_locked,time=await Auth().is_locked(data.mobile_number if data.mobile_number else data.email)
@@ -82,8 +82,8 @@ class AuthService:
         if not user.is_authenticated:
             login_otp=Auth().generate_otp()
             source="email" if data.email else "phone_no"
-            source_value=[data.email] if data.email else [data.mobile_number]
-            send_otp.delay(login_otp,source,source_value,user.first_name)
+            source_value=data.email if data.email else data.mobile_number
+            send_otp.delay(login_otp,source,[source_value],user.first_name)
             await Auth().set_resend_key(str(user.id))
             raise UserNotAuthenticated(details={"field_name":source,"field_value":source_value,"user_id":str(user.id)})
         if user.provider and user.provider_id:
@@ -133,6 +133,7 @@ class AuthService:
             await Auth().set_otp_attempt(data.user_id)
             raise InvalidOrExpiredOtp
         await Auth().delete_previous_otp_key(data.user_id)
+        await Auth().delete_otp_attempt(data.user_id)
         user=await self.repo.authenticate_user(user)
         return SuccessResponse(message="You are now verified",data=None)
 
@@ -147,8 +148,8 @@ class AuthService:
         await Auth().delete_previous_otp_key(data.user_id)
         await Auth().set_otp_key(new_otp,str(user.id))
         source=data.field_name
-        source_value=[data.field_value]
-        send_otp.delay(new_otp,source,source_value,user.first_name)
+        source_value=data.field_value
+        send_otp.delay(new_otp,source,[source_value],user.first_name)
         await Auth().set_resend_key(str(user.id))
 
         return SuccessResponse(data=None,message="Please check your email for new otp")

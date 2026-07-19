@@ -48,6 +48,10 @@ class Auth:
         if attempt==1:
             await redis.expire(self.get_otp_attempt_key(user_id),300)
         return attempt
+
+    async def delete_otp_attempt(self,user_id:str):
+        key=self.get_otp_attempt_key(user_id)
+        return await redis.delete(key)
     async def is_locked_otp(self,user_id:str):
         attempt_raw=await redis.get(self.get_otp_attempt_key(user_id))
         attempt=int(attempt_raw) if attempt_raw else 0
