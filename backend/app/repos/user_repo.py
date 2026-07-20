@@ -36,6 +36,15 @@ class UserRepo:
         await self.db.commit()
         return user
 
+    async def change_user_password(self,user:User,new_hash_password):
+        try:
+            user.password=new_hash_password
+            await self.db.commit()
+            return user
+        except Exception as e:
+            await self.db.rollback()
+            raise e
+
 
 
 

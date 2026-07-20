@@ -5,6 +5,8 @@ from fastapi import APIRouter, Depends, File, Request, UploadFile
 from app.dependencies.factories import get_auth_service
 from app.schemas.common import SuccessResponse
 from app.schemas.user_schema import (
+    ChangePasswordResetSchema,
+    ForgetPassSchema,
     OtpVerifySchema,
     RegisterSuccessResponseSchema,
     UserLogin,
@@ -30,7 +32,7 @@ async def verify_user_token(data:OtpVerifySchema,service:Annotated[AuthService,D
     return await service.verify_otp(data)
 
 # For resending the otp
-@auth_router.post("/resend/otp",response_model=SuccessResponse[None])
+@auth_router.post("/verify/resend/otp",response_model=SuccessResponse[None])
 async def resend_otp_endpoint(data:RegisterSuccessResponseSchema,service:Annotated[AuthService,Depends(get_auth_service)]):
     return await service.resend_otp(data)
 
@@ -38,5 +40,24 @@ async def resend_otp_endpoint(data:RegisterSuccessResponseSchema,service:Annotat
 @auth_router.post("/refresh",response_model=SuccessResponse[dict])
 async def refresh_endpoint(request:Request,service:Annotated[AuthService,Depends(get_auth_service)]):
     return await service.refresh(request)
+
+# For forget-password
+@auth_router.post("/forget",response_model=SuccessResponse[RegisterSuccessResponseSchema])
+async def forget_password_endpoint(data:ForgetPassSchema,auth_service:Annotated[AuthService,Depends(get_auth_service)]):
+    return await auth_service.forget_password_otp_sender(data)
+
+# For reset resend otp
+@auth_router.post("/forget/resend",response_model=SuccessResponse[None])
+async def resend_reset_endpoint(user_id:str,auth_service:Annotated[AuthService,Depends(get_auth_service)]):
+    return await auth_service.resend_reset_otp(user_id)
+# For reset resend otp
+
+@auth_router.post("/forget/verify",response_model=SuccessResponse[RegisterSuccessResponseSchema])
+async def verify_forget_key_endpoint(data:OtpVerifySchema,auth_service:Annotated[AuthService,Depends(get_auth_service)]):
+    return await auth_service.verify_reset_key(data)
+
+@auth_router.post("/forget/change",response_model=SuccessResponse[None])
+async def change_password_after_forget_key_endpoint(data:ChangePasswordResetSchema,auth_service:Annotated[AuthService,Depends(get_auth_service)]):
+    return await auth_service.change_password_after_reset(data)
 
 

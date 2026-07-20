@@ -17,12 +17,14 @@ class Auth:
                  login_limit=300,
                  max_login_attempt=5,
                  max_otp_attempt=5,
-                 resend_time_limit=60
+                 resend_time_limit=60,
+                 max_reset_attempt=5
                  ):
         self.hash=hash
         self.MAXIMUM_LOGIN_ATTEMPT=max_login_attempt
         self.MAXIMUM_LOGIN_LIMIT=login_limit
         self.MAXIMUM_OTP_ATTEMPT=max_otp_attempt
+        self.MAXIMUM_RESET_ATTEMPT=max_reset_attempt
         self.RESEND_AFTER=resend_time_limit
         self.otp_expires_in=otp_expires_in
 
@@ -45,6 +47,8 @@ class Auth:
 
     async def set_otp_key(self,value,user_id):
         return await redis.setex(self.get_otp_key(user_id),self.otp_expires_in,value)
+    async def exists_otp_key(self,user_id:str):
+        return await redis.get(self.get_otp_key(user_id))
     async def set_otp_attempt(self,user_id:str):
         attempt=await redis.incr(self.get_otp_attempt_key(user_id))
         if attempt==1:
@@ -134,6 +138,55 @@ class Auth:
         return await redis.get(f"refresh:{jti}")
     async def delete_refresh_from_redis(self,jti:str):
         return await redis.delete(f"refresh:{jti}")
+
+    async def set_reset_otp_key(self,user_id:str,otp:str):
+        return await redis.setex(f"reset:{user_id}",300,otp)
+
+    async def exist_reset_otp_key(self,user_id:str):
+        return await redis.get(f"reset:{user_id}")
+
+    async def set_resend_reset_otp_key(self,user_id):
+        return await redis.setex(f"reset:resend:{user_id}",60,"True")
+    async def can_resend_reset_otp(self,user_id:str):
+        exist=await redis.get(f"reset:resend:{user_id}")
+        if exist is None:
+            return True,0
+        ttl=await redis.ttl(f"reset:resend:{user_id}")
+        return False,ttl
+
+    async def set_attempt_for_reset_otp(self,user_id:str):
+        attempt=await redis.incr(f"reset:attempt:{user_id}")
+        if attempt ==1:
+            await redis.expire(f"reset:attempt:{user_id}",300)
+        return attempt
+
+
+    async def is_locked_reset_otp(self,user_id:str):
+        attempt_raw=await redis.get(f"reset:attempt:{user_id}")
+        attempt=int(attempt_raw) if attempt_raw else 0
+        if attempt>=self.MAXIMUM_RESET_ATTEMPT:
+            ttl=await redis.ttl(f"reset:attempt:{user_id}")
+            return True,ttl
+        return False,0
+
+    async def delete_old_reset_otp(self,user_id:str):
+        return await redis.delete(f"reset:{user_id}")
+    async def delete_old_resend_reset_otp(self,user_id:str):
+        return await redis.delete(f"reset:resend:{user_id}")
+    async def delete_reset_attempt(self,user_id:str):
+        return await redis.delete(f"reset:attempt:{user_id}")
+
+    async def set_can_change_password(self,user_id:str):
+        return await redis.setex(f"reset:change:{user_id}",300,"True")
+
+    async def can_change_password(self,user_id:str):
+        return await redis.get(f"reset:change:{user_id}")
+
+    async def delete_can_change_user_from_reset(self,user_id:str):
+        return await redis.delete(f"reset:change:{user_id}")
+
+
+
 
 
 

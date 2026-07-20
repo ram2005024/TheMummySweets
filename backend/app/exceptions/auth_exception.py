@@ -52,6 +52,14 @@ class MissingToken(AppException):
         error_code: str = "MISSING_TOKEN",
     ):
         super().__init__(message, status_code, error_code)
+class MissingKey(AppException):
+    def __init__(
+        self,
+        message: str = "Missing key",
+        status_code: int = status.HTTP_401_UNAUTHORIZED,
+        error_code: str = "MISSING_KEY",
+    ):
+        super().__init__(message, status_code, error_code)
 
 class InvalidOrExpiredOtp(AppException):
     def __init__(

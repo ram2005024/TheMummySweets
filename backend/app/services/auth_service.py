@@ -13,6 +13,7 @@ from app.exceptions.auth_exception import (
     InvalidOrExpiredToken,
     InvalidSession,
     ManyAttemptsError,
+    MissingKey,
     MissingToken,
     UserAlreadyExists,
     UserDoesnotExist,
@@ -22,13 +23,15 @@ from app.repos.session_repo import SessionRepo
 from app.repos.user_repo import UserRepo
 from app.schemas.common import SuccessResponse
 from app.schemas.user_schema import (
+    ChangePasswordResetSchema,
+    ForgetPassSchema,
     OtpVerifySchema,
     RegisterSuccessResponseSchema,
     UserLogin,
     UserRegiser,
 )
 from app.tasks.auth_task import upload_user_image
-from app.tasks.email_task import send_otp
+from app.tasks.email_task import send_otp, send_reset_otp
 
 
 class AuthService:
@@ -86,6 +89,9 @@ class AuthService:
             login_otp=Auth().generate_otp()
             source="email" if data.email else "phone_no"
             source_value=data.email if data.email else data.mobile_number
+            exist_otp_already=await Auth().exists_otp_key(str(user.id))
+            if exist_otp_already:
+                raise UserNotAuthenticated(details={"field_name":source,"field_value":source_value,"user_id":str(user.id)})
             send_otp.delay(login_otp,source,[source_value],user.first_name)
             await Auth().set_resend_key(str(user.id))
             raise UserNotAuthenticated(details={"field_name":source,"field_value":source_value,"user_id":str(user.id)})
@@ -187,6 +193,77 @@ class AuthService:
         response=JSONResponse(status_code=200,content=SuccessResponse(data={"access":new_access}).model_dump())
         response.set_cookie("refresh",new_refresh,httponly=True,secure=settings.SECURE,samesite=settings.SAMESITE)
         return response
+
+
+    # Forget Pass
+    async def forget_password_otp_sender(self,data:ForgetPassSchema):
+        field="email" if data.email else "phone_no"
+        value=data.email if data.email else data.mobile_number
+        user=await self.repo.get_user_by_field(field,value)
+        if not user:
+            raise UserDoesnotExist
+
+        otp=Auth().generate_otp()
+        already_exist=await Auth().exist_reset_otp_key(str(user.id))
+        if already_exist:
+            return SuccessResponse(message=f"Please check your inbox sent in {field} for the otp",data={"user_id":str(user.id)})
+
+        send_reset_otp.delay(otp,field,[value],user.first_name)
+        await Auth().set_reset_otp_key(str(user.id),str(otp))
+        await Auth().set_resend_reset_otp_key(str(user.id))
+        return SuccessResponse(message="Otp sent successfully",data={"user_id":str(user.id)})
+    # Resend the reset_otp
+    async def resend_reset_otp(self,user_id:str):
+        user=await self.repo.get_user_by_field("id",uuid.UUID(user_id))
+        if not user:
+            raise UserDoesnotExist
+        can_resend,ttl=await Auth().can_resend_reset_otp(user_id)
+        if not can_resend:
+            raise HTTPException(status_code=403,detail=f"You can't resend the otp.Please try again after {ttl} {"seconds" if ttl>1 else "second"}")
+        field="email" if user.email else "phone_no"
+        value=user.email if user.email else user.phone_no
+        new_otp=Auth().generate_otp()
+        send_reset_otp.delay(new_otp,field,[value],user.first_name)
+        await Auth().delete_old_reset_otp(str(user.id))
+        await Auth().set_reset_otp_key(user_id,str(new_otp))
+        await Auth().set_resend_reset_otp_key(str(user.id))
+        return SuccessResponse(message="Resend otp sent successfully",data=None)
+
+    # Verify reset key for forget password
+    async def verify_reset_key(self,data:OtpVerifySchema):
+        exist_key=await Auth().exist_reset_otp_key(data.user_id)
+        if exist_key is None:
+            await Auth().set_attempt_for_reset_otp(data.user_id)
+            raise InvalidOrExpiredOtp
+        is_locked_to_verify_reset_key,ttl=await Auth().is_locked_reset_otp(data.user_id)
+        if is_locked_to_verify_reset_key:
+            ttl_in_minute=ttl//60
+            raise ManyAttemptsError(message=f"Too many attempts.Please try again after {ttl_in_minute if ttl_in_minute>1 else ttl} {"minutes" if ttl_in_minute>1 else "seconds" if ttl>1 else "second"}")
+        if data.otp!=exist_key:
+            await Auth().set_attempt_for_reset_otp(data.user_id)
+            raise InvalidOrExpiredOtp
+        await Auth().delete_old_reset_otp(data.user_id)
+        await Auth().delete_reset_attempt(data.user_id)
+        await Auth().delete_old_resend_reset_otp(data.user_id)
+        await Auth().set_can_change_password(data.user_id)
+        return SuccessResponse(message="Key verified",data={"user_id":data.user_id})
+
+    # Change password after reset
+    async def change_password_after_reset(self,data:ChangePasswordResetSchema):
+        can_change=await Auth().can_change_password(data.user_id)
+        if can_change is None:
+            raise MissingKey(message="Request timeout please try again")
+        user=await self.repo.get_user_by_field("id",uuid.UUID(data.user_id))
+        if not user:
+            raise UserDoesnotExist
+        new_hash_password=Auth().hash_content(data.password_1)
+        user=await self.repo.change_user_password(user,new_hash_password)
+        await Auth().delete_can_change_user_from_reset(data.user_id)
+        return SuccessResponse(message="Password changed successfully",data=None)
+
+
+
+
 
 
 

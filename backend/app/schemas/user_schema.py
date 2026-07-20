@@ -101,3 +101,35 @@ class OtpVerifySchema(BaseModel):
 
 class RegisterSuccessResponseSchema(BaseModel):
     user_id:str
+
+class ForgetPassSchema(BaseModel):
+    email:Optional[EmailStr]=None
+    mobile_number:Optional[str]=None
+
+    @model_validator(mode="after")
+    def check_both_field(self):
+        if self.email and self.mobile_number:
+            raise HTTPException(status_code=400,detail="Either email or phone number can be used to verify")
+        if not self.email and not self.mobile_number:
+            raise HTTPException(status_code=400,detail="Either email or phone number should be provided")
+        return self
+
+    @field_validator("mobile_number",mode="before")
+    def normalize_mobile(cls,value:str):
+        if not value:
+            return value
+        value=normalize_phone(value)
+        return value
+
+class ChangePasswordResetSchema(BaseModel):
+        user_id:str
+        password_1:str
+        password_2:str
+
+        @model_validator(mode="before")
+        def validate_password(cls,data):
+            if data["password_1"]!=data["password_2"]:
+                raise PasswordMismatched
+            return data
+
+
