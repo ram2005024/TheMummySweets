@@ -5,11 +5,9 @@ import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Menu, X, Search, ShoppingCart, User, Phone } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
-import { useAuth, UserButton } from "@clerk/nextjs";
 
 export default function NavBar() {
   const router = useRouter();
-  const { isSignedIn } = useAuth();
   const [open, setOpen] = useState(false);
   const path = usePathname();
   const navLinks = [
@@ -21,7 +19,7 @@ export default function NavBar() {
   ];
 
   return (
-    <header className="sticky top-0 z-50 border-b border-gray-200 bg-slate-100 backdrop-blur-lg shadow-xs">
+    <header className="sticky top-0 z-100 border-b border-gray-200 bg-slate-100 backdrop-blur-lg shadow-xs">
       <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-5 lg:px-8">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-3">
@@ -63,7 +61,6 @@ export default function NavBar() {
               2
             </span>
           </button>
-          {!isSignedIn ? (
             <button
               onClick={() => router.push("/login")}
               className="flex items-center gap-2 rounded-full bg-orange-500 px-5 py-2.5 font-medium text-white transition hover:bg-orange-600"
@@ -71,9 +68,7 @@ export default function NavBar() {
               <User size={18} />
               Login
             </button>
-          ) : (
-            <UserButton afterSignOutUrl="/" />
-          )}
+
         </div>
 
         {/* Mobile Button */}

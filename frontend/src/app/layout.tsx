@@ -1,22 +1,26 @@
-import { QueryClientProvider } from "@tanstack/react-query";
+
 import "./globals.css";
-import { ClerkProvider } from "@clerk/nextjs";
-import queryClient from "./libs/queryClient";
-import AuthSynchronizer from "@/providers/AuthSynchronizer";
+import { Geist } from "next/font/google";
+import { cn } from "@/lib/utils";
+import NavBar from "../components/NavBar";
+import Footer from "../components/Footer";
+
+const geist = Geist({subsets:['latin'],variable:'--font-sans'});
+
+
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
-    <ClerkProvider>
-      <html lang="en">
+
+      <html lang="en" className={cn("font-sans", geist.variable)}>
         <body className="min-h-full flex flex-col">
-          <QueryClientProvider client={queryClient}>
-            <AuthSynchronizer>{children}</AuthSynchronizer>
-          </QueryClientProvider>
+      <NavBar />
+      {children}
+    <Footer/>
         </body>
       </html>
-    </ClerkProvider>
   );
 }

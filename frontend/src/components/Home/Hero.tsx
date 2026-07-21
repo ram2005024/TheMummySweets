@@ -30,7 +30,7 @@ const Hero = () => {
         height={320}
         className="absolute max-sm:-right-20 max-sm:top-60 max-sm:size-50 right-20 top-20 -rotate-20"
       />
-      <div className="flex flex-col gap-5 z-100">
+      <div className="flex flex-col gap-5 z-50">
         <h1
           className={`${poppins.className} leading-20 max-sm:leading-15 text-6xl max-sm:text-4xl max-sm:max-w-xs w-full max-w-md font-bold text-black`}
         >
