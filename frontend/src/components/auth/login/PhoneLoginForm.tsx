@@ -18,14 +18,39 @@ const handleRegisterLogin=(data:phoneLoginType)=>{
 }
   return (
     <form className="mt-4 space-y-4" onSubmit={form.handleSubmit(handleRegisterLogin)}>
-          <Input placeholder="+977 98••••••••" {...form.register('mobile_number')}/>
-              <Input type="password" placeholder="Password" {...form.register('mobile_number')} />
+           <div className="flex items-center gap-2">
+            {/* Fixed prefix outside */}
+            <span className="px-3 py-2 rounded-md bg-gray-100 text-gray-700 select-none">
+              +977
+            </span>
+
+            {/* Input only for 10 digits */}
+            <Input
+              type="tel"
+              maxLength={10}
+              placeholder="98••••••••"
+              {...form.register("mobile_number")}
+              className="flex-1"
+            />
+
+          </div>
+            {form.formState.errors.mobile_number && (
+        <p className="text-xs text-red-500 mt-1">
+          {form.formState.errors.mobile_number.message}
+        </p>
+      )}
+              <Input type="password" placeholder="Password" {...form.register('password')} />
+               {form.formState.errors?.password && (
+              <p className="text-xs text-red-500 mt-1">
+                   {form.formState.errors.password.message}
+              </p>
+            )}
               <div className="flex justify-end">
                 <Button variant="link" className="text-xs text-gray-500">
                   Forgot password?
                 </Button>
               </div>
-              <Button className="w-full bg-orange-500 hover:bg-orange-600 text-white">
+              <Button type='submit' className="w-full bg-orange-500 hover:bg-orange-600 text-white">
                 Sign in →
               </Button>
               </form>

@@ -22,17 +22,27 @@ const handleEmailLogin=(data:emailLoginType)=>{
         placeholder="you@example.com"
         {...form.register('email')}
       />
+        {form.formState.errors.email && (
+        <p className="text-xs text-red-500 mt-1">
+          {form.formState.errors?.email?.message}
+        </p>
+      )}
       <Input
         type="password"
         placeholder="Password"
         {...form.register('password')}
       />
+       {form.formState.errors.password && (
+        <p className="text-xs text-red-500 mt-1">
+          {form.formState.errors?.password?.message}
+        </p>
+      )}
       <div className="flex justify-end">
         <Button variant="link" className="text-xs text-gray-500">
           Forgot password?
         </Button>
       </div>
-      <Button className="w-full bg-orange-500 hover:bg-orange-600 text-white">
+      <Button type='submit' className="w-full bg-orange-500 hover:bg-orange-600 text-white">
         Sign in →
       </Button>
     </form>
