@@ -5,19 +5,20 @@ import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/componen
 import { Button } from "@/components/ui/button";
 import PhoneRegisterForm from "../../components/auth/register/PhoneRegisterForm";
 import EmailRegisterForm from "../../components/auth/register/EmailRegisterForm";
+import Image from "next/image";
 
 export default function Register() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-50">
-      <Card className="w-90 shadow-lg rounded-xl">
+      <Card className="w-100 px-5 shadow-lg rounded-xl">
         <CardHeader className="text-center space-y-2">
           {/* Logo placeholder */}
           <div className="flex justify-center mb-3">
-            <div className="w-16 h-16 rounded-full bg-gray-200 flex items-center justify-center">
-              <span className="text-xs text-gray-600">Logo</span>
-            </div>
+                           <Image src={"/logo.png"} height={50} width={50} className="size-12 rounded-full" alt="logo_avatar"/>
+
+
           </div>
-          <CardTitle className="text-xl font-semibold">Create your account</CardTitle>
+          <CardTitle className="text-2xl font-bold font-serif">Create your account</CardTitle>
           <p className="text-sm text-gray-500">
             Join 1,200+ customers who order from us weekly.
           </p>
@@ -55,7 +56,7 @@ export default function Register() {
           </Button>
         </CardContent>
 
-        <CardFooter className="flex flex-col items-center gap-2 text-sm">
+        <CardFooter className="flex bg-white flex-col items-center gap-2 text-sm">
           <p className="text-gray-500">
             Already have an account?{" "}
             <Button variant="link" className="p-0 text-orange-500">

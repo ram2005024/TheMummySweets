@@ -10,15 +10,15 @@ import EmailLoginForm from "../../components/auth/login/EmailLoginForm";
 export default function Login() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-50">
-      <Card className="w-90 shadow-lg rounded-xl">
+      <Card className="w-100 shadow-lg rounded-xl px-5">
         <CardHeader className="text-center space-y-2">
           {/* Logo placeholder */}
           <div className="flex justify-center mb-3">
             <div className="w-16 h-16 rounded-full  flex items-center justify-center">
-             <Image src={"/logo.jpg"} height={20} width={20} className="size-12 rounded-full" alt="logo_avatar"/>
+             <Image src={"/logo.png"} height={50} width={50} className="size-12 rounded-full" alt="logo_avatar"/>
             </div>
           </div>
-          <CardTitle className="text-xl font-semibold">Welcome back</CardTitle>
+          <CardTitle className="text-3xl font-bold font-serif">Welcome back</CardTitle>
           <p className="text-sm text-gray-500">
             Sign in to track orders, save favourites and earn loyalty points.
           </p>
@@ -56,7 +56,7 @@ export default function Login() {
           </Button>
         </CardContent>
 
-        <CardFooter className="flex flex-col items-center gap-2 text-sm">
+        <CardFooter className="flex flex-col items-center gap-2 text-sm bg-white">
           <p className="text-gray-500">
             New here?{" "}
             <Button variant="link" className="p-0 text-orange-500">

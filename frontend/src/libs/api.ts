@@ -9,6 +9,12 @@ const api = axios.create({
 let is_refreshing=false
 let refresh:Promise<string>
 
+export const publicAPI=axios.create({
+   baseURL: process.env.NEXT_PUBLIC_BACKEND_URL,
+  withCredentials: true,
+})
+
+
 // Request interceptor
 api.interceptors.request.use((config)=>{
   const token=authStore.getState().access
@@ -47,3 +53,4 @@ async (error:AxiosError)=>{
     return Promise.reject(error)
 }
 )
+export default api

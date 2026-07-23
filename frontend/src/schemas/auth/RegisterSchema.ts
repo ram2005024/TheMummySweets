@@ -8,6 +8,7 @@ export const phoneRegisterSchema = z.object({
     .regex(/^9[78]\d{8}$/, "Enter a valid Nepali phone number"),
   password_1: z.string().min(8, "Password must be at least 8 characters"),
   password_2: z.string(),
+  image:z.file().optional()
 }).refine((data) => data.password_1 === data.password_2, {
   message: "Passwords do not match",
   path: ["password_2"],
@@ -20,6 +21,7 @@ export const emailRegisterSchema = z.object({
   email: z.email("Enter a valid email address"),
   password_1: z.string().min(8, "Password must be at least 8 characters"),
   password_2: z.string(),
+  image:z.file().optional()
 }).refine((data) => data.password_1 === data.password_2, {
   message: "Passwords do not match",
   path: ["password_2"],

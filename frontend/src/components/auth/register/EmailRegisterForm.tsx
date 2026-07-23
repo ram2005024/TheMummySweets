@@ -1,10 +1,14 @@
-import React from "react";
+"use client"
+import React, { useState } from "react";
 import { Input } from "../../ui/input";
 import { Button } from "../../ui/button";
 import { useForm } from "react-hook-form";
-
 import { zodResolver } from "@hookform/resolvers/zod";
-import { emailRegisterSchema, emailRegisterType } from "../../../schemas/auth/RegisterSchema";
+import {
+  emailRegisterSchema,
+  emailRegisterType,
+} from "../../../schemas/auth/RegisterSchema";
+import Image from "next/image";
 
 const EmailRegisterForm = () => {
   const emailRegisterForm = useForm<emailRegisterType>({
@@ -14,9 +18,12 @@ const EmailRegisterForm = () => {
       password_2: "",
       first_name: "",
       last_name: "",
+      image: undefined, // optional
     },
     resolver: zodResolver(emailRegisterSchema),
   });
+
+  const [preview, setPreview] = useState<string | null>(null);
 
   const handleEmailRegisterForm = (data: emailRegisterType) => {
     console.log(data);
@@ -86,6 +93,61 @@ const EmailRegisterForm = () => {
         {emailRegisterForm.formState.errors.password_2 && (
           <p className="text-xs text-red-500 mt-1">
             {emailRegisterForm.formState.errors.password_2.message}
+          </p>
+        )}
+      </div>
+
+      {/* Image Upload with Preview + Delete */}
+      <div className="space-y-2">
+        <label className="block text-sm font-medium text-gray-700">
+          Profile Image (optional)
+        </label>
+
+        {!preview ? (
+          <Input
+            type="file"
+            accept="image/*"
+            {...emailRegisterForm.register("image")}
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              if (file) {
+                setPreview(URL.createObjectURL(file));
+                emailRegisterForm.setValue("image", file);
+              }
+            }}
+            className="block w-full text-sm text-gray-500
+                       file:mr-4 file:px-3 file:text-center
+                       file:rounded-md file:border-0
+                       file:text-xs file:font-semibold
+                       file:bg-blue-50 file:text-blue-700
+                       hover:file:bg-blue-100 border-0"
+          />
+        ) : (
+          <div className="relative inline-block">
+            <Image
+              src={preview}
+              alt="Preview"
+              width={40}
+              height={40}
+
+              className="w-32 h-32 object-cover rounded-md border"
+            />
+            <button
+              type="button"
+              onClick={() => {
+                setPreview(null);
+                emailRegisterForm.setValue("image", undefined);
+              }}
+              className="absolute top-1 right-1 bg-red-500 text-white text-xs px-2 py-1 rounded"
+            >
+              ✕
+            </button>
+          </div>
+        )}
+
+        {emailRegisterForm.formState.errors.image && (
+          <p className="text-xs text-red-500 mt-1">
+            {emailRegisterForm.formState.errors.image.message}
           </p>
         )}
       </div>

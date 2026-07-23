@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { Input } from "../../ui/input";
 import { Button } from "../../ui/button";
 import { useForm } from "react-hook-form";
@@ -9,6 +9,7 @@ import {
   phoneRegisterSchema,
   phoneRegisterType,
 } from "../../../schemas/auth/RegisterSchema";
+import Image from "next/image";
 
 const PhoneRegisterForm = () => {
   const phoneRegisterForm = useForm<phoneRegisterType>({
@@ -21,6 +22,8 @@ const PhoneRegisterForm = () => {
     },
     resolver: zodResolver(phoneRegisterSchema),
   });
+    const [preview, setPreview] = useState<string | null>(null);
+
 
   const handlePhoneRegisterForm = (data: phoneRegisterType) => {
     // Combine prefix +977 with user input
@@ -109,6 +112,59 @@ const PhoneRegisterForm = () => {
           </p>
         )}
       </div>
+      {/* Image Upload with Preview + Delete */}
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-700">
+                Profile Image (optional)
+              </label>
+
+              {!preview ? (
+                <Input
+                  type="file"
+                  accept="image/*"
+                  {...phoneRegisterForm.register("image")}
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      setPreview(URL.createObjectURL(file));
+                      phoneRegisterForm.setValue("image", file);
+                    }
+                  }}
+                  className="block w-full text-sm text-gray-500
+                             file:mr-4 file:px-3 file:text-center
+                             file:rounded-md file:border-0
+                             file:text-xs file:font-semibold
+                             file:bg-blue-50 file:text-blue-700
+                             hover:file:bg-blue-100 border-0"
+                />
+              ) : (
+                <div className="relative inline-block">
+                  <Image
+                    src={preview}
+                    alt="Preview"
+                    width={40}
+                    height={40}
+                    className="w-32 h-32 object-cover rounded-md border"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setPreview(null);
+                      phoneRegisterForm.setValue("image", undefined);
+                    }}
+                    className="absolute top-1 right-1 bg-red-500 text-white text-xs px-2 py-1 rounded"
+                  >
+                    ✕
+                  </button>
+                </div>
+              )}
+
+              {phoneRegisterForm.formState.errors.image && (
+                <p className="text-xs text-red-500 mt-1">
+                  {phoneRegisterForm.formState.errors.image.message}
+                </p>
+              )}
+            </div>
 
       {/* Submit button */}
       <Button
