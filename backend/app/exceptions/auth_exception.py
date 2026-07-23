@@ -9,7 +9,7 @@ class InvalidEmailOrPassword(AppException):
     def __init__(
         self,
         message: str = "Invalid email or password",
-        status_code: int = status.HTTP_404_NOT_FOUND,
+        status_code: int = status.HTTP_401_UNAUTHORIZED,
         error_code: str = "INVALID_EMAIL_PASSWORD",
     ):
         super().__init__(message, status_code, error_code)

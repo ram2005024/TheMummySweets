@@ -85,6 +85,14 @@ class AuthService:
         if not user:
             await Auth().increase_attempt(value)
             raise InvalidEmailOrPassword
+        # Check the provider
+        if user.provider and user.provider_id:
+            raise HTTPException(status_code=400,detail="This account has different provider")
+            # Check the password
+        if not Auth().verify_hash(data.password,user.password):
+            await Auth().increase_attempt(value)
+            raise InvalidEmailOrPassword
+
         if not user.is_authenticated:
             login_otp=Auth().generate_otp()
             source="email" if data.email else "phone_no"
@@ -93,14 +101,12 @@ class AuthService:
             if exist_otp_already:
                 raise UserNotAuthenticated(details={"field_name":source,"field_value":source_value,"user_id":str(user.id)})
             send_otp.delay(login_otp,source,[source_value],user.first_name)
+            await Auth().set_otp_key(login_otp,str(user.id))
             await Auth().set_resend_key(str(user.id))
             raise UserNotAuthenticated(details={"field_name":source,"field_value":source_value,"user_id":str(user.id)})
-        if user.provider and user.provider_id:
-            raise HTTPException(status_code=400,detail="This account has different provider")
 
-        if not Auth().verify_hash(data.password,user.password):
-            await Auth().increase_attempt(value)
-            raise InvalidEmailOrPassword
+
+
         jti=uuid.uuid4()
         device_id=request.headers.get("X-Device-ID") # type: ignore
         if not device_id:
@@ -132,7 +138,7 @@ class AuthService:
         is_locked,ttl=await Auth().is_locked_otp(data.user_id)
         if is_locked:
             ttl_min=ttl//60
-            raise ManyAttemptsError(message=f"To many attempts.Please try again in {ttl_min if ttl_min!=0 else ttl} {"minutes" if ttl_min>1 else "second" if ttl<1 else "seconds"}")
+            raise ManyAttemptsError(message=f"Too many attempts.Please try again in {ttl_min if ttl_min!=0 else ttl} {"minutes" if ttl_min>1 else "second" if ttl<1 else "seconds"}")
         user_otp=await Auth().get_otp_value(data.user_id)
         if not user_otp:
             await Auth().set_otp_attempt(data.user_id)

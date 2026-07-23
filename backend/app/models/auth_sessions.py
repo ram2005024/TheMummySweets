@@ -11,7 +11,7 @@ class Session(BaseModel):
 
     __tablename__="sessions"
 
-    user_id:Mapped[UUID]=mapped_column(unique=True)
+    user_id:Mapped[UUID]
     device_id:Mapped[str]=mapped_column(unique=True)
     os:Mapped[str]=mapped_column(nullable=True)
     last_login:Mapped[datetime]=mapped_column(default=datetime.now())
