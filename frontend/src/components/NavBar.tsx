@@ -3,12 +3,23 @@
 import Link from "next/link";
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { Menu, X, Search, ShoppingCart, User, Phone } from "lucide-react";
+import { Menu, X, Search, ShoppingCart, User, Phone, LogOut } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
+import { useUser } from "../hooks/auth/useUser";
+import UserIcon from "./Nav/UserIcon";
+import { useLogout } from "../hooks/auth/useLogout";
+import { authStore } from "../store/auth";
 
 export default function NavBar() {
   const router = useRouter();
+  const logoutMutation=useLogout()
   const [open, setOpen] = useState(false);
+  const {data:user}=useUser()
+  console.log({
+  access: authStore.getState().access,
+  user,
+  status,
+});
   const path = usePathname();
   const navLinks = [
     { name: "Home", href: "/" },
@@ -17,7 +28,6 @@ export default function NavBar() {
 
     { name: "Contact", href: "/contact" },
   ];
-
   return (
     <header className="sticky top-0 z-100 border-b border-gray-200 bg-slate-100 backdrop-blur-lg shadow-xs">
       <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-5 lg:px-8">
@@ -61,23 +71,46 @@ export default function NavBar() {
               2
             </span>
           </button>
-            <button
+          {
+            user ? (
+              <div className="relative">
+                <UserIcon/>
+              </div>
+            ):(
+               <button
               onClick={() => router.push("/login")}
               className="flex items-center gap-2 rounded-full bg-orange-500 px-5 py-2.5 font-medium text-white transition hover:bg-orange-600"
             >
               <User size={18} />
               Login
             </button>
-
+            )
+          }
         </div>
 
         {/* Mobile Button */}
-        <button
-          onClick={() => setOpen(!open)}
-          className="rounded-full p-2 transition hover:bg-orange-100 lg:hidden"
+        <div
+
         >
-          {open ? <X size={28} /> : <Menu size={28} />}
-        </button>
+          {open ? <X size={28} onClick={()=>setOpen(!open)} /> :
+          <div className="flex gap-2 items-center lg:hidden">
+          <div className="relative">
+                <UserIcon/>
+              </div>
+                <button className="relative rounded-full bg-gray-50 border border-gray-100 p-3 transition hover:bg-orange-50">
+            <ShoppingCart size={20} />
+
+            <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-orange-500 text-[10px] text-white">
+              2
+            </span>
+          </button>
+          <div  onClick={() => setOpen(!open)}
+          className="rounded-full p-2 transition hover:bg-orange-100 ">
+          <Menu size={28} />
+          </div>
+          </div>
+          }
+        </div>
       </div>
 
       {/* Mobile Menu */}
@@ -117,10 +150,7 @@ export default function NavBar() {
 
               <hr />
 
-              <button className="flex w-full items-center justify-center gap-3 rounded-xl border py-3 font-medium hover:bg-orange-50">
-                <ShoppingCart size={20} />
-                Cart (2)
-              </button>
+
 
               <a
                 href="tel:+9779800000000"
@@ -129,11 +159,31 @@ export default function NavBar() {
                 <Phone size={18} />
                 Call Us
               </a>
+          {user ? (
+      <button
+      disabled={logoutMutation.isPending}
+      onClick={()=>logoutMutation.mutate()}
+     className="flex w-full items-center justify-center gap-3
+               rounded-xl bg-red-500 cursor-pointer py-3 px-4 font-semibold text-white
+               shadow-md transition-all duration-200
+               hover:bg-orange-600 hover:shadow-lg active:scale-95"
+  >
+    <LogOut size={20} />
+    {logoutMutation.isPending ? "Logging out...":"Logout"}
+  </button>
+) : (
+  <button
+  onClick={()=>router.push("/login")}
+    className="flex w-full items-center justify-center gap-3
+               rounded-xl bg-orange-500 py-3 px-4 font-semibold text-white
+               shadow-md transition-all duration-200
+               hover:bg-orange-600 hover:shadow-lg active:scale-95"
+  >
+    <User size={20} />
+    Login
+  </button>
+)}
 
-              <button className="flex w-full items-center justify-center gap-3 rounded-xl bg-orange-500 py-3 font-medium text-white hover:bg-orange-600">
-                <User size={20} />
-                Login
-              </button>
             </div>
           </motion.div>
         )}

@@ -8,14 +8,15 @@ import { useLoginWithEmail } from '../../../hooks/auth/useLogin'
 import { AxiosError } from 'axios'
 import toast from 'react-hot-toast'
 import { UnauthenticatedDialog } from './UnauthenticatedDialog'
-export interface typeOfErrorDetails{
-  user_id:string,
-  field_name:string,
-  field_value:string,
-}
+import { unAuthenticatedLogin } from '../../../type/auth.type'
+import { useRouter } from 'next/navigation'
+import { authStore } from '../../../store/auth'
+
 const EmailLoginForm = () => {
   const [unauthenticatedFlag,setUnauthenticatedFlag]=useState<boolean>(false)
-  const [detailsError,setDetailsError]=useState<typeOfErrorDetails>()
+  const router=useRouter()
+  const {setAccess}=authStore()
+  const [detailsError,setDetailsError]=useState<unAuthenticatedLogin>()
   const form = useForm<emailLoginType>({
     defaultValues: {
       email: '',
@@ -27,7 +28,7 @@ const EmailLoginForm = () => {
 const handleEmailLogin=(data:emailLoginType)=>{
   mutation.mutate(data,{
     onError:(err)=>{
-      const error = err as AxiosError<{ message?: string,error_code?:string,details?:typeOfErrorDetails }>;
+      const error = err as AxiosError<{ message?: string,error_code?:string,details?:unAuthenticatedLogin }>;
       if(error.response){
         const errorCode=error.response?.data?.error_code
         if (errorCode==="USER_UNAUTHENTICATED"){
@@ -39,6 +40,11 @@ const handleEmailLogin=(data:emailLoginType)=>{
       }else{
         toast.error(error.message ||"Network error")
       }
+    },
+    onSuccess:(data)=>{
+      setAccess(data.data.access)
+      toast.success(data.message||"Welcome")
+      router.push("/")
     }
   })
 }
@@ -78,6 +84,7 @@ const handleEmailLogin=(data:emailLoginType)=>{
     open={unauthenticatedFlag}
     onClose={() => setUnauthenticatedFlag(false)}
     data={detailsError}
+
   />
 )}
     </form>

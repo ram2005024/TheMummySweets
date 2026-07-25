@@ -9,5 +9,7 @@ export interface SuccessResponse<T>{
 export interface ErrorResponse<T>{
     success:boolean,
     message:string,
+    error_code:string,
     details:T
 }
+

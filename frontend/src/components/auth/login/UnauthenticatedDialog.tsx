@@ -19,26 +19,30 @@ import {
   InputOTPGroup,
   InputOTPSlot,
 } from "@/components/ui/input-otp"
-import { typeOfErrorDetails } from "./EmailLoginForm"
 import { useVerifyOtp } from "../../../hooks/auth/useLogin"
 import toast from "react-hot-toast"
 import { AxiosError } from "axios"
 import { ErrorResponse } from "../../../type/common.type"
+import { unAuthenticatedLogin } from "../../../type/auth.type"
+import { useRouter } from "next/navigation"
 
 
 interface Props {
   open: boolean
   onClose: () => void
-  data:typeOfErrorDetails
+  data:unAuthenticatedLogin
+  onSuccessURL?:string
 }
 
 export function UnauthenticatedDialog({
   open,
   onClose,
   data,
+  onSuccessURL=""
 }: Props) {
   const [otp, setOtp] = React.useState("")
   const [timer, setTimer] = React.useState(60)
+  const router=useRouter()
   const verifyMutation=useVerifyOtp()
   React.useEffect(() => {
     if (!open) return
@@ -67,6 +71,7 @@ export function UnauthenticatedDialog({
         onSuccess:(data)=>{
             toast.success(data.message)
             onClose()
+            if(onSuccessURL)router.push(onSuccessURL)
         }
     })
   }
@@ -93,7 +98,7 @@ export function UnauthenticatedDialog({
             </DialogTitle>
 
             <DialogDescription className="text-sm leading-6">
-              Enter the verification code we sent to
+              Enter the verification code we sent to your <strong>{data.field_name}</strong>
             </DialogDescription>
 
             <p className="font-medium break-all">

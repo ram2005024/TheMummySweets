@@ -3,15 +3,22 @@
 import React, { useState } from "react";
 import { Input } from "../../ui/input";
 import { Button } from "../../ui/button";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   phoneRegisterSchema,
   phoneRegisterType,
 } from "../../../schemas/auth/RegisterSchema";
 import Image from "next/image";
+import { useRegisterPhone } from "../../../hooks/auth/useRegister";
+import { UnauthenticatedDialog } from "../login/UnauthenticatedDialog";
+import { ErrorResponse } from "../../../type/common.type";
+import { AxiosError } from "axios";
 
 const PhoneRegisterForm = () => {
+  const registerPhone=useRegisterPhone()
+  const [user_id,setUserID]=useState<string>("")
+  const [open,setOpen]=useState<boolean>(false)
   const phoneRegisterForm = useForm<phoneRegisterType>({
     defaultValues: {
       first_name: "",
@@ -19,6 +26,7 @@ const PhoneRegisterForm = () => {
       mobile_number: "",
       password_1: "",
       password_2: "",
+
     },
     resolver: zodResolver(phoneRegisterSchema),
   });
@@ -26,10 +34,14 @@ const PhoneRegisterForm = () => {
 
 
   const handlePhoneRegisterForm = (data: phoneRegisterType) => {
-    // Combine prefix +977 with user input
-    const fullNumber = `+977${data.mobile_number}`;
-    console.log({ ...data, fullNumber });
-    // later: call backend mutation here
+    registerPhone.mutate(data,{
+      onSuccess:(data)=>{
+        if(data.data.user_id){
+          setUserID(data.data.user_id)
+          setOpen(true)
+        }
+      }
+    })
   };
 
   return (
@@ -37,6 +49,8 @@ const PhoneRegisterForm = () => {
       className="mt-4 space-y-4"
       onSubmit={phoneRegisterForm.handleSubmit(handlePhoneRegisterForm)}
     >
+      {/* If the register is succeed then  */}
+      {open && user_id && <UnauthenticatedDialog data={{field_value:phoneRegisterForm.getValues("mobile_number"),field_name:"phone no.",user_id:user_id}} onSuccessURL="/login" onClose={()=>setOpen(false)} open={open}/>}
       {/* First + Last name */}
       <div className="grid grid-cols-2 gap-4">
         <div>
@@ -119,24 +133,7 @@ const PhoneRegisterForm = () => {
               </label>
 
               {!preview ? (
-                <Input
-                  type="file"
-                  accept="image/*"
-                  {...phoneRegisterForm.register("image")}
-                  onChange={(e) => {
-                    const file = e.target.files?.[0];
-                    if (file) {
-                      setPreview(URL.createObjectURL(file));
-                      phoneRegisterForm.setValue("image", file);
-                    }
-                  }}
-                  className="block w-full text-sm text-gray-500
-                             file:mr-4 file:px-3 file:text-center
-                             file:rounded-md file:border-0
-                             file:text-xs file:font-semibold
-                             file:bg-blue-50 file:text-blue-700
-                             hover:file:bg-blue-100 border-0"
-                />
+                <Controller control={phoneRegisterForm.control} name="image" render={({ field }) => ( <Input type="file" accept="image/*" onChange={(e) => { const file = e.target.files?.[0]; field.onChange(file); if (file) { setPreview(URL.createObjectURL(file)); } else { setPreview(null); } }} /> )} />
               ) : (
                 <div className="relative inline-block">
                   <Image
@@ -166,12 +163,19 @@ const PhoneRegisterForm = () => {
               )}
             </div>
 
+            {/* If any error occurs */}
+            { registerPhone.isError && (
+              <p className="text-xs text-red-500 mt-3">
+                {(registerPhone.error as AxiosError<ErrorResponse<null>>).response?.data?.message||"Something went wrong"}
+              </p>
+            )}
+
       {/* Submit button */}
       <Button
         type="submit"
         className="w-full bg-orange-500 hover:bg-orange-600 text-white"
       >
-        Create account →
+        {registerPhone.isPending?"Creating...":" Create account →"}
       </Button>
     </form>
   );

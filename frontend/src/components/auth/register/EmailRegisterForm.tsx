@@ -9,8 +9,15 @@ import {
   emailRegisterType,
 } from "../../../schemas/auth/RegisterSchema";
 import Image from "next/image";
+import { useRegisterEmail } from "../../../hooks/auth/useRegister";
+import { UnauthenticatedDialog } from "../login/UnauthenticatedDialog";
+import { AxiosError } from "axios";
+import { ErrorResponse } from "../../../type/common.type";
 
 const EmailRegisterForm = () => {
+    const registerEmail=useRegisterEmail()
+    const [user_id,setUserID]=useState<string>("")
+    const [open,setOpen]=useState<boolean>(false)
   const emailRegisterForm = useForm<emailRegisterType>({
     defaultValues: {
       email: "",
@@ -26,7 +33,14 @@ const EmailRegisterForm = () => {
   const [preview, setPreview] = useState<string | null>(null);
 
   const handleEmailRegisterForm = (data: emailRegisterType) => {
-    console.log(data);
+    registerEmail.mutate(data,{
+      onSuccess:(data)=>{
+        if(data.data.user_id){
+          setUserID(data.data.user_id)
+          setOpen(true)
+        }
+      }
+    })
   };
 
   return (
@@ -34,6 +48,8 @@ const EmailRegisterForm = () => {
       className="mt-4 space-y-4"
       onSubmit={emailRegisterForm.handleSubmit(handleEmailRegisterForm)}
     >
+      {/* If the register is succeed then  */}
+            {open && user_id && <UnauthenticatedDialog data={{field_value:emailRegisterForm.getValues("email"),field_name:"email",user_id:user_id}} onSuccessURL="/login" onClose={()=>setOpen(false)} open={open}/>}
       <div className="grid grid-cols-2 gap-4">
         <div>
           <Input
@@ -151,12 +167,17 @@ const EmailRegisterForm = () => {
           </p>
         )}
       </div>
-
+        {/* If any error occurs */}
+                    { registerEmail.isError && (
+                      <p className="text-xs text-red-500 mt-3">
+                        {(registerEmail.error as AxiosError<ErrorResponse<null>>).response?.data?.message||"Something went wrong"}
+                      </p>
+                    )}
       <Button
         type="submit"
         className="w-full bg-orange-500 hover:bg-orange-600 text-white"
       >
-        Create account →
+        {registerEmail.isPending?"Creating...":" Create account →"}
       </Button>
     </form>
   );
