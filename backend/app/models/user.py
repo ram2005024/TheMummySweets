@@ -52,7 +52,7 @@ class Profile(BaseModel):
 
     @property
     def rank(self) -> str:
-        if self.loyality_points > 0 and self.loyality_points < 1000:
+        if self.loyality_points >= 0 and self.loyality_points < 1000:
             return "bronze"
         elif self.loyality_points >= 1000 and self.loyality_points <= 5000:
             return "silver"

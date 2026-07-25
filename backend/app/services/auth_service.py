@@ -1,7 +1,7 @@
 import base64
 import uuid
 
-from fastapi import HTTPException, UploadFile
+from fastapi import HTTPException, Response, UploadFile
 from fastapi.responses import JSONResponse
 from starlette.requests import Request
 
@@ -40,7 +40,7 @@ class AuthService:
         self.session_repo=session_repo
 
         # Auth services
-    async def register_user(self,data:UserRegiser,request:Request,image:UploadFile):
+    async def register_user(self,data:UserRegiser,request:Request,image:UploadFile|None):
         if data.email:
             user=await self.repo.get_user_by_field("email",data.email)
             if user:
@@ -126,7 +126,7 @@ class AuthService:
         await Auth().set_refresh_into_redis(str(jti))
         access=Auth().generate_access(token_data)
         response=JSONResponse(status_code=200,content=SuccessResponse(data={"access":access},message="Welcome to the mummy sweets").model_dump())
-        response.set_cookie("refresh",refresh,httponly=True,secure=settings.SECURE,samesite=settings.SAMESITE)
+        response.set_cookie("refresh",refresh,httponly=True,secure=settings.SECURE,samesite=settings.SAMESITE,max_age=settings.REFRESH_EXPIRY*24*60*60)
         return response
 
     async def verify_otp(self,data:OtpVerifySchema):
@@ -172,6 +172,7 @@ class AuthService:
     async def refresh(self,request:Request):
         token=request.cookies.get("refresh")
         if not token:
+            print("Token aaako xaina")
             raise MissingToken
         payload=Auth().verify_token(token)
         session_id=payload["session_id"]
@@ -197,7 +198,7 @@ class AuthService:
         await Auth().set_refresh_into_redis(str(new_jti))
         new_access=Auth().generate_access(payload)
         response=JSONResponse(status_code=200,content=SuccessResponse(data={"access":new_access}).model_dump())
-        response.set_cookie("refresh",new_refresh,httponly=True,secure=settings.SECURE,samesite=settings.SAMESITE)
+        response.set_cookie("refresh",new_refresh,httponly=True,secure=settings.SECURE,samesite=settings.SAMESITE,max_age=settings.REFRESH_EXPIRY*24*60*60)
         return response
 
 
@@ -266,6 +267,16 @@ class AuthService:
         user=await self.repo.change_user_password(user,new_hash_password)
         await Auth().delete_can_change_user_from_reset(data.user_id)
         return SuccessResponse(message="Password changed successfully",data=None)
+
+    async def logout_user(self,request:Request,response:Response):
+        token=request.cookies.get("refresh",None)
+        if token:
+            payload=Auth().verify_token(token)
+            jti=payload["jti"]
+            await Auth().delete_refresh_from_redis(jti)
+            response.delete_cookie("refresh")
+            return SuccessResponse(message="Logged out successfully",data=None)
+
 
 
 

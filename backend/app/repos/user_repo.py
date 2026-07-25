@@ -1,6 +1,7 @@
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
 from app.models.user import Profile, User
 
@@ -12,7 +13,8 @@ class UserRepo:
     # User repos
     async def get_user_by_field(self,field,value):
         column=getattr(User,field)
-        user=(await self.db.execute(select(User).where(column==value))).scalar_one_or_none()
+        user=(await self.db.execute(select(User).options(
+            selectinload(User.profile)).where(column==value))).scalar_one_or_none()
         return user
 
     async def create_user(self,data:dict):
@@ -43,7 +45,7 @@ class UserRepo:
             return user
         except Exception as e:
             await self.db.rollback()
-            raise e
+            raise e  # noqa: TRY201
 
 
 

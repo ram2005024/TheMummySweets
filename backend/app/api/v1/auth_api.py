@@ -1,8 +1,10 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, File, Request, UploadFile
+from fastapi import APIRouter, Depends, File, Request, Response, UploadFile
 
-from app.dependencies.factories import get_auth_service
+from app.dependencies.services import get_auth_service
+from app.dependencies.user import get_user
+from app.models.user import User
 from app.schemas.common import SuccessResponse
 from app.schemas.user_schema import (
     ChangePasswordResetSchema,
@@ -10,6 +12,7 @@ from app.schemas.user_schema import (
     OtpVerifySchema,
     RegisterSuccessResponseSchema,
     UserLogin,
+    UserReadBasic,
     UserRegiser,
 )
 from app.services.auth_service import AuthService
@@ -17,7 +20,7 @@ from app.services.auth_service import AuthService
 auth_router=APIRouter(prefix="/auth",tags=["Auth endpoints"])
 
 @auth_router.post("/register",response_model=SuccessResponse[RegisterSuccessResponseSchema])
-async def register_endpoint(request:Request,data:Annotated[UserRegiser,Depends(UserRegiser.as_form)],auth_service:Annotated[AuthService,Depends(get_auth_service)],image:UploadFile=File(None)):
+async def register_endpoint(request:Request,data:Annotated[UserRegiser,Depends(UserRegiser.as_form)],auth_service:Annotated[AuthService,Depends(get_auth_service)],image:Annotated[UploadFile|None,File()]=None):
     result=await auth_service.register_user(data=data,image=image,request=request)
     return result
 
@@ -60,4 +63,13 @@ async def verify_forget_key_endpoint(data:OtpVerifySchema,auth_service:Annotated
 async def change_password_after_forget_key_endpoint(data:ChangePasswordResetSchema,auth_service:Annotated[AuthService,Depends(get_auth_service)]):
     return await auth_service.change_password_after_reset(data)
 
+# Get the authenticated and valid user
+@auth_router.get("/me",response_model=SuccessResponse[UserReadBasic])
+async def get_user_endpoint(request:Request,user:Annotated[User,Depends(get_user)]):
+    return SuccessResponse(data=user)
+
+
+@auth_router.post("/logout",response_model=SuccessResponse[None])
+async def logout_user_endpoint(request:Request,response:Response,auth_service:Annotated[AuthService,Depends(get_auth_service)]):
+    return await auth_service.logout_user(request,response)
 

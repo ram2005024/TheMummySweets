@@ -1,0 +1,15 @@
+from typing import Annotated
+
+from fastapi import Depends
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from app.core.db import get_db
+from app.repos.session_repo import SessionRepo
+from app.repos.user_repo import UserRepo
+
+
+def get_user_repo(db:Annotated[AsyncSession,Depends(get_db)])->UserRepo:
+    return UserRepo(db)
+
+def get_session_repo(db:Annotated[AsyncSession,Depends(get_db)]):
+    return SessionRepo(db)

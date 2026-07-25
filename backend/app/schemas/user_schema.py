@@ -1,18 +1,20 @@
-from typing import Optional
+
+from uuid import UUID
 
 from fastapi import Form
 from fastapi.exceptions import HTTPException
 from pydantic import BaseModel, EmailStr, field_validator, model_validator
 
 from app.exceptions.auth_exception import PasswordMismatched
+from app.models.user import UserRole
 from app.utils.normalize_phone import normalize_phone
 
 
 class UserRegiser(BaseModel):
     first_name: str
-    last_name: Optional[str] = None
-    email: Optional[EmailStr]=None
-    mobile_number:Optional[str]=None
+    last_name: str | None = None
+    email: EmailStr | None=None
+    mobile_number:str | None=None
     password_1: str
     password_2: str
 
@@ -54,11 +56,11 @@ class UserRegiser(BaseModel):
     @staticmethod
     def as_form(
                 first_name:str=Form(...),
-                last_name:Optional[str]=Form(None),
+                last_name:str | None=Form(None),
                 password_1:str=Form(...),
                 password_2:str=Form(...),
-                email:Optional[str]=Form(None),
-                mobile_number:Optional[str]=Form(None),
+                email:str | None=Form(None),
+                mobile_number:str | None=Form(None),
                 ):
         return UserRegiser(
             first_name=first_name,
@@ -71,8 +73,8 @@ class UserRegiser(BaseModel):
 
 # User login
 class UserLogin(BaseModel):
-    email:Optional[str]=None
-    mobile_number:Optional[str]=None
+    email:str | None=None
+    mobile_number:str | None=None
     password:str
     @model_validator(mode="after")
     def validate_email_phone(self):
@@ -103,8 +105,8 @@ class RegisterSuccessResponseSchema(BaseModel):
     user_id:str
 
 class ForgetPassSchema(BaseModel):
-    email:Optional[EmailStr]=None
-    mobile_number:Optional[str]=None
+    email:EmailStr | None=None
+    mobile_number:str | None=None
 
     @model_validator(mode="after")
     def check_both_field(self):
@@ -131,5 +133,20 @@ class ChangePasswordResetSchema(BaseModel):
             if data["password_1"]!=data["password_2"]:
                 raise PasswordMismatched
             return data
+
+class ProfileReadBasic(BaseModel):
+    full_name:str
+    image:str|None=None
+    rank:str|None=None
+
+
+class UserReadBasic(BaseModel):
+    id:UUID
+    profile:ProfileReadBasic
+    role:UserRole
+    is_active:bool
+    is_authenticated:bool
+    email:str|None=None
+    phone_no:str|None=None
 
 
