@@ -20,7 +20,9 @@ class UserRegiser(BaseModel):
 
     @field_validator("first_name","last_name",mode="before")
     def normalize_names(cls,value:str)->str:
-        return value.strip().title()
+        if value:
+            return value.strip().title()
+        return value
 
     @field_validator("email",mode="before")
     def normalize_email(cls,value:str)->str:

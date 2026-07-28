@@ -32,6 +32,7 @@ class User(BaseModel):
     profile: Mapped["Profile"] = relationship("Profile",
         uselist=False, cascade="all,delete-orphan", back_populates="user"
     )
+
     provider:Mapped[str]=mapped_column(nullable=True)
     provider_id:Mapped[str]=mapped_column(unique=True,nullable=True)
 

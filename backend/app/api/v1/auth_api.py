@@ -15,7 +15,8 @@ from app.schemas.user_schema import (
     UserReadBasic,
     UserRegiser,
 )
-from app.services.auth_service import AuthService
+from app.services.auth.auth_service import AuthService
+from app.services.auth.oauth_service import OauthService
 
 auth_router=APIRouter(prefix="/auth",tags=["Auth endpoints"])
 
@@ -50,7 +51,7 @@ async def forget_password_endpoint(data:ForgetPassSchema,auth_service:Annotated[
     return await auth_service.forget_password_otp_sender(data)
 
 # For reset resend otp
-@auth_router.post("/forget/resend",response_model=SuccessResponse[None])
+@auth_router.post("/forget/resend/{user_id}",response_model=SuccessResponse[None])
 async def resend_reset_endpoint(user_id:str,auth_service:Annotated[AuthService,Depends(get_auth_service)]):
     return await auth_service.resend_reset_otp(user_id)
 # For reset resend otp
@@ -72,4 +73,15 @@ async def get_user_endpoint(request:Request,user:Annotated[User,Depends(get_user
 @auth_router.post("/logout",response_model=SuccessResponse[None])
 async def logout_user_endpoint(request:Request,response:Response,auth_service:Annotated[AuthService,Depends(get_auth_service)]):
     return await auth_service.logout_user(request,response)
+
+# Oauth external endpoints
+@auth_router.get("/oauth/login/google")
+async def login_oauth(request:Request):
+    return await OauthService().login(request,"google")
+
+# Callback route
+@auth_router.post("/oauth/callback")
+async def oauth_callback(request:Request,provider:str):
+    token=await OauthService().provider(provider).authorize_access_token(request)
+
 

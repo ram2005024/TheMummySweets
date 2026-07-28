@@ -42,6 +42,10 @@ class Settings(BaseSettings):
     SECURE:bool=True
     SAMESITE:Literal["lax","none","strict"]="none"
 
+    #Oauth
+    #-------Google-------
+    GOOGLE_CLIENT_ID:str=""
+    GOOGLE_CLIENT_SECRET:str=""
 
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
