@@ -14,8 +14,8 @@ class SessionRepo:
         self.db = db
 
     # Session repos
-    async def get_session_by_device_id(self,device_id:str):
-        session =(await self.db.execute(select(Session).where(Session.device_id==device_id))).scalar_one_or_none()
+    async def get_session_by_device_id_user_id(self,device_id:str,user_id:UUID):
+        session =(await self.db.execute(select(Session).where(Session.device_id==device_id,Session.user_id==user_id))).scalar_one_or_none()
         return session
 
     # Create session

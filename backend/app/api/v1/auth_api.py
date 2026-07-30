@@ -2,6 +2,7 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, File, Request, Response, UploadFile
 
+from app.core.oauth2 import oauth
 from app.dependencies.services import get_auth_service
 from app.dependencies.user import get_user
 from app.models.user import User
@@ -16,7 +17,6 @@ from app.schemas.user_schema import (
     UserRegiser,
 )
 from app.services.auth.auth_service import AuthService
-from app.services.auth.oauth_service import OauthService
 
 auth_router=APIRouter(prefix="/auth",tags=["Auth endpoints"])
 
@@ -75,13 +75,29 @@ async def logout_user_endpoint(request:Request,response:Response,auth_service:An
     return await auth_service.logout_user(request,response)
 
 # Oauth external endpoints
-@auth_router.get("/oauth/login/google")
-async def login_oauth(request:Request):
-    return await OauthService().login(request,"google")
+@auth_router.get("/login/google")
+async def login_oauth(request:Request,device_id:str):
+    redirect_url=request.url_for("oauth_callback")
+    return await oauth.google.authorize_redirect(request,redirect_url,state=device_id)
 
 # Callback route
-@auth_router.post("/oauth/callback")
-async def oauth_callback(request:Request,provider:str):
-    token=await OauthService().provider(provider).authorize_access_token(request)
+@auth_router.get("/login/google/callback")
+async def oauth_callback(request:Request,auth_service:Annotated[AuthService,Depends(get_auth_service)]):
+    token=await oauth.google.authorize_access_token(request)
+    data=token.get("userinfo")
+    user_data={
+        "first_name":data.get("given_name"),
+        "last_name":data.get("family_name"),
+        "email":data.get("email"),
+        "phone_no":data.get("phone"),
+        "provider":"google",
+        "provider_id":data.get("sub"),
+        "is_authenticated":True
+    }
+    user_profile_data={
+        "image":data.get("picture"),
+        "full_name":data.get("name"),
+    }
+    return await auth_service.create_oauth_user_or_login(request,user_data,user_profile_data)
 
 

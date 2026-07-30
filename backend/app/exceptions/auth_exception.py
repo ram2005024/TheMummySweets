@@ -83,7 +83,7 @@ class PasswordMismatched(AppException):
 class InvalidSession(AppException):
     def __init__(
         self,
-        message: str = "Session nto found",
+        message: str = "Session not found",
         status_code: int = status.HTTP_401_UNAUTHORIZED,
         error_code: str = "INVALID_SESSION",
     ):
@@ -104,5 +104,22 @@ class UserDoesnotExist(AppException):
         message: str = "User doesn't exist",
         status_code: int = status.HTTP_401_UNAUTHORIZED,
         error_code: str = "USER_NOT_FOUND",
+    ):
+        super().__init__(message, status_code, error_code)
+
+class OauthLoginFailed(AppException):
+    def __init__(
+        self,
+        message: str = "Something went wrong during third party login",
+        status_code: int = status.HTTP_400_BAD_REQUEST,
+        error_code: str = "OAUTH_ERROR",
+    ):
+        super().__init__(message, status_code, error_code)
+class MissingDeviceID(AppException):
+    def __init__(
+        self,
+        message: str = "Device id is misssing",
+        status_code: int = status.HTTP_400_BAD_REQUEST,
+        error_code: str = "MISSING_DEVICE_ID",
     ):
         super().__init__(message, status_code, error_code)

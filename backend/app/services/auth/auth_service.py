@@ -2,7 +2,7 @@ import base64
 import uuid
 
 from fastapi import HTTPException, Response, UploadFile
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, RedirectResponse
 from starlette.requests import Request
 
 from app.core.config import settings
@@ -13,6 +13,7 @@ from app.exceptions.auth_exception import (
     InvalidOrExpiredToken,
     InvalidSession,
     ManyAttemptsError,
+    MissingDeviceID,
     MissingKey,
     MissingToken,
     UserAlreadyExists,
@@ -112,7 +113,7 @@ class AuthService:
         if not device_id:
             raise HTTPException(status_code=400,detail="Missing device ID")
         # Check if the session exist or not
-        session=await self.session_repo.get_session_by_device_id(device_id)
+        session=await self.session_repo.get_session_by_device_id_user_id(device_id,user.id)
         if session:
             await self.session_repo.put_jti_into_session(jti,session)
         else:
@@ -172,7 +173,7 @@ class AuthService:
     async def refresh(self,request:Request):
         token=request.cookies.get("refresh")
         if not token:
-            print("Token aaako xaina")
+            print("yAHAAAA")
             raise MissingToken
         payload=Auth().verify_token(token)
         session_id=payload["session_id"]
@@ -185,8 +186,9 @@ class AuthService:
         if  redis_refresh_jti is None:
             # For concurrency in React strict mode
             if  await Auth().get_old_rotation_into_redis(payload["jti"]) is None:
+                print("yAHAAAA")
                 raise InvalidOrExpiredToken
-            return SuccessResponse(data={"message":"Rotation handeled already"})
+            return SuccessResponse(data={"message":"Rotation handled already"})
 
         old_jti=payload["jti"]
         new_jti=uuid.uuid4()
@@ -276,6 +278,46 @@ class AuthService:
             await Auth().delete_refresh_from_redis(jti)
             response.delete_cookie("refresh")
             return SuccessResponse(message="Logged out successfully",data=None)
+
+    async def create_oauth_user_or_login(self,request:Request,user_data:dict,user_profile_data:dict):
+        # Find whether the user exist already or not
+        # IF oauth gives email then
+        if user_data.get("email"):
+            user=await self.repo.get_user_by_field("email",user_data.get("email"))
+        else:
+            user=await self.repo.get_user_by_field("provider_id",user_data.get("provider_id"))
+        if not user:
+            new_user=await self.repo.create_user(user_data)
+            user_profile_data["user_id"]=new_user.id
+            await self.repo.create_profile(user_profile_data)
+            return await self.check_user_session_and_create_response(request,new_user.id)
+        return await self.check_user_session_and_create_response(request,user.id)
+
+
+    async def check_user_session_and_create_response(self,request:Request,user_id:uuid.UUID):
+            new_jti=uuid.uuid4()
+            device_id=request.query_params.get("state")
+            if not device_id:
+                raise MissingDeviceID
+            # Check for the session
+            session=await self.session_repo.get_session_by_device_id_user_id(device_id,user_id)
+            if session:
+                await self.session_repo.put_jti_into_session(new_jti,session)
+            else:
+                session=await self.session_repo.create_session(request,device_id,user_id,new_jti) # type: ignore
+            refresh=Auth().generate_refresh({"jti":str(new_jti),"session_id":str(session.id),"user_id":str(user_id)})
+            await Auth().set_refresh_into_redis(str(new_jti))
+            response=RedirectResponse(url=settings.FRONTEND_URL)
+            response.set_cookie(
+                key="refresh",
+                value=refresh,
+                httponly=True,
+                samesite=settings.SAMESITE,
+                secure=settings.SECURE,
+                max_age=settings.REFRESH_EXPIRY*24*60*60
+            )
+            return response
+
 
 
 

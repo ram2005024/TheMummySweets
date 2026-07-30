@@ -7,6 +7,10 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
+    # Session secret
+    SESSION_SECRET:str=""
+    # Frontend url
+    FRONTEND_URL:str=""
     # DATABASE_CONFIG
     ASYNC_DATABASE_URL: str = ""
     SYNC_DATABASE_URL: str = ""

@@ -3,8 +3,10 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from rich.panel import Panel
+from starlette.middleware.sessions import SessionMiddleware
 
 from app import api
+from app.core.config import settings
 from app.core.logger import console
 from app.exceptions.exception_handler import exception_handler
 from app.middlewares.LoggingMiddleware import LoggingMiddleware
@@ -40,7 +42,7 @@ app.add_middleware(CORSMiddleware,
     allow_methods=["*"],
     allow_headers=["*"])
 app.add_middleware(LoggingMiddleware)
-
+app.add_middleware(SessionMiddleware, secret_key=settings.SESSION_SECRET)
 # Def to handle the exception
 exception_handler(app)
 app.include_router(api.auth_router,prefix="/api/v1")
