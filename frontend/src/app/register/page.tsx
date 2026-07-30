@@ -8,6 +8,11 @@ import EmailRegisterForm from "../../components/auth/register/EmailRegisterForm"
 import Image from "next/image";
 
 export default function Register() {
+    let device_id=localStorage.getItem("device_id")
+   if(!device_id){
+        device_id=crypto.randomUUID()
+        localStorage.setItem("device_id",device_id)
+       }
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-50">
       <Card className="w-100 px-5 shadow-lg rounded-xl">
@@ -51,7 +56,7 @@ export default function Register() {
           </div>
 
           {/* Social signup */}
-          <Button variant="outline" className="w-full">
+          <Button onClick={()=>window.location.href=`${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/login/google?device_id=${device_id}`} variant="outline" className="w-full">
             Continue with Google
           </Button>
         </CardContent>

@@ -6,8 +6,15 @@ import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import PhoneLoginForm from "../../components/auth/login/PhoneLoginForm";
 import EmailLoginForm from "../../components/auth/login/EmailLoginForm";
+import { useRouter } from "next/navigation";
 
 export default function Login() {
+  let device_id=localStorage.getItem("device_id")
+   if(!device_id){
+        device_id=crypto.randomUUID()
+        localStorage.setItem("device_id",device_id)
+       }
+  const router=useRouter()
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-50">
       <Card className="w-100 shadow-lg rounded-xl px-5">
@@ -42,7 +49,12 @@ export default function Login() {
               <EmailLoginForm/>
             </TabsContent>
           </Tabs>
-
+        {/* Forget password section */}
+          <div className="flex justify-end">
+                        <Button variant="link" onClick={()=>router.push("/forget")} className="text-xs text-gray-500">
+                          Forgot password?
+                        </Button>
+                      </div>
           {/* Divider */}
           <div className="flex items-center">
             <div className="grow border-t border-gray-200"></div>
@@ -51,7 +63,7 @@ export default function Login() {
           </div>
 
           {/* Social login */}
-          <Button variant="outline" className="w-full">
+          <Button onClick={()=>window.location.href=`${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/login/google?device_id=${device_id}`} variant="outline" className="w-full cursor-pointer">
             Continue with Google
           </Button>
         </CardContent>
@@ -68,6 +80,8 @@ export default function Login() {
           </Button>
         </CardFooter>
       </Card>
+
+
     </div>
   );
 }

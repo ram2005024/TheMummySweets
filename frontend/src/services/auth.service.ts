@@ -1,7 +1,8 @@
+import axios from "axios"
 import   api, { publicAPI } from "../libs/api"
 import { emailLoginType, phoneLoginType } from "../schemas/auth/LoginSchema"
 import { emailRegisterType, phoneRegisterType } from "../schemas/auth/RegisterSchema"
-import { loginSuccessType, registerSuccessData, verifyOtp } from "../type/auth.type"
+import { forget_password_change_schema, forget_schema, loginSuccessType, registerSuccessData, verifyOtp } from "../type/auth.type"
 import { SuccessResponse } from "../type/common.type"
 import { UserBasic } from "../type/user.type"
 
@@ -78,6 +79,22 @@ export class AuthService{
     }
     static logout=async():Promise<SuccessResponse<null>>=>{
         const res=await publicAPI.post("/auth/logout")
+        return res.data
+    }
+    static forget=async(data:forget_schema):Promise<registerSuccessData>=>{
+        const res=await publicAPI.post("/auth/forget",data)
+        return res.data.data
+    }
+    static forget_resend=async(user_id:string):Promise<SuccessResponse<null>>=>{
+        const res=await publicAPI.post(`/auth/forget/resend/${user_id}`)
+        return res.data
+    }
+    static forget_verify=async(data:verifyOtp):Promise<registerSuccessData>=>{
+        const res=await publicAPI.post("/auth/forget/verify",data)
+        return res.data.data
+    }
+    static password_change_after_forget=async(data:forget_password_change_schema):Promise<SuccessResponse<null>>=>{
+        const res=await publicAPI.post("/auth/forget/change",data)
         return res.data
     }
 }

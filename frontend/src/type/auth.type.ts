@@ -18,3 +18,12 @@ user_id:string,
 export interface registerSuccessData{
     user_id:string
 }
+export interface forget_schema{
+    mobile_number?:string,
+    email?:string
+}
+export interface forget_password_change_schema{
+    password_1:string,
+    password_2:string,
+    user_id?:string
+}

@@ -69,11 +69,7 @@ const handleEmailLogin=(data:emailLoginType)=>{
           {form.formState.errors?.password?.message}
         </p>
       )}
-      <div className="flex justify-end">
-        <Button variant="link" className="text-xs text-gray-500">
-          Forgot password?
-        </Button>
-      </div>
+
       <Button disabled={mutation.isPending} type='submit' className="w-full bg-orange-500 hover:bg-orange-600 text-white">
         {mutation.isPending ? "Signing in....":"Sign in"}
       </Button>

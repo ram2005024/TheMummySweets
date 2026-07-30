@@ -83,11 +83,7 @@ const handleRegisterLogin=(data:phoneLoginType)=>{
                 {(loginPhone.error as AxiosError<ErrorResponse<unAuthenticatedLogin>>).response?.data?.message ||"Something went wrong"}
               </p>
             )}
-              <div className="flex justify-end">
-                <Button variant="link" className="text-xs text-gray-500">
-                  Forgot password?
-                </Button>
-              </div>
+
               <Button type='submit' className="w-full bg-orange-500 hover:bg-orange-600 text-white">
                 {loginPhone.isPending ? "Logging in...":"Login"}
               </Button>

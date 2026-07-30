@@ -162,7 +162,7 @@ export default function NavBar() {
           {user ? (
       <button
       disabled={logoutMutation.isPending}
-      onClick={()=>logoutMutation.mutate()}
+      onClick={()=>{logoutMutation.mutate();setOpen(false)}}
      className="flex w-full items-center justify-center gap-3
                rounded-xl bg-red-500 cursor-pointer py-3 px-4 font-semibold text-white
                shadow-md transition-all duration-200
@@ -173,7 +173,7 @@ export default function NavBar() {
   </button>
 ) : (
   <button
-  onClick={()=>router.push("/login")}
+  onClick={()=>{router.push("/login");setOpen(false)}}
     className="flex w-full items-center justify-center gap-3
                rounded-xl bg-orange-500 py-3 px-4 font-semibold text-white
                shadow-md transition-all duration-200
