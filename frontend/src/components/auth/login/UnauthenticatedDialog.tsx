@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/set-state-in-effect */
 "use client"
 
-import React from "react"
+import React, { useState } from "react"
 import { Mail, RotateCcw } from "lucide-react"
 
 import {
@@ -25,6 +25,7 @@ import { AxiosError } from "axios"
 import { ErrorResponse } from "../../../type/common.type"
 import { unAuthenticatedLogin } from "../../../type/auth.type"
 import { useRouter } from "next/navigation"
+import { AuthService } from "../../../services/auth.service"
 
 
 interface Props {
@@ -42,26 +43,37 @@ export function UnauthenticatedDialog({
 }: Props) {
   const [otp, setOtp] = React.useState("")
   const [timer, setTimer] = React.useState(60)
+  const intervalRef = React.useRef<NodeJS.Timeout | null>(null)
   const router=useRouter()
   const verifyMutation=useVerifyOtp()
+  function startTimer() {
+  // clear any existing interval
+  if (intervalRef.current) {
+    clearInterval(intervalRef.current)
+  }
+
+  setTimer(60)
+  intervalRef.current = setInterval(() => {
+    setTimer((prev) => {
+      if (prev <= 1) {
+        if (intervalRef.current) clearInterval(intervalRef.current)
+        return 0
+      }
+      return prev - 1
+    })
+  }, 1000)
+}
   React.useEffect(() => {
     if (!open) return
-    console.log(data)
     setTimer(60)
     setOtp("")
+    startTimer()
 
-    const interval = setInterval(() => {
-      setTimer((prev) => {
-        if (prev <= 1) {
-          clearInterval(interval)
-          return 0
-        }
-        return prev - 1
-      })
-    }, 1000)
-
-    return () => clearInterval(interval)
+  return () => {
+    if (intervalRef.current) clearInterval(intervalRef.current)
+  }
   }, [open,data])
+
 
   async function handleVerify(e?: React.FormEvent) {
     e?.preventDefault()
@@ -76,8 +88,21 @@ export function UnauthenticatedDialog({
     })
   }
 
-  function handleResend() {
+  async function handleResend() {
     setTimer(60)
+    setOtp("")
+    startTimer()
+    try {
+      const res=await AuthService.resend_otp_register(data.user_id)
+      toast.success(res.message)
+    } catch (err) {
+      const error = err as AxiosError<{ message?: string }>;
+      toast.error(
+        error.response?.data?.message ||
+          error.message ||
+          "Something went wrong"
+      );
+    }
   }
 
   return (
@@ -93,7 +118,7 @@ export function UnauthenticatedDialog({
 
           <div className="space-y-2">
             <DialogTitle className="text-2xl font-semibold">
-              Verify your email
+              Verify your {data.field_name}
             </DialogTitle>
 
             <DialogDescription className="text-sm leading-6">

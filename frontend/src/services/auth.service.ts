@@ -97,4 +97,9 @@ export class AuthService{
         const res=await publicAPI.post("/auth/forget/change",data)
         return res.data
     }
+
+    static resend_otp_register=async (user_id:string):Promise<SuccessResponse<null>>=>{
+        const res=await publicAPI.post("/auth/verify/resend/otp",{user_id:user_id})
+        return res.data
+    }
 }

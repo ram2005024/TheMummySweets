@@ -5,10 +5,34 @@ import { Phone } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useState } from "react";
+import { useForget } from "../../../hooks/auth/useForget";
+import z from "zod";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import VerifyForget from "./verifyForget";
+import { AxiosError } from "axios";
+import toast from "react-hot-toast";
 
 export default function ForgotByPhone() {
+      const [open,setOpen]=useState<boolean>(false)
+      const forgetByPhoneMutation=useForget()
+      const [userID,setUserID]=useState<string>("")
+      const forget_schema_phone=z.object({
+          phone_no:z.string().regex(/^9[78]\d{8}$/,"Enter a valid phone number")
+      })
+      const form=useForm<{phone_no:string}>({
+          defaultValues:{
+              phone_no:"",
+          },
+          resolver:zodResolver(forget_schema_phone)
+      })
   return (
     <div className="space-y-6 pt-5">
+       {/* Forget success model */}
+        {open &&
+        userID && <VerifyForget open={open} onClose={()=>setOpen(false)} data={{user_id:userID,field_name:"phone number",field_value:form.getValues("phone_no")}}/>
+        }
       <div>
         <label className="mb-2 block text-sm font-medium text-gray-700">
           Phone Number
@@ -38,6 +62,7 @@ export default function ForgotByPhone() {
               focus-visible:ring-0
               focus-visible:ring-offset-0
             "
+               {...form.register("phone_no")}
             onInput={(e) => {
               e.currentTarget.value = e.currentTarget.value.replace(
                 /\D/g,
@@ -50,10 +75,26 @@ export default function ForgotByPhone() {
         <p className="mt-2 text-xs text-gray-500">
           Enter your registered 10-digit mobile number.
         </p>
+        {form.formState.errors?.phone_no && (
+            <p className="text-xs mt-2 text-red-600">{form.formState.errors?.phone_no?.message}</p>
+        )}
       </div>
 
-      <Button className="h-12 w-full rounded-xl bg-orange-500 font-semibold hover:bg-orange-600">
-        Send OTP
+      <Button onClick={()=>forgetByPhoneMutation.mutate({mobile_number:form.getValues("phone_no")},{
+        onSuccess:(data)=>{
+            setUserID(data.user_id)
+            setOpen(true)
+        },
+        onError:(err)=>{
+            const error = err as AxiosError<{ message?: string }>;
+            toast.error(
+              error.response?.data?.message ||
+                error.message ||
+                "Something went wrong"
+            );
+        }
+      })} disabled={forgetByPhoneMutation.isPending} className="h-12 w-full rounded-xl bg-orange-500 font-semibold transition hover:bg-orange-600">
+       {forgetByPhoneMutation.isPending ? "Sending...":"Send Reset OTP"}
       </Button>
 
       <p className="text-center text-sm text-gray-500">

@@ -31,33 +31,45 @@ interface Props {
 
 const VerifyForget = ({ open, onClose,data }: Props) => {
   const [otp, setOtp] = React.useState("")
+    const intervalRef = React.useRef<NodeJS.Timeout | null>(null)
   const [pChange,setPChange]=useState<boolean>(false)
   const [userID,setUserID]=useState<string>("")
   const resendMutation=useForgetResend()
   const [timer, setTimer] = React.useState(60)
+function startTimer() {
+  // clear any existing interval
+  if (intervalRef.current) {
+    clearInterval(intervalRef.current)
+  }
 
+  setTimer(60)
+  intervalRef.current = setInterval(() => {
+    setTimer((prev) => {
+      if (prev <= 1) {
+        if (intervalRef.current) clearInterval(intervalRef.current)
+        return 0
+      }
+      return prev - 1
+    })
+  }, 1000)
+}
   React.useEffect(() => {
     if (!open) return
     // eslint-disable-next-line react-hooks/set-state-in-effect
-    setTimer(60)
+  setTimer(60)
     setOtp("")
+    startTimer()
 
-    const interval = setInterval(() => {
-      setTimer((prev) => {
-        if (prev <= 1) {
-          clearInterval(interval)
-          return 0
-        }
-        return prev - 1
-      })
-    }, 1000)
-
-    return () => clearInterval(interval)
-  }, [open])
+     return () => {
+    if (intervalRef.current) clearInterval(intervalRef.current)
+  }
+  }, [open,data])
 
   function handleResend() {
     setTimer(60)
     setOtp("")
+    startTimer()
+
     resendMutation.mutate(data.user_id)
   }
 //   Mutation for verification
