@@ -168,7 +168,7 @@ class AuthService:
         send_otp.delay(new_otp,source,[source_value],user.first_name)
         await Auth().set_resend_key(str(user.id))
 
-        return SuccessResponse(data=None,message="Please check your email for new otp")
+        return SuccessResponse(data=None,message=f"Please check your {source}  for new otp")
 
     async def refresh(self,request:Request):
         token=request.cookies.get("refresh")

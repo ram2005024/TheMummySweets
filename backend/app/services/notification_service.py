@@ -78,8 +78,7 @@ This code expires in 5 minutes.
 Do not share it with anyone.
 """
 
-        if phone_number.startswith("+"):
-            phone_number = phone_number[1:]
+        phone_number = phone_number.removeprefix("+")
 
         url = f"{cls.BASE_URL}/{settings.WHATSAPP_PHONE_NUMBER_ID}/messages"
 
