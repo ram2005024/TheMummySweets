@@ -1,4 +1,4 @@
-from typing import Any, Generic, Optional, TypeVar
+from typing import Any, Generic, TypeVar
 
 from pydantic import BaseModel
 
@@ -7,12 +7,12 @@ T = TypeVar("T")
 
 class ErrorResponse(BaseModel):
     success: bool = False
-    message: Optional[str] = ""
-    error_code: Optional[str] = ""
+    message: str | None = ""
+    error_code: str | None = ""
     details: Any = None
 
 
-class SuccessResponse(BaseModel, Generic[T]):
+class SuccessResponse(BaseModel, Generic[T]):  # noqa: UP046
     success: bool = True
-    message: Optional[str] = ""
+    message: str | None = ""
     data: T

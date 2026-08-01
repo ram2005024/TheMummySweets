@@ -1,16 +1,16 @@
 
 
-import app.modules.menu.models.relationship_model
-from typing import List
-from sqlalchemy.ext.hybrid import hybrid_property
-from sqlalchemy import ARRAY, CheckConstraint, String, func, select
-from app.modules.menu.models.relationship_model import category_product
-from sqlalchemy.orm import Mapped, mapped_column, relationship
 from typing import TYPE_CHECKING
-from app.models.base import BaseModel
+
+from sqlalchemy import ARRAY, CheckConstraint, String, func, select
+from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+
+from app.modules.auth.models.base import BaseModel
+from app.modules.menu.models.relationship_model import category_product
+from app.modules.menu.models.review_model import Review
 
 if TYPE_CHECKING:
-    from app.modules.menu.models.review_model import Review
     from app.modules.menu.models.category_model import Category
 
 
@@ -26,13 +26,12 @@ class Product(BaseModel):
     discount_percentage:Mapped[float]=mapped_column(default=0)
     average_preparation_time:Mapped[int]=mapped_column(default=15)
     grouped_quantity:Mapped[int]=mapped_column(default=0)
-    ingredients:Mapped[List[str]]=mapped_column(ARRAY(String),default=list,server_default="{}")
+    ingredients:Mapped[list[str]]=mapped_column(ARRAY(String),default=list,server_default="{}")
     stock_quantity:Mapped[int]
     main_image:Mapped[str]
-    side_images:Mapped[List[str]]=mapped_column(ARRAY(String),default=list,server_default="{}")
-    sold_quantity:Mapped[int]=mapped_column(default=0)
-    reviews:Mapped[List["Review"]]=relationship("Review")
-    categories:Mapped[List["Category"]]=relationship("Category",secondary=category_product)
+    side_images:Mapped[list[str]]=mapped_column(ARRAY(String),default=list,server_default="{}")
+    reviews:Mapped[list["Review"]]=relationship("Review")
+    categories:Mapped[list["Category"]]=relationship("Category",secondary=category_product)
 
     # Dynamic fields
     @hybrid_property

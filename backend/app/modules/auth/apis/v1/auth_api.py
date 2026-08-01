@@ -3,11 +3,11 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, File, Request, Response, UploadFile
 
 from app.core.oauth2 import oauth
-from app.dependencies.services import get_auth_service
-from app.dependencies.user import get_user
-from app.models.user import User
+from app.modules.auth.dependencies.services import get_auth_service
+from app.modules.auth.dependencies.user import get_user
+from app.modules.auth.models.user import User
 from app.schemas.common import SuccessResponse
-from app.schemas.user_schema import (
+from app.modules.auth.schemas.user_schema import (
     ChangePasswordResetSchema,
     ForgetPassSchema,
     OtpVerifySchema,
@@ -16,7 +16,7 @@ from app.schemas.user_schema import (
     UserReadBasic,
     UserRegiser,
 )
-from app.services.auth.auth_service import AuthService
+from app.modules.auth.services.auth_service import AuthService
 
 auth_router=APIRouter(prefix="/auth",tags=["Auth endpoints"])
 

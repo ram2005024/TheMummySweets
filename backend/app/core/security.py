@@ -7,7 +7,7 @@ from pwdlib import PasswordHash
 
 from app.core.config import settings
 from app.core.redis import redis
-from app.exceptions.auth_exception import InvalidOrExpiredToken
+from app.modules.auth.exceptions.auth_exception import InvalidOrExpiredToken
 
 
 class Auth:

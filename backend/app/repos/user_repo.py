@@ -3,7 +3,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
-from app.models.user import Profile, User
+from app.modules.auth.models.user import Profile, User
 
 
 class UserRepo:

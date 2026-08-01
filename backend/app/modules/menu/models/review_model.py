@@ -1,16 +1,16 @@
 
 
 
+from typing import TYPE_CHECKING
 from uuid import UUID
 
 from sqlalchemy import CheckConstraint, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from app.models.base import BaseModel
-from typing import TYPE_CHECKING, List
+from app.modules.auth.models.base import BaseModel
 
 if TYPE_CHECKING:
-    from app.models.user import User
+    from app.modules.auth.models.user import User
 
 # Comment
 class Comment(BaseModel):
@@ -32,7 +32,7 @@ class Review(BaseModel):
     like_count:Mapped[int]=mapped_column(default=0)
     rating:Mapped[float]=mapped_column(default=5)
     # sqlalchemy field
-    comments:Mapped[List["Comment"]]=relationship("Comment",cascade="all,delete-orphan")
+    comments:Mapped[list["Comment"]]=relationship("Comment",cascade="all,delete-orphan")
 
 
 

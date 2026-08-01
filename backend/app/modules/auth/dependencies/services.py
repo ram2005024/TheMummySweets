@@ -2,10 +2,10 @@ from typing import Annotated
 
 from fastapi import Depends
 
-from app.dependencies.repo import get_session_repo, get_user_repo
+from app.modules.auth.dependencies.repo import get_session_repo, get_user_repo
 from app.repos.session_repo import SessionRepo
 from app.repos.user_repo import UserRepo
-from app.services.auth.auth_service import AuthService
+from app.modules.auth.services.auth_service import AuthService
 
 
 # Get Service factory

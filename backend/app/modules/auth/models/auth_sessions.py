@@ -5,7 +5,7 @@ from uuid import UUID
 from sqlalchemy import UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column
 
-from app.models.base import BaseModel
+from app.modules.auth.models.base import BaseModel
 
 
 class Session(BaseModel):

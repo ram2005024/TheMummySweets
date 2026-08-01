@@ -5,7 +5,7 @@ from uuid import UUID
 
 from app.core.celery_app import celery_app
 from app.core.db import SyncSessionLocal
-from app.models.user import Profile
+from app.modules.auth.models.user import Profile
 from app.utils import upload_image
 
 logger=logging.getLogger(__name__)

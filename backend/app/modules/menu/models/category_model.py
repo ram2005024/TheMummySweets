@@ -7,7 +7,7 @@ from sqlalchemy import Column, ForeignKey, Table
 from sqlalchemy.orm import Mapped, relationship
 from app.modules.menu.models.relationship_model import category_product
 from app.core.db import Base
-from app.models.base import BaseModel
+from app.modules.auth.models.base import BaseModel
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:

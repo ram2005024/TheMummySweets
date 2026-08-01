@@ -152,6 +152,6 @@ def exception_handler(app: FastAPI):
             content=ErrorResponse(
                 error_code="VALUE_ERROR",
                 message="Invalid input provided",
-                details={"reason":f"{str(exc)}"}
+                details={"reason":f"{exc!s}"}
             ).model_dump(),
         )

@@ -5,8 +5,8 @@ from fastapi import Form
 from fastapi.exceptions import HTTPException
 from pydantic import BaseModel, EmailStr, field_validator, model_validator
 
-from app.exceptions.auth_exception import PasswordMismatched
-from app.models.user import UserRole
+from app.modules.auth.exceptions.auth_exception import PasswordMismatched
+from app.modules.auth.models.user import UserRole
 from app.utils.normalize_phone import normalize_phone
 
 

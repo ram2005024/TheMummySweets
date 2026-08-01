@@ -7,7 +7,7 @@ from starlette.requests import Request
 
 from app.core.config import settings
 from app.core.security import Auth
-from app.exceptions.auth_exception import (
+from app.modules.auth.exceptions.auth_exception import (
     InvalidEmailOrPassword,
     InvalidOrExpiredOtp,
     InvalidOrExpiredToken,
@@ -20,10 +20,7 @@ from app.exceptions.auth_exception import (
     UserDoesnotExist,
     UserNotAuthenticated,
 )
-from app.repos.session_repo import SessionRepo
-from app.repos.user_repo import UserRepo
-from app.schemas.common import SuccessResponse
-from app.schemas.user_schema import (
+from app.modules.auth.schemas.user_schema import (
     ChangePasswordResetSchema,
     ForgetPassSchema,
     OtpVerifySchema,
@@ -31,6 +28,9 @@ from app.schemas.user_schema import (
     UserLogin,
     UserRegiser,
 )
+from app.repos.session_repo import SessionRepo
+from app.repos.user_repo import UserRepo
+from app.schemas.common import SuccessResponse
 from app.tasks.auth_task import upload_user_image
 from app.tasks.email_task import send_otp, send_reset_otp
 

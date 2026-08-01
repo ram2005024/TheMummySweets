@@ -6,7 +6,7 @@ from h11 import Request
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.models.auth_sessions import Session
+from app.modules.auth.models.auth_sessions import Session
 
 
 class SessionRepo:

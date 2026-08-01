@@ -6,7 +6,7 @@ from sqlalchemy import Enum as SQLEnum
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from app.models.base import BaseModel
+from app.modules.auth.models.base import BaseModel
 
 
 class UserRole(Enum):

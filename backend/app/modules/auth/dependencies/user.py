@@ -7,7 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.db import get_db
 from app.core.security import Auth
-from app.exceptions.auth_exception import (
+from app.modules.auth.exceptions.auth_exception import (
     MissingToken,
     UserDoesnotExist,
     UserNotAuthenticated,

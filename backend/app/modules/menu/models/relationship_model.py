@@ -4,7 +4,6 @@ from sqlalchemy import Column, ForeignKey, Table
 
 from app.core.db import Base
 
-
 category_product=Table(
     "category_product",
     Base.metadata,
