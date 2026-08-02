@@ -1,3 +1,4 @@
+import hashlib
 import random
 from datetime import datetime, timedelta
 
@@ -30,6 +31,8 @@ class Auth:
     def hash_content(self,content):
         return self.hash.hash(content)
 
+    def hash_content_with_same_hash(self,content):
+        return hashlib.sha256(content).hexdigest()
 
     def verify_hash(self,plain_text,cipher_text):
         is_matched=self.hash.verify(plain_text,cipher_text)
