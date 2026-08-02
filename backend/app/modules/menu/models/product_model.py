@@ -28,10 +28,10 @@ class Product(BaseModel):
     grouped_quantity:Mapped[int]=mapped_column(default=0)
     ingredients:Mapped[list[str]]=mapped_column(ARRAY(String),default=list,server_default="{}")
     stock_quantity:Mapped[int]
-    main_image:Mapped[str]
+    main_image:Mapped[str]=mapped_column(nullable=True)
     side_images:Mapped[list[str]]=mapped_column(ARRAY(String),default=list,server_default="{}")
     reviews:Mapped[list["Review"]]=relationship("Review")
-    categories:Mapped[list["Category"]]=relationship("Category",secondary=category_product)
+    categories:Mapped[list["Category"]]=relationship("Category",secondary=category_product,back_populates="products")
 
     # Dynamic fields
     @hybrid_property
@@ -48,7 +48,7 @@ class Product(BaseModel):
     def average_rating(self): # type: ignore
         if not self.reviews:
             return 0
-        sum_rating=sum(rating for rating in self.reviews)
+        sum_rating=sum(review.rating for review in self.reviews)
         ratings_count=len(self.reviews)
         return sum_rating/ratings_count
 
@@ -63,6 +63,6 @@ class Product(BaseModel):
 
 
     # Extra args
-    __tableargs__=(
-        CheckConstraint("price > 0",name="Positive price value")
+    __table_args__=(
+        CheckConstraint("price > 0",name="Positive price value"),
     )

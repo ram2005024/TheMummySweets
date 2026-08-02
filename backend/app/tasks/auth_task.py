@@ -13,7 +13,7 @@ logger=logging.getLogger(__name__)
 def upload_user_image(image_string:str,user_id:str):
     try:
         image_bytes=base64.b64decode(image_string)
-        image_url=upload_image.upload_image(image_bytes,user_id)
+        image_url=upload_image.upload_image(image_bytes,"user",user_id,"users")
         if image_url:
             db=SyncSessionLocal()
             profile=db.query(Profile).filter(Profile.user_id==UUID(user_id)).one_or_none()

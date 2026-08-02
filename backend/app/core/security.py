@@ -12,7 +12,6 @@ from app.modules.auth.exceptions.auth_exception import InvalidOrExpiredToken
 
 class Auth:
     def __init__(self,
-                 hash:PasswordHash|None=None,
                  otp_expires_in=300,
                  login_limit=300,
                  max_login_attempt=5,
@@ -20,7 +19,7 @@ class Auth:
                  resend_time_limit=60,
                  max_reset_attempt=5
                  ):
-        self.hash=hash or PasswordHash.recommended()
+        self.hash=PasswordHash.recommended()
         self.MAXIMUM_LOGIN_ATTEMPT=max_login_attempt
         self.MAXIMUM_LOGIN_LIMIT=login_limit
         self.MAXIMUM_OTP_ATTEMPT=max_otp_attempt
@@ -28,8 +27,9 @@ class Auth:
         self.RESEND_AFTER=resend_time_limit
         self.otp_expires_in=otp_expires_in
 
-    def hash_content(self,content:str):
+    def hash_content(self,content):
         return self.hash.hash(content)
+
 
     def verify_hash(self,plain_text,cipher_text):
         is_matched=self.hash.verify(plain_text,cipher_text)

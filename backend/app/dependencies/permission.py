@@ -16,6 +16,6 @@ class RolePermission:
         self.roles=roles
 
     def __call__(self,user:Annotated[User,Depends(get_user)]):
-        if user.role not in self.roles:
+        if user.role.value not in self.roles:
             raise UserNotAllowed
         return user

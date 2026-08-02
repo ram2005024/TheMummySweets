@@ -3,6 +3,7 @@ from fastapi.exceptions import HTTPException, RequestValidationError
 from fastapi.responses import JSONResponse
 from rich.panel import Panel
 from rich.table import Table
+from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 
 from app.core.logger import console
 from app.exceptions.base_custom_exception import AppException
@@ -62,6 +63,54 @@ def exception_handler(app: FastAPI):
             content=ErrorResponse(
                 error_code="HTTP_ERROR",
                 message=exc.detail,
+            ).model_dump(),
+        )
+    # ── SQLALCHEMY Integrity  Error─────────────────────────────────────────
+    @app.exception_handler(IntegrityError)
+    async def integrity_errro_handler_sqlalchemy(request: Request, exc: IntegrityError):
+        rid = _req_id(request)
+        console.print(
+            Panel(
+                f"[warning]🌐  HTTP EXCEPTION[/]\n\n"
+                f"[bold white]Route  :[/]  {request.method} {request.url.path}\n"
+                f"[bold white]Code   :[/]  {exc.code}\n"
+                f"[bold white]Detail :[/]  {exc.detail}\n"
+                f"[bold white]Req ID :[/]  [dim]{rid}[/]",
+                title="[yellow]HTTP Error[/]",
+                border_style="yellow",
+                expand=False,
+            )
+        )
+        return JSONResponse(
+            status_code=422,
+            content=ErrorResponse(
+                error_code="INTEGRITY_ERROR",
+                message="Integrity error happened in the database",
+                details=str(exc)
+            ).model_dump(),
+        )
+    # ── SQLALCHEMY ERROR ─────────────────────────────────────────
+    @app.exception_handler(SQLAlchemyError)
+    async def sql_alchemy_error(request: Request, exc: SQLAlchemyError):
+        rid = _req_id(request)
+        console.print(
+            Panel(
+                f"[warning]🌐  HTTP EXCEPTION[/]\n\n"
+                f"[bold white]Route  :[/]  {request.method} {request.url.path}\n"
+                f"[bold white]Code   :[/]  {exc._code_str}\n"
+                f"[bold white]Detail :[/]  {exc._message}\n"
+                f"[bold white]Req ID :[/]  [dim]{rid}[/]",
+                title="[yellow]HTTP Error[/]",
+                border_style="yellow",
+                expand=False,
+            )
+        )
+        return JSONResponse(
+            status_code=400,
+            content=ErrorResponse(
+                error_code="SQLALCHEMY_ERROR",
+                message="Some error occur in the database",
+                details=str(exc._message)
             ).model_dump(),
         )
 

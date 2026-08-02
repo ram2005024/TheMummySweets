@@ -1,9 +1,9 @@
+from app import models  # noqa
 from logging.config import fileConfig
 
 from sqlalchemy import engine_from_config, pool
 
 from alembic import context
-from app import models  # noqa
 from app.core.config import settings
 from app.core.db import Base
 

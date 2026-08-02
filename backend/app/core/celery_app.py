@@ -4,6 +4,7 @@ import sentry_sdk
 from celery import Celery
 from sentry_sdk.integrations.celery import CeleryIntegration
 
+from app import models  #Noqa
 from app.core.config import settings
 
 celery_app=Celery(
