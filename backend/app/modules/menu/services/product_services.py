@@ -5,6 +5,8 @@ from fastapi import File, UploadFile
 from fastapi.responses import JSONResponse
 
 from app.core.security import Auth
+from app.dependencies.pagination import Pagination
+from app.modules.menu.dependencies.filter_products import FilterProduct
 from app.modules.menu.repos.product_repo import ProductRepo
 from app.modules.menu.schemas.product import ProductCreate
 from app.modules.menu.utils import encode_image
@@ -69,3 +71,11 @@ class ProductService:
             )
         if to_put_side_images:
             upload_product_side_images.delay(to_put_side_images, product_id)
+
+    async def read_all_product_service(
+        self, filter_data: FilterProduct, pagination_data: Pagination
+    ):
+        resp = await self.product_repo.read_multiple_products(
+            filter_data, pagination_data
+        )
+        return SuccessResponse(data=resp)

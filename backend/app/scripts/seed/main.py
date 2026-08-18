@@ -315,12 +315,13 @@ async def seed_products(
         category_name = template["category"]
         category = category_map[category_name]
         images = PRODUCT_IMAGES[category_name]
-
+        is_best_seller = random.choices([True, False], weights=[70, 30], k=1)[0]
         product = Product(
             product_name=f"{template['name']} #{index + 1}",
             product_description=f"Delicious {template['name'].lower()} prepared with fresh and quality ingredients.",
             category_label=category_name,
             is_available=random.choices([True, False], weights=[90, 10], k=1)[0],
+            is_best_seller=is_best_seller,
             price=random.randint(*template["price"]),
             discount_percentage=random.choice([0, 0.05, 0.10, 0.15, 0.20, 0.25]),
             average_preparation_time=random.randint(*template["prep_time"]),
@@ -372,9 +373,8 @@ async def seed_comments(
     comments = []
 
     for review in reviews:
-        commenters = random.sample(users, k=min(random.randint(0, 3), len(users)))
-
-        for user in commenters:
+        if random.random() < 0.7:
+            user = random.choice(users)
             comment = Comment(
                 user_id=user.id,
                 review_id=review.id,

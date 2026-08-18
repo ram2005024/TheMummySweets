@@ -16,21 +16,29 @@ class Comment(BaseModel):
     __tablename__ = "comments"
     user_id: Mapped[UUID] = mapped_column(ForeignKey("users.id"))
     comment: Mapped[str]
-    review_id: Mapped[UUID] = mapped_column(ForeignKey("reviews.id"))
+    review_id: Mapped[UUID] = mapped_column(
+        ForeignKey(
+            "reviews.id",
+            ondelete="CASCADE",
+        )
+    )
     # sqlalchemy field
     user: Mapped["User"] = relationship("User")
+    review: Mapped["Review"] = relationship("Review", back_populates="comment")
 
 
 class Review(BaseModel):
     __tablename__ = "reviews"
 
     user_id: Mapped[UUID] = mapped_column(ForeignKey("users.id"))
-    product_id: Mapped[UUID] = mapped_column(ForeignKey("products.id"))
+    product_id: Mapped[UUID] = mapped_column(
+        ForeignKey("products.id", ondelete="CASCADE")
+    )
     like_count: Mapped[int] = mapped_column(default=0)
     rating: Mapped[float] = mapped_column(default=5)
     # sqlalchemy field
-    comments: Mapped[list["Comment"]] = relationship(
-        "Comment", cascade="all,delete-orphan"
+    comment: Mapped["Comment"] = relationship(
+        "Comment", uselist=False, back_populates="review"
     )
     product: Mapped["Product"] = relationship(
         "Product",

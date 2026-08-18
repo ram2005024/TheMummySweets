@@ -1,4 +1,3 @@
-
 from typing import Annotated
 
 from fastapi import Depends, Request
@@ -30,15 +29,15 @@ from app.repos.user_repo import UserRepo
 # For swagger docs testing using the cookie
 # Get the user with token and authenticated
 
-async def get_user(request:Request,db:Annotated[AsyncSession,Depends(get_db)]):
-    token=request.cookies.get("refresh")
+
+async def get_user(request: Request, db: Annotated[AsyncSession, Depends(get_db)]):
+    token = request.cookies.get("refresh")
     if not token:
         raise MissingToken
-    payload=Auth().verify_token(token)
-    user=await UserRepo(db).get_user_by_field("id",payload["user_id"])
+    payload = Auth().verify_token(token)
+    user = await UserRepo(db).get_user_by_field("id", payload["user_id"])
     if not user:
         raise UserDoesnotExist
     if not user.is_authenticated:
         raise UserNotAuthenticated
     return user
-

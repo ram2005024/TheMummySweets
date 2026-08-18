@@ -1,12 +1,16 @@
 from uuid import UUID
 
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.dependencies.pagination import Pagination
 from app.models.image import Image
+from app.modules.menu.dependencies.filter_products import FilterProduct
 from app.modules.menu.models.category_model import Category
 from app.modules.menu.models.product_model import Product
-from app.modules.menu.schemas.product import ProductCreate
+from app.modules.menu.models.review_model import Review
+from app.modules.menu.schemas.product import ProductCreate, ProductReadBasicCustomer
+from app.schemas.pagination_schema import PaginatedResponse
 
 
 class ProductRepo:
@@ -53,3 +57,44 @@ class ProductRepo:
         ).scalar_one()
         product.side_images = image
         await self.db.commit()
+
+    async def read_multiple_products(
+        self, filter_data: FilterProduct, pagination_data: Pagination
+    ):
+        root_stmt = (
+            select(
+                Product,
+                func.count(Review.id).label("review_count"),
+                func.coalesce(func.avg(Review.rating), 0).label("rating"),
+            )
+            .outerjoin(Review, Product.id == Review.product_id)
+            .group_by(Product.id)
+        )
+        filtered_stmt = await filter_data.filter_product(root_stmt)
+        total = (
+            await self.db.execute(
+                select(func.count()).select_from(root_stmt.subquery())
+            )
+        ).scalar()
+        filtered_data = (
+            await self.db.execute(
+                filtered_stmt.limit(pagination_data.limit).offset(
+                    (pagination_data.page - 1) * pagination_data.limit
+                )
+            )
+        ).all()
+        filtered_total = (
+            await self.db.execute(
+                select(func.count()).select_from(filtered_stmt.subquery())
+            )
+        ).scalar()
+        meta = pagination_data.pagination(total or 0, filtered_total or 0)
+        data = []
+        for product, review_count, rating in filtered_data:
+            product_data = ProductReadBasicCustomer.model_validate(product)
+            data.append(
+                product_data.model_copy(
+                    update={"rating": float(rating), "review_count": int(review_count)}
+                )
+            )
+        return PaginatedResponse(meta=meta, data=data)
