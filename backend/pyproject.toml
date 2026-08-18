@@ -10,6 +10,7 @@ dependencies = [
     "authlib>=1.7.2",
     "celery[redis]>=5.3.1",
     "cloudinary>=1.45.0",
+    "faker>=40.36.0",
     "fastapi-mail>=1.6.5",
     "fastapi[standard]>=0.139.0",
     "httpx>=0.28.1",

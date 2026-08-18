@@ -1,5 +1,3 @@
-
-
 from typing import TYPE_CHECKING
 
 from sqlalchemy import ARRAY, CheckConstraint, String, func, select
@@ -14,55 +12,60 @@ if TYPE_CHECKING:
     from app.modules.menu.models.category_model import Category
 
 
-
 class Product(BaseModel):
-    __tablename__="products"
+    __tablename__ = "products"
 
-    product_name:Mapped[str]
-    product_description:Mapped[str]=mapped_column(nullable=True)
-    category_label:Mapped[str]
-    is_available:Mapped[bool]=mapped_column(default=True)
-    price:Mapped[int]
-    discount_percentage:Mapped[float]=mapped_column(default=0)
-    average_preparation_time:Mapped[int]=mapped_column(default=15)
-    grouped_quantity:Mapped[int]=mapped_column(default=0)
-    ingredients:Mapped[list[str]]=mapped_column(ARRAY(String),default=list,server_default="{}")
-    stock_quantity:Mapped[int]
-    main_image:Mapped[str]=mapped_column(nullable=True)
-    side_images:Mapped[list[str]]=mapped_column(ARRAY(String),default=list,server_default="{}")
-    reviews:Mapped[list["Review"]]=relationship("Review")
-    categories:Mapped[list["Category"]]=relationship("Category",secondary=category_product,back_populates="products")
+    product_name: Mapped[str]
+    product_description: Mapped[str] = mapped_column(nullable=True)
+    category_label: Mapped[str]
+    is_available: Mapped[bool] = mapped_column(default=True)
+    price: Mapped[int]
+    discount_percentage: Mapped[float] = mapped_column(default=0)
+    average_preparation_time: Mapped[int] = mapped_column(default=15)
+    grouped_quantity: Mapped[int] = mapped_column(default=0)
+    ingredients: Mapped[list[str]] = mapped_column(
+        ARRAY(String), default=list, server_default="{}"
+    )
+    stock_quantity: Mapped[int]
+    main_image: Mapped[str] = mapped_column(nullable=True)
+    side_images: Mapped[list[str]] = mapped_column(
+        ARRAY(String), default=list, server_default="{}"
+    )
+    reviews: Mapped[list["Review"]] = relationship(
+        "Review",
+        back_populates="product",
+        cascade="all, delete-orphan",
+    )
+    categories: Mapped[list["Category"]] = relationship(
+        "Category", secondary=category_product, back_populates="products"
+    )
 
     # Dynamic fields
     @hybrid_property
     def in_stock(self):
-        return self.stock_quantity>0
-
+        return self.stock_quantity > 0
 
     @hybrid_property
     def total_amount(self):
-        discount_amount=self.price*self.discount_percentage
-        return self.price-discount_amount
+        discount_amount = self.price * self.discount_percentage
+        return self.price - discount_amount
 
     @hybrid_property
-    def average_rating(self): # type: ignore
+    def average_rating(self):  # type: ignore
         if not self.reviews:
             return 0
-        sum_rating=sum(review.rating for review in self.reviews)
-        ratings_count=len(self.reviews)
-        return sum_rating/ratings_count
+        sum_rating = sum(review.rating for review in self.reviews)
+        ratings_count = len(self.reviews)
+        return sum_rating / ratings_count
 
-    @average_rating.expression # type: ignore
+    @average_rating.expression  # type: ignore
     def average_rating(cls):
         return (
             select(func.avg(Review.rating))
-            .where(Review.product_id==cls.id)
+            .where(Review.product_id == cls.id)
             .correlate(cls)
             .scalar_subquery()
         )
 
-
     # Extra args
-    __table_args__=(
-        CheckConstraint("price > 0",name="Positive price value"),
-    )
+    __table_args__ = (CheckConstraint("price > 0", name="Positive price value"),)

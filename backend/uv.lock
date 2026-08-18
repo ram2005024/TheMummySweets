@@ -322,6 +322,7 @@ dependencies = [
     { name = "authlib" },
     { name = "celery", extra = ["redis"] },
     { name = "cloudinary" },
+    { name = "faker" },
     { name = "fastapi", extra = ["standard"] },
     { name = "fastapi-mail" },
     { name = "httpx" },
@@ -347,6 +348,7 @@ requires-dist = [
     { name = "authlib", specifier = ">=1.7.2" },
     { name = "celery", extras = ["redis"], specifier = ">=5.3.1" },
     { name = "cloudinary", specifier = ">=1.45.0" },
+    { name = "faker", specifier = ">=40.36.0" },
     { name = "fastapi", extras = ["standard"], specifier = ">=0.139.0" },
     { name = "fastapi-mail", specifier = ">=1.6.5" },
     { name = "httpx", specifier = ">=0.28.1" },
@@ -714,6 +716,18 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/f5/22/900cb125c76b7aaa450ce02fd727f452243f2e91a61af068b40adba60ea9/email_validator-2.3.0.tar.gz", hash = "sha256:9fc05c37f2f6cf439ff414f8fc46d917929974a82244c20eb10231ba60c54426", size = 51238, upload-time = "2025-08-26T13:09:06.831Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/de/15/545e2b6cf2e3be84bc1ed85613edd75b8aea69807a71c26f4ca6a9258e82/email_validator-2.3.0-py3-none-any.whl", hash = "sha256:80f13f623413e6b197ae73bb10bf4eb0908faf509ad8362c5edeb0be7fd450b4", size = 35604, upload-time = "2025-08-26T13:09:05.858Z" },
+]
+
+[[package]]
+name = "faker"
+version = "40.36.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "tzdata", marker = "sys_platform == 'win32'" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/98/d2/026af1e002bbc6df534d1f8262b18ec79a974f928e9290bfbfdfe7c7b2af/faker-40.36.0.tar.gz", hash = "sha256:754048c76c03afa7de83eee8f4bcee3cf668cbb7d995f54a4e9678db7f110308", size = 2025903, upload-time = "2026-07-24T21:11:33.088Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/50/9a/b947ed175ce9a0dcb070ccf3607f0ce8720cfb5ed1a36166a150b2acd5af/faker-40.36.0-py3-none-any.whl", hash = "sha256:82b9497d9cfe017048075bcf969298a74b1b6e39f5e4dad1211085d1133f7b62", size = 2062829, upload-time = "2026-07-24T21:11:31.37Z" },
 ]
 
 [[package]]

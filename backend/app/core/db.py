@@ -24,7 +24,7 @@ async def get_db():
 
 
 # Sync Database conf
-sync_engine=create_engine(settings.SYNC_DATABASE_URL,echo=True)
+sync_engine = create_engine(settings.SYNC_DATABASE_URL, echo=True)
 
 # SessionLocal for sync connection
-SyncSessionLocal=sessionmaker(bind=sync_engine,autoflush=False,autocommit=False)
+SyncSessionLocal = sessionmaker(bind=sync_engine, autoflush=False, autocommit=False)
