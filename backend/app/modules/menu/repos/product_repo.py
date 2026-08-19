@@ -17,7 +17,6 @@ class ProductRepo:
     def __init__(self, db: AsyncSession) -> None:
         self.db = db
 
-    # Repos
     async def create(self, data: ProductCreate):
         categories = (
             (
