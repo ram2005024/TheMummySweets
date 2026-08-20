@@ -9,7 +9,7 @@ from app.core.db import AsyncSessionHandler
 from app.core.security import Auth
 from app.modules.auth.models.user import Profile, User, UserRole
 from app.modules.menu.models.category_model import Category
-from app.modules.menu.models.product_model import Product
+from app.modules.menu.models.product_model import Product, QuantizedUnit
 from app.modules.menu.models.review_model import Comment, Review
 
 fake = Faker()
@@ -49,6 +49,12 @@ REVIEW_COMMENTS = [
     "Highly recommended.",
 ]
 
+# grouped_unit / grouped_quantity_choices are defined per PRODUCT, not per
+# category. Only dishes that are genuinely counted or measured get a real
+# unit (momo pieces, pizza/cake slices, burgers per order, drink volume).
+# Everything sold as a single plate/serving (biryani, chowmein, thukpa,
+# sekuwa, fries) has nothing meaningful to group, so it stays NA / 0 — which
+# the fixed model constraint now actually allows.
 PRODUCT_TEMPLATES = [
     {
         "name": "Chicken Momo",
@@ -56,6 +62,8 @@ PRODUCT_TEMPLATES = [
         "ingredients": ["Chicken", "Flour", "Onion", "Garlic", "Ginger", "Coriander"],
         "price": (180, 350),
         "prep_time": (15, 30),
+        "grouped_unit": QuantizedUnit.PCS,
+        "grouped_quantity_choices": [6, 8, 10, 12],  # momo pieces per plate
     },
     {
         "name": "Buff Momo",
@@ -63,6 +71,8 @@ PRODUCT_TEMPLATES = [
         "ingredients": ["Buff", "Flour", "Onion", "Garlic", "Ginger", "Coriander"],
         "price": (150, 300),
         "prep_time": (15, 30),
+        "grouped_unit": QuantizedUnit.PCS,
+        "grouped_quantity_choices": [6, 8, 10, 12],
     },
     {
         "name": "Veg Momo",
@@ -70,6 +80,8 @@ PRODUCT_TEMPLATES = [
         "ingredients": ["Cabbage", "Carrot", "Onion", "Flour", "Garlic", "Ginger"],
         "price": (120, 250),
         "prep_time": (15, 25),
+        "grouped_unit": QuantizedUnit.PCS,
+        "grouped_quantity_choices": [6, 8, 10, 12],
     },
     {
         "name": "Chicken Pizza",
@@ -77,6 +89,8 @@ PRODUCT_TEMPLATES = [
         "ingredients": ["Chicken", "Cheese", "Flour", "Tomato", "Capsicum", "Onion"],
         "price": (500, 1000),
         "prep_time": (25, 45),
+        "grouped_unit": QuantizedUnit.PCS,
+        "grouped_quantity_choices": [6, 8],  # slices per pizza
     },
     {
         "name": "Margherita Pizza",
@@ -84,6 +98,8 @@ PRODUCT_TEMPLATES = [
         "ingredients": ["Cheese", "Flour", "Tomato", "Basil", "Olive Oil"],
         "price": (450, 900),
         "prep_time": (20, 40),
+        "grouped_unit": QuantizedUnit.PCS,
+        "grouped_quantity_choices": [6, 8],
     },
     {
         "name": "Pepperoni Pizza",
@@ -91,6 +107,8 @@ PRODUCT_TEMPLATES = [
         "ingredients": ["Pepperoni", "Cheese", "Flour", "Tomato", "Olives"],
         "price": (600, 1100),
         "prep_time": (25, 45),
+        "grouped_unit": QuantizedUnit.PCS,
+        "grouped_quantity_choices": [6, 8],
     },
     {
         "name": "Chicken Burger",
@@ -98,6 +116,8 @@ PRODUCT_TEMPLATES = [
         "ingredients": ["Chicken", "Bun", "Cheese", "Lettuce", "Tomato", "Mayonnaise"],
         "price": (300, 600),
         "prep_time": (15, 30),
+        "grouped_unit": QuantizedUnit.PCS,
+        "grouped_quantity_choices": [1, 2],  # burgers per order
     },
     {
         "name": "Cheese Burger",
@@ -105,6 +125,8 @@ PRODUCT_TEMPLATES = [
         "ingredients": ["Beef", "Bun", "Cheese", "Lettuce", "Tomato", "Onion"],
         "price": (350, 650),
         "prep_time": (15, 30),
+        "grouped_unit": QuantizedUnit.PCS,
+        "grouped_quantity_choices": [1, 2],
     },
     {
         "name": "Veg Burger",
@@ -112,6 +134,8 @@ PRODUCT_TEMPLATES = [
         "ingredients": ["Potato", "Bun", "Lettuce", "Tomato", "Cheese"],
         "price": (250, 500),
         "prep_time": (15, 25),
+        "grouped_unit": QuantizedUnit.PCS,
+        "grouped_quantity_choices": [1, 2],
     },
     {
         "name": "Chicken Biryani",
@@ -127,6 +151,8 @@ PRODUCT_TEMPLATES = [
         ],
         "price": (300, 600),
         "prep_time": (30, 50),
+        "grouped_unit": QuantizedUnit.NA,
+        "grouped_quantity_choices": [0],  # single plate, nothing to group
     },
     {
         "name": "Mutton Biryani",
@@ -142,6 +168,8 @@ PRODUCT_TEMPLATES = [
         ],
         "price": (450, 800),
         "prep_time": (35, 55),
+        "grouped_unit": QuantizedUnit.NA,
+        "grouped_quantity_choices": [0],
     },
     {
         "name": "Veg Biryani",
@@ -149,6 +177,8 @@ PRODUCT_TEMPLATES = [
         "ingredients": ["Rice", "Carrot", "Peas", "Potato", "Onion", "Spices"],
         "price": (250, 500),
         "prep_time": (25, 45),
+        "grouped_unit": QuantizedUnit.NA,
+        "grouped_quantity_choices": [0],
     },
     {
         "name": "Chicken Chowmein",
@@ -163,6 +193,8 @@ PRODUCT_TEMPLATES = [
         ],
         "price": (180, 350),
         "prep_time": (15, 30),
+        "grouped_unit": QuantizedUnit.NA,
+        "grouped_quantity_choices": [0],
     },
     {
         "name": "Veg Chowmein",
@@ -170,6 +202,8 @@ PRODUCT_TEMPLATES = [
         "ingredients": ["Noodles", "Cabbage", "Carrot", "Capsicum", "Soy Sauce"],
         "price": (150, 300),
         "prep_time": (15, 25),
+        "grouped_unit": QuantizedUnit.NA,
+        "grouped_quantity_choices": [0],
     },
     {
         "name": "Chicken Thukpa",
@@ -177,6 +211,8 @@ PRODUCT_TEMPLATES = [
         "ingredients": ["Noodles", "Chicken", "Carrot", "Cabbage", "Garlic", "Ginger"],
         "price": (200, 400),
         "prep_time": (20, 35),
+        "grouped_unit": QuantizedUnit.NA,
+        "grouped_quantity_choices": [0],
     },
     {
         "name": "Veg Thukpa",
@@ -184,6 +220,8 @@ PRODUCT_TEMPLATES = [
         "ingredients": ["Noodles", "Carrot", "Cabbage", "Mushroom", "Garlic", "Ginger"],
         "price": (180, 350),
         "prep_time": (20, 30),
+        "grouped_unit": QuantizedUnit.NA,
+        "grouped_quantity_choices": [0],
     },
     {
         "name": "French Fries",
@@ -191,6 +229,8 @@ PRODUCT_TEMPLATES = [
         "ingredients": ["Potato", "Salt", "Oil"],
         "price": (120, 250),
         "prep_time": (10, 20),
+        "grouped_unit": QuantizedUnit.NA,
+        "grouped_quantity_choices": [0],  # single basket/serving
     },
     {
         "name": "Chicken Sekuwa",
@@ -198,6 +238,8 @@ PRODUCT_TEMPLATES = [
         "ingredients": ["Chicken", "Onion", "Garlic", "Ginger", "Spices", "Lemon"],
         "price": (350, 700),
         "prep_time": (30, 50),
+        "grouped_unit": QuantizedUnit.NA,
+        "grouped_quantity_choices": [0],
     },
     {
         "name": "Mutton Sekuwa",
@@ -205,6 +247,8 @@ PRODUCT_TEMPLATES = [
         "ingredients": ["Mutton", "Onion", "Garlic", "Ginger", "Spices", "Lemon"],
         "price": (450, 900),
         "prep_time": (35, 55),
+        "grouped_unit": QuantizedUnit.NA,
+        "grouped_quantity_choices": [0],
     },
     {
         "name": "Chocolate Cake",
@@ -212,6 +256,8 @@ PRODUCT_TEMPLATES = [
         "ingredients": ["Flour", "Cocoa", "Sugar", "Milk", "Chocolate"],
         "price": (250, 500),
         "prep_time": (5, 10),
+        "grouped_unit": QuantizedUnit.PCS,
+        "grouped_quantity_choices": [6, 8],  # slices per cake
     },
     {
         "name": "Red Velvet Cake",
@@ -219,6 +265,8 @@ PRODUCT_TEMPLATES = [
         "ingredients": ["Flour", "Sugar", "Milk", "Cream Cheese", "Cocoa"],
         "price": (300, 600),
         "prep_time": (5, 10),
+        "grouped_unit": QuantizedUnit.PCS,
+        "grouped_quantity_choices": [6, 8],
     },
     {
         "name": "Coke",
@@ -226,6 +274,8 @@ PRODUCT_TEMPLATES = [
         "ingredients": ["Carbonated Water", "Sugar"],
         "price": (80, 150),
         "prep_time": (1, 5),
+        "grouped_unit": QuantizedUnit.ML,
+        "grouped_quantity_choices": [250, 330, 500],
     },
     {
         "name": "Fresh Lemonade",
@@ -233,6 +283,8 @@ PRODUCT_TEMPLATES = [
         "ingredients": ["Lemon", "Water", "Sugar", "Ice"],
         "price": (100, 200),
         "prep_time": (3, 8),
+        "grouped_unit": QuantizedUnit.ML,
+        "grouped_quantity_choices": [250, 500],
     },
 ]
 
@@ -316,6 +368,17 @@ async def seed_products(
         category = category_map[category_name]
         images = PRODUCT_IMAGES[category_name]
         is_best_seller = random.choices([True, False], weights=[70, 30], k=1)[0]
+
+        # The Product check constraint requires grouped_unit to be one of
+        # 'pcs' | 'ml' | 'ltr' AND grouped_quantity > 0 for every row, so we
+        # must always set both explicitly (the model's default of NA/0 would
+        # violate the constraint on insert). The values come from the
+        # template itself so they reflect how that specific dish is actually
+        # sold (e.g. 1 plate of biryani, 8 momo pieces, 500ml of coke) rather
+        # than a category-wide guess.
+        grouped_unit = template["grouped_unit"]
+        grouped_quantity = random.choice(template["grouped_quantity_choices"])
+
         product = Product(
             product_name=f"{template['name']} #{index + 1}",
             product_description=f"Delicious {template['name'].lower()} prepared with fresh and quality ingredients.",
@@ -323,9 +386,12 @@ async def seed_products(
             is_available=random.choices([True, False], weights=[90, 10], k=1)[0],
             is_best_seller=is_best_seller,
             price=random.randint(*template["price"]),
-            discount_percentage=random.choice([0, 0.05, 0.10, 0.15, 0.20, 0.25]),
+            # discount_percentage is a whole-number percent (e.g. 10 == 10%),
+            # since total_amount divides it by 100 — not a 0-1 fraction.
+            discount_percentage=random.choice([0, 5, 10, 15, 20, 25]),
             average_preparation_time=random.randint(*template["prep_time"]),
-            grouped_quantity=random.randint(1, 10),
+            grouped_unit=grouped_unit,
+            grouped_quantity=grouped_quantity,
             ingredients=random.sample(
                 template["ingredients"],
                 k=random.randint(2, len(template["ingredients"])),
@@ -372,6 +438,8 @@ async def seed_comments(
 ) -> list[Comment]:
     comments = []
 
+    # Review.comment is a one-to-one relationship (uselist=False), so each
+    # review can carry at most a single comment.
     for review in reviews:
         if random.random() < 0.7:
             user = random.choice(users)

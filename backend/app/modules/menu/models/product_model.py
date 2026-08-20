@@ -1,6 +1,8 @@
+from enum import Enum
 from typing import TYPE_CHECKING
 
 from sqlalchemy import ARRAY, CheckConstraint, String
+from sqlalchemy.dialects.postgresql import ENUM
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -10,6 +12,13 @@ from app.modules.menu.models.review_model import Review
 
 if TYPE_CHECKING:
     from app.modules.menu.models.category_model import Category
+
+
+class QuantizedUnit(str, Enum):
+    LTR = "ltr"
+    ML = "ml"
+    PCS = "pcs"
+    NA = "na"
 
 
 class Product(BaseModel):
@@ -22,6 +31,9 @@ class Product(BaseModel):
     price: Mapped[int]
     discount_percentage: Mapped[float] = mapped_column(default=0)
     average_preparation_time: Mapped[int] = mapped_column(default=15)
+    grouped_unit: Mapped[QuantizedUnit] = mapped_column(
+        ENUM(QuantizedUnit), default=QuantizedUnit.NA
+    )
     grouped_quantity: Mapped[int] = mapped_column(default=0)
     ingredients: Mapped[list[str]] = mapped_column(
         ARRAY(String), default=list, server_default="{}"
@@ -39,6 +51,13 @@ class Product(BaseModel):
     )
     categories: Mapped[list["Category"]] = relationship(
         "Category", secondary=category_product, back_populates="products"
+    )
+    __table_args__ = (
+        CheckConstraint(
+            "(grouped_unit = 'na' AND grouped_quantity = 0) "
+            "OR (grouped_unit IN ('pcs','ml','ltr') AND grouped_quantity > 0)",
+            name="grouped_quantity_positive_for_unit",
+        ),
     )
 
     # Dynamic fields

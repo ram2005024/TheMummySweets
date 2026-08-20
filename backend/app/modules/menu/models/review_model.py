@@ -14,7 +14,7 @@ if TYPE_CHECKING:
 # Comment
 class Comment(BaseModel):
     __tablename__ = "comments"
-    user_id: Mapped[UUID] = mapped_column(ForeignKey("users.id"))
+    user_id: Mapped[UUID] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"))
     comment: Mapped[str]
     review_id: Mapped[UUID] = mapped_column(
         ForeignKey(
@@ -30,7 +30,7 @@ class Comment(BaseModel):
 class Review(BaseModel):
     __tablename__ = "reviews"
 
-    user_id: Mapped[UUID] = mapped_column(ForeignKey("users.id"))
+    user_id: Mapped[UUID] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"))
     product_id: Mapped[UUID] = mapped_column(
         ForeignKey("products.id", ondelete="CASCADE")
     )
