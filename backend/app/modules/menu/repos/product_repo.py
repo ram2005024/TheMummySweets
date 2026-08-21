@@ -97,3 +97,18 @@ class ProductRepo:
                 )
             )
         return PaginatedResponse(meta=meta, data=data)
+
+    async def read_single_product(self, product_id: str):
+        product = (
+            await self.db.execute(
+                select(
+                    Product,
+                    func.count(Review.id).label("review_count"),
+                    func.coalesce(func.avg(Review.rating), 0).label("rating"),
+                )
+                .outerjoin(Product.id == Review.product_id)
+                .group_by(Product.id)
+                .where(Product.id == UUID(product_id))
+            )
+        ).scalar_one_or_none()
+        return product

@@ -7,8 +7,9 @@ from fastapi.responses import JSONResponse
 from app.core.security import Auth
 from app.dependencies.pagination import Pagination
 from app.modules.menu.dependencies.filter_products import FilterProduct
+from app.modules.menu.exceptions.product_exceptions import ProductNotFound
 from app.modules.menu.repos.product_repo import ProductRepo
-from app.modules.menu.schemas.product import ProductCreate
+from app.modules.menu.schemas.product import ProductCreate, ProductReadSingleCustomer
 from app.modules.menu.utils import encode_image
 from app.schemas.common import SuccessResponse
 from app.tasks.menu_task import upload_product_main_image, upload_product_side_images
@@ -79,3 +80,14 @@ class ProductService:
             filter_data, pagination_data
         )
         return SuccessResponse(data=resp)
+
+    async def read_product_by_id(self, product_id: str):
+        result = await self.product_repo.read_single_product(product_id)
+        if result is None:
+            raise ProductNotFound
+        (product_obj, review_count, rating) = result
+        product = ProductReadSingleCustomer.model_validate(product_obj)
+        product_final = product.model_copy(
+            update={"review_count": review_count, "rating": rating}
+        )
+        return product_final

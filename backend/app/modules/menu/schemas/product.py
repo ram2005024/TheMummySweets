@@ -3,6 +3,8 @@ from uuid import UUID
 from fastapi import Form
 from pydantic import BaseModel, ConfigDict, field_validator
 
+from app.modules.menu.models.product_model import QuantizedUnit
+
 
 class ProductCreate(BaseModel):
     product_name: str
@@ -61,5 +63,15 @@ class ProductReadBasicCustomer(BaseModel):
     price: int
     total_amount: float
     discount_percentage: float
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class ProductReadSingleCustomer(ProductReadBasicCustomer):
+    ingredients: list[str] | None
+    grouped_quantity: int
+    grouped_unit: QuantizedUnit
+    side_images: list[str] | None
+    is_available: bool
 
     model_config = ConfigDict(from_attributes=True)
