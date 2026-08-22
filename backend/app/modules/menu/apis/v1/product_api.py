@@ -8,7 +8,11 @@ from app.dependencies.permission import RolePermission
 from app.modules.auth.models.user import User
 from app.modules.menu.dependencies.factories_service import get_product_service
 from app.modules.menu.dependencies.filter_products import FilterProduct
-from app.modules.menu.schemas.product import ProductCreate, ProductReadBasicCustomer
+from app.modules.menu.schemas.product import (
+    ProductCreate,
+    ProductReadBasicCustomer,
+    ProductReadSingleCustomer,
+)
 from app.modules.menu.services.product_services import ProductService
 from app.schemas.common import SuccessResponse
 from app.schemas.pagination_schema import PaginatedResponse
@@ -42,10 +46,13 @@ async def read_products_endpoint(
 
 
 # Read single product
-@product_api.get("/{product_id}")
+@product_api.get(
+    "/{product_id}", response_model=SuccessResponse[ProductReadSingleCustomer]
+)
 async def read_single_product_endpoint(
     product_id: UUID,
     user: Annotated[User, Depends(RolePermission(["admin", "member"]))],
     product_service: Annotated[ProductService, Depends(get_product_service)],
 ):
-    return await product_service.read_product_by_id(product_id)
+    data = await product_service.read_product_by_id(product_id)
+    return SuccessResponse(data=data)
