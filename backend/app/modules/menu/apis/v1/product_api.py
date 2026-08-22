@@ -1,4 +1,5 @@
 from typing import Annotated
+from uuid import UUID
 
 from fastapi import APIRouter, Depends, File, UploadFile
 
@@ -38,3 +39,13 @@ async def read_products_endpoint(
     pagination_data: Annotated[Pagination, Depends()],
 ):
     return await product_service.read_all_product_service(filter_data, pagination_data)
+
+
+# Read single product
+@product_api.get("/{product_id}")
+async def read_single_product_endpoint(
+    product_id: UUID,
+    user: Annotated[User, Depends(RolePermission(["admin", "member"]))],
+    product_service: Annotated[ProductService, Depends(get_product_service)],
+):
+    return await product_service.read_product_by_id(product_id)

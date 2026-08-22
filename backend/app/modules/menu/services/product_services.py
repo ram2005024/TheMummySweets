@@ -81,7 +81,7 @@ class ProductService:
         )
         return SuccessResponse(data=resp)
 
-    async def read_product_by_id(self, product_id: str):
+    async def read_product_by_id(self, product_id: UUID):
         result = await self.product_repo.read_single_product(product_id)
         if result is None:
             raise ProductNotFound
