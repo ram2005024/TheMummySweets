@@ -1,4 +1,4 @@
-from typing import ClassVar, Literal
+from typing import ClassVar
 
 from fastapi import Query
 from sqlalchemy import asc, desc, func
@@ -15,9 +15,7 @@ class FilterProduct:
         self,
         fast_prepare: bool = Query(default=False, description="product_fast_prepared"),
         most_rated: bool = Query(default=False, description="most_rated_product"),
-        sort_by: Literal["price", "-price"] | None = Query(
-            None, description="sort_by_product"
-        ),
+        sort_by: str | None = Query(None, description="sort_by_product"),
         search_by: str = Query(default=""),
         category: str | None = Query(None, description="category"),
     ) -> None:
@@ -32,11 +30,11 @@ class FilterProduct:
             stmt = stmt.where(Product.average_preparation_time < 10)
         if self.most_rated:
             stmt = stmt.having(func.coalesce(func.avg(Review.rating), 0) > 3.5)
-        if self.sort_by:
+        if self.sort_by in ("+price", "-price", "+created_at", "-created_at"):
+            sort_by_field = self.sort_by[1:]
+            column = getattr(Product, sort_by_field)
             stmt = stmt.order_by(
-                desc(Product.price)
-                if self.sort_by.startswith("-")
-                else asc(Product.price)
+                desc(column) if self.sort_by.startswith("-") else asc(column)
             )
         if self.category:
             stmt = stmt.join(Product.categories).where(

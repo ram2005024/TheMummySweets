@@ -93,7 +93,10 @@ class ProductRepo:
             product_data = ProductReadBasicCustomer.model_validate(product)
             data.append(
                 product_data.model_copy(
-                    update={"rating": float(rating), "review_count": int(review_count)}
+                    update={
+                        "rating": round(rating, 2),
+                        "review_count": int(review_count),
+                    }
                 )
             )
         return PaginatedResponse(meta=meta, data=data)

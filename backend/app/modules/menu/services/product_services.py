@@ -88,6 +88,6 @@ class ProductService:
         (product_obj, review_count, rating) = result
         product = ProductReadSingleCustomer.model_validate(product_obj)
         product_final = product.model_copy(
-            update={"review_count": review_count, "rating": rating}
+            update={"review_count": review_count, "rating": round(rating, 2)}
         )
         return product_final
