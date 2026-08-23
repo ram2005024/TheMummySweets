@@ -1,4 +1,7 @@
+import { useGetMenuProducts } from "@/hooks/menu/useMenuItems";
+
 const HeadingSection = () => {
+  const { data: products } = useGetMenuProducts();
   return (
     <section className="border-b border-[#eadfd3] bg-[#fff8ed]">
       <div className="mx-auto max-w-[1600px] px-7 py-10">
@@ -14,7 +17,7 @@ const HeadingSection = () => {
           </div>
 
           <p className="mt-7 text-[15px] font-light text-[#544f4c]">
-            Showing 12 of 12 products.
+            Showing {products?.meta.limit} of {products?.meta.total} products.
           </p>
         </div>
       </div>

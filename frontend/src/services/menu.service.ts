@@ -1,6 +1,6 @@
 import api from "@/libs/api";
-import { PaginatedResponse } from "@/type/common.type";
-import { MenuParams, MenuProduct } from "@/type/menu.type";
+import { PaginatedResponse, SuccessResponse } from "@/type/common.type";
+import { CategoryReadBasic, MenuParams, MenuProduct } from "@/type/menu.type";
 
 export class MenuService {
   static getMenuItems = async (
@@ -10,5 +10,11 @@ export class MenuService {
       params,
     });
     return res.data.data;
+  };
+  static getMultipleCategories = async (): Promise<
+    SuccessResponse<CategoryReadBasic[]>
+  > => {
+    const res = await api.get("/category/");
+    return res.data;
   };
 }

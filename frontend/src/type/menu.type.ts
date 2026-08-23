@@ -21,3 +21,8 @@ export interface MenuParams {
   category: string | null;
   limit: number;
 }
+
+export interface CategoryReadBasic {
+  id: string;
+  category_name: string;
+}

@@ -30,4 +30,9 @@ export const useGetMenuProducts = () => {
   });
 };
 
-//
+// To get the multiple categories
+export const useGetMenuCategories = () =>
+  useQuery({
+    queryKey: ["categories"],
+    queryFn: MenuService.getMultipleCategories,
+  });

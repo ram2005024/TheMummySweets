@@ -1,7 +1,7 @@
 "use client";
 
-import Image from "next/image";
 import { Loader2 } from "lucide-react";
+import Image from "next/image";
 
 export default function SplashScreen() {
   return (
@@ -27,16 +27,12 @@ export default function SplashScreen() {
         The Mummy Sweets
       </h1>
 
-      <p className="mt-2 text-sm text-gray-500">
-        Fresh • Pure • Homemade
-      </p>
+      <p className="mt-2 text-sm text-gray-500">Fresh • Pure • Homemade</p>
 
       {/* Loader */}
       <Loader2 className="mt-8 h-7 w-7 animate-spin text-orange-500" />
 
-      <p className="mt-3 text-sm text-gray-400">
-        Preparing your experience...
-      </p>
+      <p className="mt-3 text-sm text-gray-400">Preparing your experience...</p>
     </div>
   );
 }
