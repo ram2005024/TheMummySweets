@@ -1,23 +1,19 @@
 import { MenuService } from "@/services/menu.service";
 import { menuStore } from "@/store/menu.product";
-import { keepPreviousData, useQuery } from "@tanstack/react-query";
+import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 
 // To get the menu items
 export const useGetMenuProducts = () => {
-  const {
-    page,
-    limit,
-    search_by,
-    category,
-    most_rated,
-    fast_prepare,
-    sort_by,
-  } = menuStore();
-  return useQuery({
-    queryKey: ["menu-products", page],
-    queryFn: () =>
+  const { limit, search_by, category, most_rated, fast_prepare, sort_by } =
+    menuStore();
+  return useInfiniteQuery({
+    queryKey: [
+      "menu-products",
+      { limit, search_by, category, most_rated, fast_prepare, sort_by },
+    ],
+    queryFn: ({ pageParam = 1 }) =>
       MenuService.getMenuItems({
-        page,
+        page: pageParam,
         limit,
         search_by,
         category,
@@ -25,7 +21,11 @@ export const useGetMenuProducts = () => {
         fast_prepare,
         sort_by,
       }),
-    placeholderData: keepPreviousData,
+    getNextPageParam: (lastResult) => {
+      const { meta } = lastResult;
+      return meta?.has_next ? meta.page_no + 1 : undefined;
+    },
+    initialPageParam: 1,
     staleTime: 5 * 60 * 1000,
   });
 };

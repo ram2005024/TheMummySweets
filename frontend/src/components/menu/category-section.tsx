@@ -8,7 +8,7 @@ import NoCategories from "./categories-section/no-categories-to-show";
 const CategorySection = () => {
   const { data: categories } = useGetMenuCategories();
   return (
-    <section className="border-y-2 border-surface-2 ">
+    <section className="border-y-2  border-surface-2 sticky top-20 backdrop-blur-lg z-20">
       <div className="sm:max-w-[80%]  w-full mx-auto  py-10">
         {/* For categories links */}
         {categories && categories?.data.length > 0 ? (

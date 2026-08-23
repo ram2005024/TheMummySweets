@@ -39,8 +39,8 @@ export default function NavBar() {
     { name: "Contact", href: "/contact" },
   ];
   return (
-    <header className="sticky top-0 z-100 border-b border-gray-200 bg-[var(--background)] backdrop-blur-lg shadow-xs">
-      <div className="mx-auto flex h-fit max-w-7xl items-center justify-between px-5 lg:px-8">
+    <header className="sticky top-0 z-100 border-b border-gray-200 bg-background backdrop-blur-lg shadow-xs">
+      <div className="mx-auto flex h-30 max-w-7xl items-center justify-between px-5 lg:px-8">
         {/* Desktop Navigation */}
         <nav className="hidden items-center gap-3 lg:flex flex-col w-full">
           <NavBarUpperSection />

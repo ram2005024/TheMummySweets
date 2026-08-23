@@ -2,7 +2,10 @@
 
 import Image from "next/image";
 
-import { DropdownMenu, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 import { useUser } from "@/hooks/auth/useUser";
 
@@ -15,8 +18,7 @@ export default function UserIcon() {
 
   const profile = user.profile;
 
-  const avatarLetter =
-    profile.full_name.trim().charAt(0).toUpperCase();
+  const avatarLetter = profile.full_name.trim().charAt(0).toUpperCase();
 
   return (
     <DropdownMenu>

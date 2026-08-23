@@ -1,4 +1,5 @@
 export interface MenuProduct {
+  id: string;
   main_image: string;
   is_best_seller: boolean;
   category_label: string;

@@ -1,8 +1,6 @@
 import { create } from "zustand";
 
 interface menuStoreInterface {
-  page: number;
-  setMenuPage: (page: number) => void;
   fast_prepare: boolean;
   setFastPrepare: (val: boolean) => void;
   most_rated: boolean;
@@ -19,8 +17,6 @@ interface menuStoreInterface {
 
 // Menu store
 export const menuStore = create<menuStoreInterface>((set) => ({
-  page: 1,
-  setMenuPage: (val) => set({ page: val }),
   fast_prepare: false,
   setFastPrepare: (val) => set({ fast_prepare: val }),
   most_rated: false,
