@@ -10,7 +10,16 @@
    THE MUMMY SWEETS & CORNER
    Warm • Premium • Modern Indian/Nepali Food
    ========================================================= */
+@layer utilities {
+  .no-scrollbar {
+    -ms-overflow-style: none; /* IE/Edge */
+    scrollbar-width: none; /* Firefox */
+  }
 
+  .no-scrollbar::-webkit-scrollbar {
+    display: none; /* Chrome, Safari */
+  }
+}
 @theme inline {
   /* -------------------------------------------------------
      Fonts

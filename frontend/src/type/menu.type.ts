@@ -25,4 +25,5 @@ export interface MenuParams {
 export interface CategoryReadBasic {
   id: string;
   category_name: string;
+  product_count: number;
 }

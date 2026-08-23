@@ -3,8 +3,8 @@ import { useGetMenuProducts } from "@/hooks/menu/useMenuItems";
 const HeadingSection = () => {
   const { data: products } = useGetMenuProducts();
   return (
-    <section className="border-b border-[#eadfd3] bg-[#fff8ed]">
-      <div className="mx-auto max-w-[1600px] px-7 py-10">
+    <section className="bg-[#fff8ed]">
+      <div className="sm:max-w-[80%] w-full mx-auto  py-10">
         <div className="max-w-3xl">
           <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-[#e8832a]">
             The Menu
