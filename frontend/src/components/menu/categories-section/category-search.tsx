@@ -7,13 +7,18 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { menuStore } from "@/store/menu.product";
 import { Search } from "lucide-react";
-import { useState } from "react";
 
 const CategorySearch = () => {
-  const [search, setSearch] = useState("");
-  const [sortBy, setSortBy] = useState("popular");
-
+  const {
+    setMostRated,
+    setSortBy,
+    setSearchBy,
+    search_by,
+    sort_by,
+    most_rated,
+  } = menuStore();
   return (
     <div className="flex items-center gap-4 w-full sm:mt-8 mt-5">
       {/* Search input */}
@@ -22,21 +27,38 @@ const CategorySearch = () => {
         <input
           type="text"
           placeholder="Search this category..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
+          value={search_by || ""}
+          onChange={(e) => setSearchBy(e.target.value)}
           className="flex-1 bg-transparent outline-none text-sm "
         />
       </div>
 
       {/* Sort dropdown using shadcn Select */}
-      <Select value={sortBy} onValueChange={(val) => setSortBy(val)}>
-        <SelectTrigger className="w-[160px]">
+      <Select
+        value={most_rated ? "popular" : (sort_by ?? "")}
+        onValueChange={(val) => {
+          if (val === "popular") {
+            setMostRated(true);
+            setSortBy(null);
+          } else if (val === "all") {
+            setMostRated(false);
+            setSortBy(null);
+          } else {
+            setMostRated(false);
+            setSortBy(val);
+          }
+        }}
+      >
+        <SelectTrigger className="w-40">
           <SelectValue placeholder="Sort by" />
         </SelectTrigger>
         <SelectContent>
+          <SelectItem value="All">All categories</SelectItem>
           <SelectItem value="popular">Most popular</SelectItem>
-          <SelectItem value="newest">Newest first</SelectItem>
-          <SelectItem value="oldest">Oldest first</SelectItem>
+          <SelectItem value="+created_at">Newest first</SelectItem>
+          <SelectItem value="-created_at">Oldest first</SelectItem>
+          <SelectItem value="+price">Price: Low to High</SelectItem>
+          <SelectItem value="-price">Price: High to Low</SelectItem>
         </SelectContent>
       </Select>
     </div>

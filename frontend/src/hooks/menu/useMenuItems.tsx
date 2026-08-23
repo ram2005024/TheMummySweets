@@ -9,7 +9,12 @@ export const useGetMenuProducts = () => {
   return useInfiniteQuery({
     queryKey: [
       "menu-products",
-      { limit, search_by, category, most_rated, fast_prepare, sort_by },
+      limit,
+      search_by,
+      category,
+      most_rated,
+      fast_prepare,
+      sort_by,
     ],
     queryFn: ({ pageParam = 1 }) =>
       MenuService.getMenuItems({
@@ -25,6 +30,7 @@ export const useGetMenuProducts = () => {
       const { meta } = lastResult;
       return meta?.has_next ? meta.page_no + 1 : undefined;
     },
+    placeholderData: (prev) => prev,
     initialPageParam: 1,
     staleTime: 5 * 60 * 1000,
   });

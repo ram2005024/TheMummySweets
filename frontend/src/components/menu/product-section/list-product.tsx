@@ -2,12 +2,11 @@
 
 import { useGetMenuProducts } from "@/hooks/menu/useMenuItems";
 import { MenuProduct } from "@/type/menu.type";
-import { Clock3, Heart, Plus, ShoppingBag, Star } from "lucide-react";
+import { Clock3, Heart, Plus, Star } from "lucide-react";
 import Image from "next/image";
 
 const ListProducts = () => {
-  const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
-    useGetMenuProducts();
+  const { data } = useGetMenuProducts();
 
   const products: MenuProduct[] =
     data?.pages.flatMap((page) => page.data) ?? [];
@@ -149,30 +148,6 @@ const ListProducts = () => {
           </div>
         </article>
       ))}
-
-      {/* ================= LOAD MORE ================= */}
-      {hasNextPage && (
-        <div className="col-span-full flex justify-center pt-5">
-          <button
-            type="button"
-            onClick={() => fetchNextPage()}
-            disabled={isFetchingNextPage}
-            className="flex h-11 cursor-pointer items-center gap-2 rounded-full border border-[#dfd1c5] bg-white px-6 text-[12px] font-semibold text-[#59483e] transition-all duration-200 hover:border-[#e6a46c] hover:bg-[#fffaf5] hover:text-[#d87520] disabled:cursor-not-allowed disabled:opacity-60"
-          >
-            {isFetchingNextPage ? (
-              <>
-                <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-[#e8832a] border-t-transparent" />
-                Loading...
-              </>
-            ) : (
-              <>
-                <ShoppingBag size={15} strokeWidth={1.8} />
-                Load more
-              </>
-            )}
-          </button>
-        </div>
-      )}
     </div>
   );
 };

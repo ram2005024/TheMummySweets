@@ -6,11 +6,11 @@ interface menuStoreInterface {
   most_rated: boolean;
   setMostRated: (val: boolean) => void;
   sort_by: string | null;
-  setSortBy: (val: string) => void;
+  setSortBy: (val: string | null) => void;
   search_by: string | null;
-  setSearchBy: (val: string) => void;
+  setSearchBy: (val: string | null) => void;
   category: string | null;
-  setCategory: (val: string) => void;
+  setCategory: (val: string | null) => void;
   limit: number;
   setLimit: (val: number) => void;
 }

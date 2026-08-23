@@ -1,6 +1,7 @@
 "use client";
 
 import { useGetMenuCategories } from "@/hooks/menu/useMenuItems";
+import { menuStore } from "@/store/menu.product";
 import {
   Coffee,
   Drumstick,
@@ -36,6 +37,7 @@ const CategoriesLinks = () => {
   const [isDefault, setIsDefault] = useState(true);
   const [activeLinkLabel, setLabel] = useState("");
   const { data: categories } = useGetMenuCategories();
+  const { setCategory } = menuStore();
 
   return (
     <div className="flex gap-2 no-scrollbar overflow-x-auto ">
@@ -44,6 +46,7 @@ const CategoriesLinks = () => {
         onClick={() => {
           setIsDefault(true);
           setLabel("");
+          setCategory(null);
         }}
         className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-colors
           ${isDefault ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground hover:bg-muted/70"}`}
@@ -60,6 +63,7 @@ const CategoriesLinks = () => {
           <button
             key={item.id}
             onClick={() => {
+              setCategory(item.category_name);
               setLabel(item.category_name);
               setIsDefault(false);
             }}

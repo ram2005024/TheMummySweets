@@ -24,7 +24,7 @@ const HeadingSection = () => {
           </div>
 
           <p className="mt-7 text-[15px] font-light text-[#544f4c]">
-            Showing {products.length} of {meta?.total ?? 0} products.
+            Showing {products.length} of {meta?.filtered_total ?? 0} products.
           </p>
         </div>
       </div>
