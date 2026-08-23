@@ -52,6 +52,7 @@ class ProductCreate(BaseModel):
 
 
 class ProductReadBasicCustomer(BaseModel):
+    id: UUID
     main_image: str | None = None
     is_best_seller: bool
     category_label: str
