@@ -16,7 +16,7 @@ export const useGetMenuProducts = () => {
       fast_prepare,
       sort_by,
     ],
-    queryFn: ({ pageParam = 1 }) =>
+    queryFn: ({ pageParam }) =>
       MenuService.getMenuItems({
         page: pageParam,
         limit,
