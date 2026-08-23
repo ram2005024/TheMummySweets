@@ -1,7 +1,8 @@
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.modules.menu.models.category_model import Category
+from app.modules.menu.models.product_model import Product
 from app.modules.menu.schemas.category import CreateCategory
 
 
@@ -17,5 +18,11 @@ class CategoryRepo:
         return True
 
     async def list_categories(self):
-        categories = (await self.db.execute(select(Category))).scalars().all()
+        categories = (
+            await self.db.execute(
+                select(Category, func.count(Product.id).label("product_count"))
+                .outerjoin(Category.products)
+                .group_by(Category.id),
+            )
+        ).all()
         return categories

@@ -1,5 +1,5 @@
 from app.modules.menu.repos.category_repo import CategoryRepo
-from app.modules.menu.schemas.category import CreateCategory
+from app.modules.menu.schemas.category import CategoryReadBasic, CreateCategory
 from app.schemas.common import SuccessResponse
 
 
@@ -16,4 +16,15 @@ class CategoryService:
 
     # Get the list of categories
     async def get_categories(self):
-        return await self.category_repo.list_categories()
+        result = await self.category_repo.list_categories()
+        categories = [
+            CategoryReadBasic.model_validate(
+                {
+                    "id": cat.id,
+                    "category_name": cat.category_name,
+                    "product_count": count,
+                }
+            )
+            for cat, count in result
+        ]
+        return categories
