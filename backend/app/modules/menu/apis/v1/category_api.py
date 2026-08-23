@@ -5,7 +5,7 @@ from fastapi import APIRouter, Depends
 from app.dependencies.permission import RolePermission
 from app.modules.auth.models.user import User
 from app.modules.menu.dependencies.factories_service import get_category_service
-from app.modules.menu.schemas.category import CreateCategory
+from app.modules.menu.schemas.category import CategoryReadBasic, CreateCategory
 from app.modules.menu.services.category_services import CategoryService
 from app.schemas.common import SuccessResponse
 
@@ -19,3 +19,12 @@ async def create_category_endpoint(
     user: Annotated[User, Depends(RolePermission(["admin"]))],
 ):
     return await category_service.create_category(data)
+
+
+@category_api.get("/", response_model=SuccessResponse[list[CategoryReadBasic]])
+async def read_all_categories_endpoint(
+    user: Annotated[User, Depends(RolePermission(["member", "admin"]))],
+    service: Annotated[CategoryService, Depends(get_category_service)],
+):
+    categories = await service.get_categories()
+    return SuccessResponse(data=categories)
