@@ -11,7 +11,7 @@ import {
   X,
 } from "lucide-react";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useLogout } from "../hooks/auth/useLogout";
 import { useUser } from "../hooks/auth/useUser";
@@ -30,7 +30,6 @@ export default function NavBar() {
     user,
     status,
   });
-  const path = usePathname();
   const navLinks = [
     { name: "Home", href: "/" },
     { name: "Menu", href: "/menu" },
