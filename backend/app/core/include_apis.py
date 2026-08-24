@@ -4,7 +4,8 @@ from app.modules.auth.apis import v1 as auth_apis_v1
 from app.modules.menu.apis import v1 as menu_apis_v1
 
 
-def include_apis(app:FastAPI):
-    app.include_router(auth_apis_v1.auth_router,prefix="/api/v1")
-    app.include_router(menu_apis_v1.category_api,prefix="/api/v1")
-    app.include_router(menu_apis_v1.product_api,prefix="/api/v1")
+def include_apis(app: FastAPI):
+    app.include_router(auth_apis_v1.auth_router, prefix="/api/v1")
+    app.include_router(menu_apis_v1.category_api, prefix="/api/v1")
+    app.include_router(menu_apis_v1.product_api, prefix="/api/v1")
+    app.include_router(menu_apis_v1.wishlist_api, prefix="/api/v1")

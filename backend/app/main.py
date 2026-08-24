@@ -35,17 +35,20 @@ async def lifespan(app: FastAPI):
 app = FastAPI(title="The Mummy Sweets", lifespan=lifespan)
 
 # Middlwares
-origins=["http://localhost:3000"]
-app.add_middleware(CORSMiddleware,
+origins = ["http://localhost:3000"]
+app.add_middleware(
+    CORSMiddleware,
     allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
-    allow_headers=["*"])
+    allow_headers=["*"],
+)
 app.add_middleware(LoggingMiddleware)
 app.add_middleware(SessionMiddleware, secret_key=settings.SESSION_SECRET)
 # Def to handle the exception
 exception_handler(app)
-include_apis(app) #api routers
+include_apis(app)  # api routers
+
 
 # Test
 @app.get("/")
