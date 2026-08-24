@@ -91,3 +91,6 @@ class ProductService:
             update={"review_count": review_count, "rating": round(rating, 2)}
         )
         return product_final
+
+    async def read_product_reviews(self, product_id: UUID):
+        return await self.product_repo.read_product_reviews(product_id)

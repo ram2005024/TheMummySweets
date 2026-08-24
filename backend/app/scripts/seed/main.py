@@ -22,58 +22,50 @@ CATEGORY_NAMES = [
     "Momo",
     "Pizza",
     "Burger",
-    "Biryani",
     "Chowmein",
     "Thukpa",
     "Snacks",
     "Drinks",
     "Desserts",
+    "Sweets",
     "Main Course",
 ]
 
-REVIEW_COMMENTS = [
-    "Really tasty!",
-    "Loved it.",
-    "Would definitely order again.",
-    "Very delicious.",
-    "Good portion size.",
-    "The taste was amazing.",
-    "Pretty good for the price.",
-    "Fresh and tasty.",
-    "Could be a little better.",
-    "Not bad.",
-    "Excellent food!",
-    "One of my favorites.",
-    "Really enjoyed this.",
-    "The preparation was great.",
-    "Highly recommended.",
+REVIEW_TITLES = [
+    "Ekdam mito thiyo!",
+    "Sasto ra mito!",
+    "Feri auchu pakkai!",
+    "Dherai ramro thiyo!",
+    "Best food in town!",
+    "Highly recommended!",
+    "Worth every paisa!",
+    "Fresh ra tasty!",
+    "Superb taste!",
+    "Khana ekdam ramro!",
+    "Mast experience thiyo!",
+    "Dherai maan paryo!",
 ]
 
-# grouped_unit / grouped_quantity_choices are defined per PRODUCT, not per
-# category. Only dishes that are genuinely counted or measured get a real
-# unit (momo pieces, pizza/cake slices, burgers per order, drink volume).
-# Everything sold as a single plate/serving (biryani, chowmein, thukpa,
-# sekuwa, fries) has nothing meaningful to group, so it stays NA / 0 — which
-# the fixed model constraint now actually allows.
+REVIEW_COMMENTS = [
+    "Ekdam mito thiyo, feri order garchu!",
+    "Dherai ramro khana, sab lai recommend garchu.",
+    "Taste ekdam unique thiyo, maan paryo!",
+    "Fresh ingredients use gareko thaha huncha.",
+    "Packaging pani ramro thiyo, time ma aayo.",
+    "Paise vasul thiyo, dherai khushi bhaye.",
+    "Aaja samma khako ma sabai bhanda mito!",
+    "Portion size pani ramro thiyo.",
+    "Sabai item try gareko, sab mito.",
+    "Ghar ko khana jastai lagyo, heart touching!",
+    "Quality ekdam ramro, continue garnus!",
+    "Next time family lai pani lyauchu.",
+    "Dherai dinpachi yo khana khaera khushi bhaye.",
+    "Service pani ramro, khana pani mito!",
+    "Swad ma koi compromise chhaina!",
+]
+
 PRODUCT_TEMPLATES = [
-    {
-        "name": "Chicken Momo",
-        "category": "Momo",
-        "ingredients": ["Chicken", "Flour", "Onion", "Garlic", "Ginger", "Coriander"],
-        "price": (180, 350),
-        "prep_time": (15, 30),
-        "grouped_unit": QuantizedUnit.PCS,
-        "grouped_quantity_choices": [6, 8, 10, 12],  # momo pieces per plate
-    },
-    {
-        "name": "Buff Momo",
-        "category": "Momo",
-        "ingredients": ["Buff", "Flour", "Onion", "Garlic", "Ginger", "Coriander"],
-        "price": (150, 300),
-        "prep_time": (15, 30),
-        "grouped_unit": QuantizedUnit.PCS,
-        "grouped_quantity_choices": [6, 8, 10, 12],
-    },
+    # ── MOMO ──────────────────────────────────────────────────────────────
     {
         "name": "Veg Momo",
         "category": "Momo",
@@ -82,16 +74,48 @@ PRODUCT_TEMPLATES = [
         "prep_time": (15, 25),
         "grouped_unit": QuantizedUnit.PCS,
         "grouped_quantity_choices": [6, 8, 10, 12],
+        "images": [
+            "https://images.unsplash.com/photo-1625220194771-7ebdea0b70b9",
+            "https://images.unsplash.com/photo-1534422298391-e4f8517d9b99",
+        ],
     },
     {
-        "name": "Chicken Pizza",
-        "category": "Pizza",
-        "ingredients": ["Chicken", "Cheese", "Flour", "Tomato", "Capsicum", "Onion"],
-        "price": (500, 1000),
-        "prep_time": (25, 45),
+        "name": "Paneer Momo",
+        "category": "Momo",
+        "ingredients": ["Paneer", "Flour", "Onion", "Garlic", "Ginger", "Coriander"],
+        "price": (160, 300),
+        "prep_time": (15, 30),
         "grouped_unit": QuantizedUnit.PCS,
-        "grouped_quantity_choices": [6, 8],  # slices per pizza
+        "grouped_quantity_choices": [6, 8, 10, 12],
+        "images": [
+            "https://images.unsplash.com/photo-1625220194771-7ebdea0b70b9",
+        ],
     },
+    {
+        "name": "Mushroom Momo",
+        "category": "Momo",
+        "ingredients": ["Mushroom", "Flour", "Onion", "Garlic", "Ginger", "Capsicum"],
+        "price": (150, 280),
+        "prep_time": (15, 25),
+        "grouped_unit": QuantizedUnit.PCS,
+        "grouped_quantity_choices": [6, 8, 10, 12],
+        "images": [
+            "https://images.unsplash.com/photo-1625220194771-7ebdea0b70b9",
+        ],
+    },
+    {
+        "name": "Cheese Momo",
+        "category": "Momo",
+        "ingredients": ["Cheese", "Flour", "Onion", "Garlic", "Ginger", "Coriander"],
+        "price": (170, 320),
+        "prep_time": (15, 30),
+        "grouped_unit": QuantizedUnit.PCS,
+        "grouped_quantity_choices": [6, 8, 10, 12],
+        "images": [
+            "https://images.unsplash.com/photo-1625220194771-7ebdea0b70b9",
+        ],
+    },
+    # ── PIZZA ─────────────────────────────────────────────────────────────
     {
         "name": "Margherita Pizza",
         "category": "Pizza",
@@ -100,102 +124,74 @@ PRODUCT_TEMPLATES = [
         "prep_time": (20, 40),
         "grouped_unit": QuantizedUnit.PCS,
         "grouped_quantity_choices": [6, 8],
+        "images": [
+            "https://images.unsplash.com/photo-1574071318508-1cdbab80d002",
+            "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38",
+        ],
     },
     {
-        "name": "Pepperoni Pizza",
+        "name": "Paneer Tikka Pizza",
         "category": "Pizza",
-        "ingredients": ["Pepperoni", "Cheese", "Flour", "Tomato", "Olives"],
-        "price": (600, 1100),
+        "ingredients": ["Paneer", "Cheese", "Flour", "Tomato", "Capsicum", "Onion"],
+        "price": (550, 1050),
         "prep_time": (25, 45),
         "grouped_unit": QuantizedUnit.PCS,
         "grouped_quantity_choices": [6, 8],
+        "images": [
+            "https://images.unsplash.com/photo-1574071318508-1cdbab80d002",
+        ],
     },
     {
-        "name": "Chicken Burger",
-        "category": "Burger",
-        "ingredients": ["Chicken", "Bun", "Cheese", "Lettuce", "Tomato", "Mayonnaise"],
-        "price": (300, 600),
-        "prep_time": (15, 30),
+        "name": "Farm Fresh Veggie Pizza",
+        "category": "Pizza",
+        "ingredients": ["Capsicum", "Onion", "Tomato", "Mushroom", "Cheese", "Flour"],
+        "price": (500, 950),
+        "prep_time": (20, 40),
         "grouped_unit": QuantizedUnit.PCS,
-        "grouped_quantity_choices": [1, 2],  # burgers per order
+        "grouped_quantity_choices": [6, 8],
+        "images": [
+            "https://images.unsplash.com/photo-1574071318508-1cdbab80d002",
+        ],
     },
-    {
-        "name": "Cheese Burger",
-        "category": "Burger",
-        "ingredients": ["Beef", "Bun", "Cheese", "Lettuce", "Tomato", "Onion"],
-        "price": (350, 650),
-        "prep_time": (15, 30),
-        "grouped_unit": QuantizedUnit.PCS,
-        "grouped_quantity_choices": [1, 2],
-    },
+    # ── BURGER ────────────────────────────────────────────────────────────
     {
         "name": "Veg Burger",
         "category": "Burger",
-        "ingredients": ["Potato", "Bun", "Lettuce", "Tomato", "Cheese"],
-        "price": (250, 500),
+        "ingredients": ["Potato Patty", "Bun", "Lettuce", "Tomato", "Cheese", "Mayo"],
+        "price": (200, 450),
         "prep_time": (15, 25),
         "grouped_unit": QuantizedUnit.PCS,
         "grouped_quantity_choices": [1, 2],
-    },
-    {
-        "name": "Chicken Biryani",
-        "category": "Biryani",
-        "ingredients": [
-            "Chicken",
-            "Rice",
-            "Onion",
-            "Yogurt",
-            "Spices",
-            "Ginger",
-            "Garlic",
+        "images": [
+            "https://images.unsplash.com/photo-1568901346375-23c9450c58cd",
+            "https://images.unsplash.com/photo-1550547660-d9450f859349",
         ],
-        "price": (300, 600),
-        "prep_time": (30, 50),
-        "grouped_unit": QuantizedUnit.NA,
-        "grouped_quantity_choices": [0],  # single plate, nothing to group
     },
     {
-        "name": "Mutton Biryani",
-        "category": "Biryani",
-        "ingredients": [
-            "Mutton",
-            "Rice",
-            "Onion",
-            "Yogurt",
-            "Spices",
-            "Ginger",
-            "Garlic",
-        ],
-        "price": (450, 800),
-        "prep_time": (35, 55),
-        "grouped_unit": QuantizedUnit.NA,
-        "grouped_quantity_choices": [0],
-    },
-    {
-        "name": "Veg Biryani",
-        "category": "Biryani",
-        "ingredients": ["Rice", "Carrot", "Peas", "Potato", "Onion", "Spices"],
+        "name": "Paneer Burger",
+        "category": "Burger",
+        "ingredients": ["Paneer Patty", "Bun", "Lettuce", "Tomato", "Cheese", "Onion"],
         "price": (250, 500),
-        "prep_time": (25, 45),
-        "grouped_unit": QuantizedUnit.NA,
-        "grouped_quantity_choices": [0],
+        "prep_time": (15, 30),
+        "grouped_unit": QuantizedUnit.PCS,
+        "grouped_quantity_choices": [1, 2],
+        "images": [
+            "https://images.unsplash.com/photo-1568901346375-23c9450c58cd",
+        ],
     },
     {
-        "name": "Chicken Chowmein",
-        "category": "Chowmein",
-        "ingredients": [
-            "Noodles",
-            "Chicken",
-            "Cabbage",
-            "Carrot",
-            "Soy Sauce",
-            "Onion",
-        ],
-        "price": (180, 350),
+        "name": "Mushroom Swiss Burger",
+        "category": "Burger",
+        "ingredients": ["Mushroom Patty", "Bun", "Swiss Cheese", "Lettuce", "Onion"],
+        "price": (280, 550),
         "prep_time": (15, 30),
-        "grouped_unit": QuantizedUnit.NA,
-        "grouped_quantity_choices": [0],
+        "grouped_unit": QuantizedUnit.PCS,
+        "grouped_quantity_choices": [1, 2],
+        "images": [
+            "https://images.unsplash.com/photo-1568901346375-23c9450c58cd",
+        ],
     },
+    # ── CHOWMEIN ──────────────────────────────────────────────────────────
     {
         "name": "Veg Chowmein",
         "category": "Chowmein",
@@ -204,16 +200,24 @@ PRODUCT_TEMPLATES = [
         "prep_time": (15, 25),
         "grouped_unit": QuantizedUnit.NA,
         "grouped_quantity_choices": [0],
+        "images": [
+            "https://images.unsplash.com/photo-1585032226651-759b368d7246",
+            "https://images.unsplash.com/photo-1569718212165-3a8278d5f624",
+        ],
     },
     {
-        "name": "Chicken Thukpa",
-        "category": "Thukpa",
-        "ingredients": ["Noodles", "Chicken", "Carrot", "Cabbage", "Garlic", "Ginger"],
-        "price": (200, 400),
-        "prep_time": (20, 35),
+        "name": "Paneer Chowmein",
+        "category": "Chowmein",
+        "ingredients": ["Noodles", "Paneer", "Cabbage", "Carrot", "Soy Sauce", "Onion"],
+        "price": (200, 380),
+        "prep_time": (15, 30),
         "grouped_unit": QuantizedUnit.NA,
         "grouped_quantity_choices": [0],
+        "images": [
+            "https://images.unsplash.com/photo-1585032226651-759b368d7246",
+        ],
     },
+    # ── THUKPA ────────────────────────────────────────────────────────────
     {
         "name": "Veg Thukpa",
         "category": "Thukpa",
@@ -222,7 +226,24 @@ PRODUCT_TEMPLATES = [
         "prep_time": (20, 30),
         "grouped_unit": QuantizedUnit.NA,
         "grouped_quantity_choices": [0],
+        "images": [
+            "https://images.unsplash.com/photo-1547592180-85f173990554",
+            "https://images.unsplash.com/photo-1569718212165-3a8278d5f624",
+        ],
     },
+    {
+        "name": "Tofu Thukpa",
+        "category": "Thukpa",
+        "ingredients": ["Noodles", "Tofu", "Spinach", "Carrot", "Garlic", "Ginger"],
+        "price": (200, 380),
+        "prep_time": (20, 35),
+        "grouped_unit": QuantizedUnit.NA,
+        "grouped_quantity_choices": [0],
+        "images": [
+            "https://images.unsplash.com/photo-1547592180-85f173990554",
+        ],
+    },
+    # ── SNACKS ────────────────────────────────────────────────────────────
     {
         "name": "French Fries",
         "category": "Snacks",
@@ -230,44 +251,67 @@ PRODUCT_TEMPLATES = [
         "price": (120, 250),
         "prep_time": (10, 20),
         "grouped_unit": QuantizedUnit.NA,
-        "grouped_quantity_choices": [0],  # single basket/serving
+        "grouped_quantity_choices": [0],
+        "images": [
+            "https://images.unsplash.com/photo-1573080496219-bb080dd4f877",
+            "https://images.unsplash.com/photo-1576107232684-1279f390859f",
+        ],
     },
     {
-        "name": "Chicken Sekuwa",
-        "category": "Main Course",
-        "ingredients": ["Chicken", "Onion", "Garlic", "Ginger", "Spices", "Lemon"],
-        "price": (350, 700),
-        "prep_time": (30, 50),
+        "name": "Peri Peri Fries",
+        "category": "Snacks",
+        "ingredients": ["Potato", "Peri Peri Spice", "Salt", "Oil"],
+        "price": (150, 280),
+        "prep_time": (10, 20),
         "grouped_unit": QuantizedUnit.NA,
         "grouped_quantity_choices": [0],
+        "images": [
+            "https://images.unsplash.com/photo-1573080496219-bb080dd4f877",
+        ],
     },
     {
-        "name": "Mutton Sekuwa",
-        "category": "Main Course",
-        "ingredients": ["Mutton", "Onion", "Garlic", "Ginger", "Spices", "Lemon"],
-        "price": (450, 900),
-        "prep_time": (35, 55),
-        "grouped_unit": QuantizedUnit.NA,
-        "grouped_quantity_choices": [0],
-    },
-    {
-        "name": "Chocolate Cake",
-        "category": "Desserts",
-        "ingredients": ["Flour", "Cocoa", "Sugar", "Milk", "Chocolate"],
-        "price": (250, 500),
-        "prep_time": (5, 10),
+        "name": "Spring Rolls",
+        "category": "Snacks",
+        "ingredients": [
+            "Cabbage",
+            "Carrot",
+            "Spring Roll Sheet",
+            "Noodles",
+            "Soy Sauce",
+        ],
+        "price": (150, 300),
+        "prep_time": (15, 25),
         "grouped_unit": QuantizedUnit.PCS,
-        "grouped_quantity_choices": [6, 8],  # slices per cake
+        "grouped_quantity_choices": [4, 6, 8],
+        "images": [
+            "https://images.unsplash.com/photo-1563245372-f21724e3856d",
+        ],
     },
     {
-        "name": "Red Velvet Cake",
-        "category": "Desserts",
-        "ingredients": ["Flour", "Sugar", "Milk", "Cream Cheese", "Cocoa"],
-        "price": (300, 600),
-        "prep_time": (5, 10),
+        "name": "Paneer Tikka",
+        "category": "Snacks",
+        "ingredients": ["Paneer", "Yogurt", "Capsicum", "Onion", "Spices", "Lemon"],
+        "price": (280, 550),
+        "prep_time": (20, 35),
         "grouped_unit": QuantizedUnit.PCS,
-        "grouped_quantity_choices": [6, 8],
+        "grouped_quantity_choices": [4, 6, 8],
+        "images": [
+            "https://images.unsplash.com/photo-1567188040759-fb8a883dc6d6",
+        ],
     },
+    {
+        "name": "Corn Cheese Balls",
+        "category": "Snacks",
+        "ingredients": ["Corn", "Cheese", "Potato", "Breadcrumbs", "Spices"],
+        "price": (180, 350),
+        "prep_time": (15, 25),
+        "grouped_unit": QuantizedUnit.PCS,
+        "grouped_quantity_choices": [4, 6, 8],
+        "images": [
+            "https://images.unsplash.com/photo-1573080496219-bb080dd4f877",
+        ],
+    },
+    # ── DRINKS ────────────────────────────────────────────────────────────
     {
         "name": "Coke",
         "category": "Drinks",
@@ -276,6 +320,10 @@ PRODUCT_TEMPLATES = [
         "prep_time": (1, 5),
         "grouped_unit": QuantizedUnit.ML,
         "grouped_quantity_choices": [250, 330, 500],
+        "images": [
+            "https://images.unsplash.com/photo-1544145945-f90425340c7e",
+            "https://images.unsplash.com/photo-1554866585-cd94860890b7",
+        ],
     },
     {
         "name": "Fresh Lemonade",
@@ -285,21 +333,232 @@ PRODUCT_TEMPLATES = [
         "prep_time": (3, 8),
         "grouped_unit": QuantizedUnit.ML,
         "grouped_quantity_choices": [250, 500],
+        "images": [
+            "https://images.unsplash.com/photo-1621263764928-df1444c5e859",
+        ],
+    },
+    {
+        "name": "Mango Lassi",
+        "category": "Drinks",
+        "ingredients": ["Mango", "Yogurt", "Sugar", "Milk", "Cardamom"],
+        "price": (150, 280),
+        "prep_time": (5, 10),
+        "grouped_unit": QuantizedUnit.ML,
+        "grouped_quantity_choices": [250, 500],
+        "images": [
+            "https://images.unsplash.com/photo-1585032226651-759b368d7246",
+        ],
+    },
+    {
+        "name": "Masala Chai",
+        "category": "Drinks",
+        "ingredients": ["Tea", "Milk", "Ginger", "Cardamom", "Cinnamon", "Sugar"],
+        "price": (60, 120),
+        "prep_time": (5, 10),
+        "grouped_unit": QuantizedUnit.ML,
+        "grouped_quantity_choices": [150, 250],
+        "images": [
+            "https://images.unsplash.com/photo-1556679343-c7306c1976bc",
+        ],
+    },
+    {
+        "name": "Cold Coffee",
+        "category": "Drinks",
+        "ingredients": ["Coffee", "Milk", "Sugar", "Ice Cream", "Ice"],
+        "price": (150, 300),
+        "prep_time": (5, 10),
+        "grouped_unit": QuantizedUnit.ML,
+        "grouped_quantity_choices": [250, 500],
+        "images": [
+            "https://images.unsplash.com/photo-1461023058943-07fcbe16d735",
+        ],
+    },
+    # ── DESSERTS ──────────────────────────────────────────────────────────
+    {
+        "name": "Chocolate Cake",
+        "category": "Desserts",
+        "ingredients": ["Flour", "Cocoa", "Sugar", "Milk", "Chocolate", "Butter"],
+        "price": (250, 500),
+        "prep_time": (5, 10),
+        "grouped_unit": QuantizedUnit.PCS,
+        "grouped_quantity_choices": [6, 8],
+        "images": [
+            "https://images.unsplash.com/photo-1578985545062-69928b1d9587",
+            "https://images.unsplash.com/photo-1606890737304-57a1ca8a5b62",
+        ],
+    },
+    {
+        "name": "Red Velvet Cake",
+        "category": "Desserts",
+        "ingredients": ["Flour", "Sugar", "Milk", "Cream Cheese", "Cocoa", "Butter"],
+        "price": (300, 600),
+        "prep_time": (5, 10),
+        "grouped_unit": QuantizedUnit.PCS,
+        "grouped_quantity_choices": [6, 8],
+        "images": [
+            "https://images.unsplash.com/photo-1586788680434-30d324b2d46f",
+        ],
+    },
+    {
+        "name": "Gulab Jamun",
+        "category": "Desserts",
+        "ingredients": ["Milk Powder", "Flour", "Sugar", "Cardamom", "Rose Water"],
+        "price": (120, 250),
+        "prep_time": (5, 10),
+        "grouped_unit": QuantizedUnit.PCS,
+        "grouped_quantity_choices": [2, 4, 6],
+        "images": [
+            "https://images.unsplash.com/photo-1601303516534-bf4b22de4f1f",
+        ],
+    },
+    {
+        "name": "Kheer",
+        "category": "Desserts",
+        "ingredients": ["Rice", "Milk", "Sugar", "Cardamom", "Cashew", "Raisin"],
+        "price": (150, 280),
+        "prep_time": (10, 15),
+        "grouped_unit": QuantizedUnit.NA,
+        "grouped_quantity_choices": [0],
+        "images": [
+            "https://images.unsplash.com/photo-1631452180519-c014fe946bc7",
+        ],
+    },
+    {
+        "name": "Brownie with Ice Cream",
+        "category": "Desserts",
+        "ingredients": ["Chocolate Brownie", "Vanilla Ice Cream", "Chocolate Sauce"],
+        "price": (250, 450),
+        "prep_time": (5, 10),
+        "grouped_unit": QuantizedUnit.PCS,
+        "grouped_quantity_choices": [1, 2],
+        "images": [
+            "https://images.unsplash.com/photo-1564355808539-22fda35bed7e",
+        ],
+    },
+    # ── SWEETS ────────────────────────────────────────────────────────────
+    {
+        "name": "Rasgulla",
+        "category": "Sweets",
+        "ingredients": ["Chhena", "Sugar", "Rose Water", "Cardamom"],
+        "price": (100, 220),
+        "prep_time": (5, 10),
+        "grouped_unit": QuantizedUnit.PCS,
+        "grouped_quantity_choices": [2, 4, 6],
+        "images": [
+            "https://images.unsplash.com/photo-1605197788044-f5e0fcfdf6a8",
+        ],
+    },
+    {
+        "name": "Barfi",
+        "category": "Sweets",
+        "ingredients": ["Milk Powder", "Sugar", "Ghee", "Cardamom", "Pistachio"],
+        "price": (150, 350),
+        "prep_time": (5, 10),
+        "grouped_unit": QuantizedUnit.PCS,
+        "grouped_quantity_choices": [4, 6, 8],
+        "images": [
+            "https://images.unsplash.com/photo-1631452180519-c014fe946bc7",
+        ],
+    },
+    {
+        "name": "Jalebi",
+        "category": "Sweets",
+        "ingredients": ["Flour", "Sugar Syrup", "Saffron", "Cardamom", "Oil"],
+        "price": (100, 200),
+        "prep_time": (10, 20),
+        "grouped_unit": QuantizedUnit.NA,
+        "grouped_quantity_choices": [0],
+        "images": [
+            "https://images.unsplash.com/photo-1601303516534-bf4b22de4f1f",
+        ],
+    },
+    {
+        "name": "Halwa",
+        "category": "Sweets",
+        "ingredients": ["Semolina", "Sugar", "Ghee", "Cardamom", "Cashew", "Raisin"],
+        "price": (120, 250),
+        "prep_time": (10, 20),
+        "grouped_unit": QuantizedUnit.NA,
+        "grouped_quantity_choices": [0],
+        "images": [
+            "https://images.unsplash.com/photo-1631452180519-c014fe946bc7",
+        ],
+    },
+    {
+        "name": "Laddoo",
+        "category": "Sweets",
+        "ingredients": ["Chickpea Flour", "Sugar", "Ghee", "Cardamom", "Cashew"],
+        "price": (120, 280),
+        "prep_time": (5, 10),
+        "grouped_unit": QuantizedUnit.PCS,
+        "grouped_quantity_choices": [2, 4, 6],
+        "images": [
+            "https://images.unsplash.com/photo-1631452180519-c014fe946bc7",
+        ],
+    },
+    # ── MAIN COURSE ───────────────────────────────────────────────────────
+    {
+        "name": "Dal Bhat Tarkari",
+        "category": "Main Course",
+        "ingredients": ["Rice", "Lentils", "Seasonal Vegetables", "Spices", "Ghee"],
+        "price": (200, 400),
+        "prep_time": (20, 40),
+        "grouped_unit": QuantizedUnit.NA,
+        "grouped_quantity_choices": [0],
+        "images": [
+            "https://images.unsplash.com/photo-1547592180-85f173990554",
+            "https://images.unsplash.com/photo-1631452180519-c014fe946bc7",
+        ],
+    },
+    {
+        "name": "Veg Biryani",
+        "category": "Main Course",
+        "ingredients": ["Rice", "Carrot", "Peas", "Potato", "Onion", "Spices"],
+        "price": (250, 500),
+        "prep_time": (25, 45),
+        "grouped_unit": QuantizedUnit.NA,
+        "grouped_quantity_choices": [0],
+        "images": [
+            "https://images.unsplash.com/photo-1589302168068-964664d93dc0",
+        ],
+    },
+    {
+        "name": "Paneer Butter Masala",
+        "category": "Main Course",
+        "ingredients": ["Paneer", "Tomato", "Butter", "Cream", "Onion", "Spices"],
+        "price": (300, 600),
+        "prep_time": (20, 35),
+        "grouped_unit": QuantizedUnit.NA,
+        "grouped_quantity_choices": [0],
+        "images": [
+            "https://images.unsplash.com/photo-1631452180519-c014fe946bc7",
+        ],
+    },
+    {
+        "name": "Mushroom Curry",
+        "category": "Main Course",
+        "ingredients": ["Mushroom", "Tomato", "Onion", "Cream", "Spices", "Garlic"],
+        "price": (250, 500),
+        "prep_time": (20, 35),
+        "grouped_unit": QuantizedUnit.NA,
+        "grouped_quantity_choices": [0],
+        "images": [
+            "https://images.unsplash.com/photo-1547592180-85f173990554",
+        ],
+    },
+    {
+        "name": "Chana Masala",
+        "category": "Main Course",
+        "ingredients": ["Chickpeas", "Tomato", "Onion", "Spices", "Garlic", "Ginger"],
+        "price": (200, 400),
+        "prep_time": (20, 35),
+        "grouped_unit": QuantizedUnit.NA,
+        "grouped_quantity_choices": [0],
+        "images": [
+            "https://images.unsplash.com/photo-1547592180-85f173990554",
+        ],
     },
 ]
-
-PRODUCT_IMAGES = {
-    "Momo": ["https://images.unsplash.com/photo-1625220194771-7ebdea0b70b9"],
-    "Pizza": ["https://images.unsplash.com/photo-1574071318508-1cdbab80d002"],
-    "Burger": ["https://images.unsplash.com/photo-1568901346375-23c9450c58cd"],
-    "Biryani": ["https://images.unsplash.com/photo-1589302168068-964664d93dc0"],
-    "Chowmein": ["https://images.unsplash.com/photo-1585032226651-759b368d7246"],
-    "Thukpa": ["https://images.unsplash.com/photo-1547592180-85f173990554"],
-    "Snacks": ["https://images.unsplash.com/photo-1573080496219-bb080dd4f877"],
-    "Desserts": ["https://images.unsplash.com/photo-1578985545062-69928b1d9587"],
-    "Drinks": ["https://images.unsplash.com/photo-1544145945-f90425340c7e"],
-    "Main Course": ["https://images.unsplash.com/photo-1547592180-85f173990554"],
-}
 
 
 async def seed_categories(session) -> list[Category]:
@@ -366,39 +625,32 @@ async def seed_products(
         template = random.choice(PRODUCT_TEMPLATES)
         category_name = template["category"]
         category = category_map[category_name]
-        images = PRODUCT_IMAGES[category_name]
-        is_best_seller = random.choices([True, False], weights=[70, 30], k=1)[0]
-
-        # The Product check constraint requires grouped_unit to be one of
-        # 'pcs' | 'ml' | 'ltr' AND grouped_quantity > 0 for every row, so we
-        # must always set both explicitly (the model's default of NA/0 would
-        # violate the constraint on insert). The values come from the
-        # template itself so they reflect how that specific dish is actually
-        # sold (e.g. 1 plate of biryani, 8 momo pieces, 500ml of coke) rather
-        # than a category-wide guess.
-        grouped_unit = template["grouped_unit"]
-        grouped_quantity = random.choice(template["grouped_quantity_choices"])
 
         product = Product(
             product_name=f"{template['name']} #{index + 1}",
-            product_description=f"Delicious {template['name'].lower()} prepared with fresh and quality ingredients.",
+            product_description=(
+                f"Freshly prepared {template['name'].lower()} made with "
+                "100% vegetarian ingredients for an authentic taste."
+            ),
             category_label=category_name,
             is_available=random.choices([True, False], weights=[90, 10], k=1)[0],
-            is_best_seller=is_best_seller,
+            is_best_seller=random.choices([True, False], weights=[70, 30], k=1)[0],
             price=random.randint(*template["price"]),
-            # discount_percentage is a whole-number percent (e.g. 10 == 10%),
-            # since total_amount divides it by 100 — not a 0-1 fraction.
             discount_percentage=random.choice([0, 5, 10, 15, 20, 25]),
             average_preparation_time=random.randint(*template["prep_time"]),
-            grouped_unit=grouped_unit,
-            grouped_quantity=grouped_quantity,
+            grouped_unit=template["grouped_unit"],
+            grouped_quantity=random.choice(template["grouped_quantity_choices"]),
             ingredients=random.sample(
                 template["ingredients"],
                 k=random.randint(2, len(template["ingredients"])),
             ),
             stock_quantity=random.randint(0, 100),
-            main_image=random.choice(images),
-            side_images=[random.choice(images) for _ in range(random.randint(1, 3))],
+            main_image=template["images"][0],
+            side_images=(
+                template["images"][1:]
+                if len(template["images"]) > 1
+                else [template["images"][0]]
+            ),
         )
 
         product.categories.append(category)
@@ -422,6 +674,8 @@ async def seed_reviews(
             review = Review(
                 user_id=user.id,
                 product_id=product.id,
+                review_title=random.choice(REVIEW_TITLES),
+                review_description=fake.sentence() if random.random() < 0.5 else None,
                 rating=random.choice([1.0, 2.0, 3.0, 3.5, 4.0, 4.5, 5.0]),
                 like_count=random.randint(0, 100),
             )
@@ -438,11 +692,17 @@ async def seed_comments(
 ) -> list[Comment]:
     comments = []
 
-    # Review.comment is a one-to-one relationship (uselist=False), so each
-    # review can carry at most a single comment.
     for review in reviews:
-        if random.random() < 0.7:
-            user = random.choice(users)
+        # Each review can have multiple comments (one-to-many)
+        num_comments = random.choices(
+            population=[0, 1, 2, 3],
+            weights=[30, 40, 20, 10],
+            k=1,
+        )[0]
+
+        commenter_pool = random.sample(users, k=min(num_comments, len(users)))
+
+        for user in commenter_pool:
             comment = Comment(
                 user_id=user.id,
                 review_id=review.id,

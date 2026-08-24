@@ -24,7 +24,7 @@ class Comment(BaseModel):
     )
     # sqlalchemy field
     user: Mapped["User"] = relationship("User")
-    review: Mapped["Review"] = relationship("Review", back_populates="comment")
+    review: Mapped["Review"] = relationship("Review", back_populates="comments")
 
 
 class Review(BaseModel):
@@ -34,16 +34,19 @@ class Review(BaseModel):
     product_id: Mapped[UUID] = mapped_column(
         ForeignKey("products.id", ondelete="CASCADE")
     )
+    review_title: Mapped[str]
+    review_description: Mapped[str | None]
     like_count: Mapped[int] = mapped_column(default=0)
     rating: Mapped[float] = mapped_column(default=5)
     # sqlalchemy field
-    comment: Mapped["Comment"] = relationship(
-        "Comment", uselist=False, back_populates="review"
+    comments: Mapped[list["Comment"] | None] = relationship(
+        "Comment", back_populates="review"
     )
     product: Mapped["Product"] = relationship(
         "Product",
         back_populates="reviews",
     )
+    user: Mapped["User"] = relationship("User")
 
     # Extra args
     __table_args__ = (

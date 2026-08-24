@@ -13,6 +13,7 @@ from app.modules.menu.schemas.product import (
     ProductReadBasicCustomer,
     ProductReadSingleCustomer,
 )
+from app.modules.menu.schemas.review import ReadReviewBasic
 from app.modules.menu.services.product_services import ProductService
 from app.schemas.common import SuccessResponse
 from app.schemas.pagination_schema import PaginatedResponse
@@ -38,7 +39,6 @@ async def create_product_endpoint(
 )
 async def read_products_endpoint(
     product_service: Annotated[ProductService, Depends(get_product_service)],
-    user: Annotated[User, Depends(RolePermission(["admin", "member"]))],
     filter_data: Annotated[FilterProduct, Depends()],
     pagination_data: Annotated[Pagination, Depends()],
 ):
@@ -51,8 +51,20 @@ async def read_products_endpoint(
 )
 async def read_single_product_endpoint(
     product_id: UUID,
-    user: Annotated[User, Depends(RolePermission(["admin", "member"]))],
     product_service: Annotated[ProductService, Depends(get_product_service)],
 ):
     data = await product_service.read_product_by_id(product_id)
+    return SuccessResponse(data=data)
+
+
+# Read  product reviews
+@product_api.get(
+    "/reviews/{product_id}", response_model=SuccessResponse[list[ReadReviewBasic]]
+)
+async def read_product_reviews(
+    product_id: UUID,
+    user: Annotated[User, Depends(RolePermission(["admin", "member"]))],
+    product_service: Annotated[ProductService, Depends(get_product_service)],
+):
+    data = await product_service.read_product_reviews(product_id)
     return SuccessResponse(data=data)

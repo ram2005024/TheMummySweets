@@ -2,13 +2,15 @@ from uuid import UUID
 
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
 from app.dependencies.pagination import Pagination
 from app.models.image import Image
+from app.modules.auth.models.user import User
 from app.modules.menu.dependencies.filter_products import FilterProduct
 from app.modules.menu.models.category_model import Category
 from app.modules.menu.models.product_model import Product
-from app.modules.menu.models.review_model import Review
+from app.modules.menu.models.review_model import Comment, Review
 from app.modules.menu.schemas.product import ProductCreate, ProductReadBasicCustomer
 from app.schemas.pagination_schema import PaginatedResponse
 
@@ -115,3 +117,22 @@ class ProductRepo:
             )
         ).one_or_none()
         return product
+
+    async def read_product_reviews(self, product_id: UUID):
+        reviews = (
+            (
+                await self.db.execute(
+                    select(Review)
+                    .where(Review.product_id == product_id)
+                    .options(
+                        selectinload(Review.user).selectinload(User.profile),
+                        selectinload(Review.comments)
+                        .selectinload(Comment.user)
+                        .selectinload(User.profile),
+                    )
+                )
+            )
+            .scalars()
+            .all()
+        )
+        return reviews
