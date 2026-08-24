@@ -56,7 +56,7 @@ class Profile(BaseModel):
     loyality_points: Mapped[int] = mapped_column(default=0)
 
     wishlist: Mapped["WishList"] = relationship(
-        "Wishlist", back_populates="user_profile"
+        "WishList", back_populates="user_profile"
     )
 
     @property
