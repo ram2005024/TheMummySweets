@@ -1,5 +1,6 @@
 from datetime import datetime
 from enum import Enum
+from typing import TYPE_CHECKING
 from uuid import UUID
 
 from sqlalchemy import Enum as SQLEnum
@@ -7,6 +8,9 @@ from sqlalchemy import ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.modules.auth.models.base import BaseModel
+
+if TYPE_CHECKING:
+    from app.modules.menu.models.wishlist_model import WishList
 
 
 class UserRole(Enum):
@@ -17,8 +21,8 @@ class UserRole(Enum):
 
 class User(BaseModel):
     __tablename__ = "users"
-    first_name:Mapped[str]
-    last_name:Mapped[str]=mapped_column(nullable=True)
+    first_name: Mapped[str]
+    last_name: Mapped[str] = mapped_column(nullable=True)
     email: Mapped[str] = mapped_column(unique=True, nullable=True)
     password: Mapped[str] = mapped_column(nullable=True)
     phone_no: Mapped[str] = mapped_column(unique=True, nullable=True)
@@ -29,18 +33,18 @@ class User(BaseModel):
     is_authenticated: Mapped[bool] = mapped_column(default=False)
     login_attempts: Mapped[int] = mapped_column(default=0)
     last_login_at: Mapped[datetime] = mapped_column(nullable=True)
-    profile: Mapped["Profile"] = relationship("Profile",
-        uselist=False, cascade="all,delete-orphan", back_populates="user"
+    profile: Mapped["Profile"] = relationship(
+        "Profile", uselist=False, cascade="all,delete-orphan", back_populates="user"
     )
 
-    provider:Mapped[str]=mapped_column(nullable=True)
-    provider_id:Mapped[str]=mapped_column(unique=True,nullable=True)
+    provider: Mapped[str] = mapped_column(nullable=True)
+    provider_id: Mapped[str] = mapped_column(unique=True, nullable=True)
 
 
 class Profile(BaseModel):
     __tablename__ = "profiles"
 
-    user_id: Mapped[UUID] = mapped_column(ForeignKey("users.id",ondelete="CASCADE"))
+    user_id: Mapped[UUID] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"))
     user: Mapped["User"] = relationship(
         "User", foreign_keys=[user_id], back_populates="profile"
     )
@@ -50,6 +54,10 @@ class Profile(BaseModel):
     total_whishlists: Mapped[int] = mapped_column(default=0)
     total_cart_items: Mapped[int] = mapped_column(default=0)
     loyality_points: Mapped[int] = mapped_column(default=0)
+
+    wishlist: Mapped["WishList"] = relationship(
+        "Wishlist", back_populates="user_profile"
+    )
 
     @property
     def rank(self) -> str:

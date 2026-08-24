@@ -7,11 +7,15 @@ from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.modules.auth.models.base import BaseModel
-from app.modules.menu.models.relationship_model import category_product
+from app.modules.menu.models.relationship_model import (
+    category_product,
+    wishlist_product,
+)
 from app.modules.menu.models.review_model import Review
 
 if TYPE_CHECKING:
     from app.modules.menu.models.category_model import Category
+    from app.modules.menu.models.wishlist_model import WishList
 
 
 class QuantizedUnit(str, Enum):
@@ -51,6 +55,9 @@ class Product(BaseModel):
     )
     categories: Mapped[list["Category"]] = relationship(
         "Category", secondary=category_product, back_populates="products"
+    )
+    wishlists: Mapped[list["WishList"]] = relationship(
+        "WishList", secondary=wishlist_product, back_populates="products"
     )
     __table_args__ = (
         CheckConstraint(
