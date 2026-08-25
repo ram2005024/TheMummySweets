@@ -73,7 +73,6 @@ serverapi.interceptors.response.use(
       | { message?: string }
       | undefined;
     const message = responseData?.message || "Something went wrong";
-
     return Promise.reject(new Error(message));
   },
 );
