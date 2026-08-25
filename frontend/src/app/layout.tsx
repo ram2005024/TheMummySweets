@@ -1,5 +1,6 @@
 import { cn } from "@/lib/utils";
 import { QueryClientProvider } from "@tanstack/react-query";
+import { Metadata } from "next";
 import { Geist } from "next/font/google";
 import { Toaster } from "react-hot-toast";
 import Footer from "../components/Footer";
@@ -9,7 +10,13 @@ import AuthProvider from "../providers/AuthProvider";
 import "./globals.css";
 
 const geist = Geist({ subsets: ["latin"], variable: "--font-sans" });
-
+export const metadata: Metadata = {
+  title: {
+    default: "The Mummy Sweets",
+    template: "%s | The Mummy Sweets",
+  },
+  description: "Awesome product app",
+};
 export default function RootLayout({
   children,
 }: Readonly<{

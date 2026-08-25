@@ -4,13 +4,15 @@ import { useGetMenuProducts } from "@/hooks/menu/useMenuItems";
 import { MenuProduct } from "@/type/menu.type";
 import { Clock3, Heart, Plus, Star } from "lucide-react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { slugify } from "./../../../utils/slugify";
 
 const ListProducts = () => {
   const { data } = useGetMenuProducts();
 
   const products: MenuProduct[] =
     data?.pages.flatMap((page) => page.data) ?? [];
-
+  const navigation = useRouter();
   return (
     <div className="grid gap-7 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
       {products.map((item) => (
@@ -19,13 +21,20 @@ const ListProducts = () => {
           className="group overflow-hidden rounded-2xl border border-[#eadfd4] bg-white transition-all duration-300 hover:-translate-y-1 hover:border-[#e8cbb4] hover:shadow-[0_18px_45px_-20px_rgba(130,70,25,0.28)]"
         >
           {/* ================= IMAGE ================= */}
-          <div className="relative aspect-[4/3] overflow-hidden bg-[#f7eee5]">
+          <div
+            onClick={() =>
+              navigation.push(
+                `/menu/product/${slugify(item.product_name)}/${item.id}`,
+              )
+            }
+            className="relative aspect-[4/3] overflow-hidden bg-[#f7eee5] cursor-pointer"
+          >
             <Image
               src={item.main_image}
               alt={item.product_name}
               fill
               sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-              className="object-cover transition-transform duration-500 ease-out group-hover:scale-[1.04]"
+              className="object-cover transition-transform duration-500 ease-out group-hover:scale-[1.04] "
             />
 
             {/* Image overlay */}
