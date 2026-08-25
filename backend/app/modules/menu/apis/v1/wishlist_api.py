@@ -2,13 +2,16 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends
 
-from app.modules.auth.models.user import Profile
+from app.dependencies.pagination import Pagination
+from app.dependencies.permission import RolePermission
+from app.modules.auth.models.user import Profile, User
 from app.modules.menu.dependencies.factories_service import get_wishlist_service
+from app.modules.menu.dependencies.filter_products import FilterProduct
 from app.modules.menu.dependencies.wishlist_dependencies import (
     get_user_and_check_product,
 )
 from app.modules.menu.models.product_model import Product
-from app.modules.menu.schemas.wishlist import WishlistRequest
+from app.modules.menu.schemas.wishlist import WishlistRequest, WishlistResponse
 from app.modules.menu.services.wishlist_service import WishlistService
 from app.schemas.common import SuccessResponse
 
@@ -30,3 +33,20 @@ async def create_wishlist_endpoint(
         data=None,
         message=f"Product {'added' if data.wishlist_state else 'removed'} {'into' if data.wishlist_state else 'from'} wishlist",
     )
+
+
+# To read wishlist of the user
+@wishlist_api.get(
+    "/product/{profile_id}", response_model=SuccessResponse[WishlistResponse]
+)
+async def read_wishlist_of_user(
+    user: Annotated[User, Depends(RolePermission(["member"]))],
+    wishlist_service: Annotated[WishlistService, Depends(get_wishlist_service)],
+    pagination_data: Annotated[Pagination, Depends()],
+    filter_data: Annotated[FilterProduct, Depends()],
+):
+
+    result = await wishlist_service.get_wishlist_items(
+        user.profile.id, pagination_data, filter_data
+    )
+    return SuccessResponse(data=result)

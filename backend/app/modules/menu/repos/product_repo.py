@@ -10,6 +10,7 @@ from app.modules.auth.models.user import User
 from app.modules.menu.dependencies.filter_products import FilterProduct
 from app.modules.menu.models.category_model import Category
 from app.modules.menu.models.product_model import Product
+from app.modules.menu.models.relationship_model import wishlist_product
 from app.modules.menu.models.review_model import Comment, Review
 from app.modules.menu.schemas.product import ProductCreate, ProductReadBasicCustomer
 from app.schemas.pagination_schema import PaginatedResponse
@@ -136,3 +137,49 @@ class ProductRepo:
             .all()
         )
         return reviews
+
+    async def read_wishlist_products(
+        self, filter_data: FilterProduct, pagination_data: Pagination, wishlist_id: UUID
+    ):
+        root_stmt = (
+            select(
+                Product,
+                func.count(Review.id).label("review_count"),
+                func.coalesce(func.avg(Review.rating), 0).label("rating"),
+            )
+            .join(wishlist_product, wishlist_product.c.product_id == Product.id)
+            .outerjoin(Review, Product.id == Review.product_id)
+            .where(wishlist_product.c.wishlist_id == wishlist_id)
+            .group_by(Product.id)
+        )
+        filtered_stmt = await filter_data.filter_product(root_stmt)
+        total = (
+            await self.db.execute(
+                select(func.count()).select_from(root_stmt.subquery())
+            )
+        ).scalar()
+        filtered_data = (
+            await self.db.execute(
+                filtered_stmt.limit(pagination_data.limit).offset(
+                    (pagination_data.page - 1) * pagination_data.limit
+                )
+            )
+        ).all()
+        filtered_total = (
+            await self.db.execute(
+                select(func.count()).select_from(filtered_stmt.subquery())
+            )
+        ).scalar()
+        meta = pagination_data.pagination(total or 0, filtered_total or 0)
+        data = []
+        for product, review_count, rating in filtered_data:
+            product_data = ProductReadBasicCustomer.model_validate(product)
+            data.append(
+                product_data.model_copy(
+                    update={
+                        "rating": round(rating, 2),
+                        "review_count": int(review_count),
+                    }
+                )
+            )
+        return PaginatedResponse(meta=meta, data=data)

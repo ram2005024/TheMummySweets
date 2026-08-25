@@ -58,3 +58,6 @@ class WishlistRepo:
                 wishlist_product.c.product_id == product_id,
             )
         )
+
+    async def get_wishlist(self, profile_id: UUID):
+        pass
