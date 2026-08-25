@@ -27,6 +27,5 @@ def get_product_service(repo: Annotated[ProductRepo, Depends(get_product_repo)])
 
 def get_wishlist_service(
     wishlist_repo: Annotated[WishlistRepo, Depends(get_wishlist_repo)],
-    product_repo: Annotated[ProductRepo, Depends(get_product_repo)],
 ):
-    return WishlistService(wishlist_repo, product_repo)
+    return WishlistService(wishlist_repo)
