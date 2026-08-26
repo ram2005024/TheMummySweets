@@ -1,5 +1,7 @@
-import { MenuService } from "@/services/menu.service";
+import { serverAPI } from "@/libs/server_api";
+import { SingleProductType } from "@/type/menu.type";
 import type { Metadata } from "next";
+import { notFound } from "next/navigation";
 
 type Props = {
   params: Promise<{
@@ -18,7 +20,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function ProductPage({ params }: Props) {
   const { name, id } = await params;
-  const product = await MenuService.getServerProduct(id);
+  const response = await serverAPI<SingleProductType>({
+    apiString: `/product/${id}`,
+  });
+  const product = response?.data;
+  if (!product) {
+    return notFound();
+  }
   return (
     <div className="min-h-screen flex flex-col sm:max-w-[80%] w-full mx-auto px-6 space-y-4 my-4 ">
       {/* Label */}
