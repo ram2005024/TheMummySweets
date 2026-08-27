@@ -65,7 +65,6 @@ async def read_single_product_endpoint(
 async def read_product_reviews(
     product_id: UUID,
     pagination: Annotated[Pagination, Depends()],
-    user: Annotated[User, Depends(RolePermission(["admin", "member"]))],
     product_service: Annotated[ProductService, Depends(get_product_service)],
 ):
     data = await product_service.read_product_reviews(product_id, pagination)

@@ -227,7 +227,6 @@ class AuthService:
     async def refresh(self, request: Request):
         token = request.cookies.get("refresh")
         if not token:
-            print("yAHAAAA")
             raise MissingToken
         payload = Auth().verify_token(token)
         session_id = payload["session_id"]
@@ -240,7 +239,6 @@ class AuthService:
         if redis_refresh_jti is None:
             # For concurrency in React strict mode
             if await Auth().get_old_rotation_into_redis(payload["jti"]) is None:
-                print("yAHAAAA")
                 raise InvalidOrExpiredToken
             return SuccessResponse(data={"message": "Rotation handled already"})
 
