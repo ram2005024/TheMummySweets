@@ -92,5 +92,5 @@ class ProductService:
         )
         return product_final
 
-    async def read_product_reviews(self, product_id: UUID):
-        return await self.product_repo.read_product_reviews(product_id)
+    async def read_product_reviews(self, product_id: UUID, pagination: Pagination):
+        return await self.product_repo.read_product_reviews(product_id, pagination)

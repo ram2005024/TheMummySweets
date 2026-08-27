@@ -12,7 +12,7 @@ class Pagination:
         self.page = page
         self.limit = limit
 
-    def pagination(self, total: int, filtered_total: int):
+    def pagination(self, total: int, filtered_total: int = 0):
         total_page = (filtered_total + (self.limit - 1)) // self.limit
         has_next = self.page < total_page
         has_previous = self.page > 1

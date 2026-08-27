@@ -119,24 +119,35 @@ class ProductRepo:
         ).one_or_none()
         return product
 
-    async def read_product_reviews(self, product_id: UUID):
-        reviews = (
+    async def read_product_reviews(self, product_id: UUID, pagination: Pagination):
+        base_stmt = (
+            select(Review)
+            .where(Review.product_id == product_id)
+            .options(
+                selectinload(Review.user).selectinload(User.profile),
+                selectinload(Review.comments)
+                .selectinload(Comment.user)
+                .selectinload(User.profile),
+            )
+        )
+        total_stmt = select(func.count()).select_from(base_stmt.subquery())
+        total_count = (await self.db.execute(total_stmt)).scalar() or 0
+        # No filter till now will be added later-----
+        filtered_stmt = select(func.count()).select_from(base_stmt.subquery())
+        filtered_count = (await self.db.execute(total_stmt)).scalar() or 0
+        data = (
             (
                 await self.db.execute(
-                    select(Review)
-                    .where(Review.product_id == product_id)
-                    .options(
-                        selectinload(Review.user).selectinload(User.profile),
-                        selectinload(Review.comments)
-                        .selectinload(Comment.user)
-                        .selectinload(User.profile),
+                    base_stmt.offset((pagination.page - 1) * pagination.limit).limit(
+                        pagination.limit
                     )
                 )
             )
             .scalars()
             .all()
         )
-        return reviews
+        meta = pagination.pagination(total=total_count, filtered_total=filtered_count)
+        return PaginatedResponse(meta=meta, data=data)
 
     async def read_wishlist_products(
         self, filter_data: FilterProduct, pagination_data: Pagination, wishlist_id: UUID

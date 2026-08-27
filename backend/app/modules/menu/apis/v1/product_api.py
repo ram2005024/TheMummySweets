@@ -59,12 +59,14 @@ async def read_single_product_endpoint(
 
 # Read  product reviews
 @product_api.get(
-    "/reviews/{product_id}", response_model=SuccessResponse[list[ReadReviewBasic]]
+    "/reviews/{product_id}",
+    response_model=SuccessResponse[PaginatedResponse[list[ReadReviewBasic]]],
 )
 async def read_product_reviews(
     product_id: UUID,
+    pagination: Annotated[Pagination, Depends()],
     user: Annotated[User, Depends(RolePermission(["admin", "member"]))],
     product_service: Annotated[ProductService, Depends(get_product_service)],
 ):
-    data = await product_service.read_product_reviews(product_id)
+    data = await product_service.read_product_reviews(product_id, pagination)
     return SuccessResponse(data=data)
