@@ -1,3 +1,5 @@
+import { PaginatedResponse } from "./common.type";
+
 export interface MenuProduct {
   id: string;
   main_image: string;
@@ -53,4 +55,57 @@ export interface SingleProductType {
   grouped_unit: GroupedUnits;
   side_images: string[];
   is_available: string;
+}
+
+export interface Comment {
+  comment: string;
+  user: {
+    id: string;
+    profile: {
+      full_name: string;
+      image: string;
+      rank: string;
+    };
+    role: string;
+    is_active: boolean;
+    is_authenticated: boolean;
+    email: string;
+    phone_no: string;
+  };
+  review_id: string;
+  id: string;
+}
+export interface ProductReview {
+  like_count: number;
+  rating: number;
+  review_title: string;
+  review_description: string;
+  user: {
+    id: string;
+    profile: {
+      full_name: string;
+      image: string;
+      rank: string;
+    };
+    role: string;
+    is_active: boolean;
+    is_authenticated: boolean;
+    email?: string;
+    phone_no?: string;
+  };
+  comments: Comment[];
+  product_id: string;
+  created_at: string;
+}
+
+export interface ReviewParam {
+  page: number;
+  limit: number;
+}
+
+export interface ReviewResponse extends PaginatedResponse<ReviewResponse[]> {
+  stats: {
+    avg_rating: number;
+    distribution: Record<number, number>;
+  };
 }

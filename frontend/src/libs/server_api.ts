@@ -20,7 +20,7 @@ type Props = {
 export async function serverAPI<T>({
   apiString,
   options = {},
-}: Props): Promise<SuccessResponse<T> | null> {
+}: Props): Promise<T | null> {
   const {
     method = "GET",
     revalidate,
@@ -55,5 +55,5 @@ export async function serverAPI<T>({
     throw new APIError(res_json.message, response.status, res_json.error_code);
   }
 
-  return res_json;
+  return res_json.data;
 }

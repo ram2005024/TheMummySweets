@@ -7,6 +7,7 @@ import ImageShowcase from "./components/image-showcase";
 import IngredientDetails from "./components/ingredients-detail";
 import ProductDescriptionHeader from "./components/product-description-header";
 import ProductQuality from "./components/product-quality";
+import ProductReviews from "./components/product-reviews";
 
 type Props = {
   params: Promise<{
@@ -28,11 +29,10 @@ export default async function ProductPage({ params }: Props) {
   const response = await serverAPI<SingleProductType>({
     apiString: `/product/${id}`,
   });
-  const product = response?.data;
+  const product = response;
   if (!product) {
     return notFound();
   }
-  console.log(product);
   return (
     <div className="min-h-screen flex flex-col sm:max-w-[80%] w-full mx-auto px-6 space-y-4 my-4 ">
       {/* Label */}
@@ -52,6 +52,8 @@ export default async function ProductPage({ params }: Props) {
           </div>
         </div>
       </div>
+      {/* Reviews and comments section for product */}
+      <ProductReviews product_id={product.id} />
     </div>
   );
 }
