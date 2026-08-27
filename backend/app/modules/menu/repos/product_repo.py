@@ -134,7 +134,7 @@ class ProductRepo:
         total_count = (await self.db.execute(total_stmt)).scalar() or 0
         # No filter till now will be added later-----
         filtered_stmt = select(func.count()).select_from(base_stmt.subquery())
-        filtered_count = (await self.db.execute(total_stmt)).scalar() or 0
+        filtered_count = (await self.db.execute(filtered_stmt)).scalar() or 0
         data = (
             (
                 await self.db.execute(
