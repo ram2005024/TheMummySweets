@@ -11,11 +11,15 @@ from app.modules.auth.models.user import Profile, User, UserRole
 from app.modules.menu.models.category_model import Category
 from app.modules.menu.models.product_model import Product, QuantizedUnit
 from app.modules.menu.models.review_model import Comment, Review
+from app.modules.menu.models.wishlist_model import WishList  # noqa
 
 fake = Faker()
 
+# ─────────────────────────────────────────────
+#  CONSTANTS
+# ─────────────────────────────────────────────
 USER_COUNT = 20
-PRODUCT_COUNT = 100
+PRODUCT_COUNT = 120
 SEED_PASSWORD = "Password123"
 
 CATEGORY_NAMES = [
@@ -64,8 +68,11 @@ REVIEW_COMMENTS = [
     "Swad ma koi compromise chhaina!",
 ]
 
+# ─────────────────────────────────────────────
+#  PRODUCT TEMPLATES
+# ─────────────────────────────────────────────
 PRODUCT_TEMPLATES = [
-    # ── MOMO ──────────────────────────────────────────────────────────────
+    # ── MOMO ──────────────────────────────────
     {
         "name": "Veg Momo",
         "category": "Momo",
@@ -75,8 +82,8 @@ PRODUCT_TEMPLATES = [
         "grouped_unit": QuantizedUnit.PCS,
         "grouped_quantity_choices": [6, 8, 10, 12],
         "images": [
-            "https://images.unsplash.com/photo-1625220194771-7ebdea0b70b9",
-            "https://images.unsplash.com/photo-1534422298391-e4f8517d9b99",
+            "https://images.unsplash.com/photo-1567188040759-fb8a883dc6d8?w=800",
+            "https://images.unsplash.com/photo-1534422298391-e4f8517d9b99?w=800",
         ],
     },
     {
@@ -88,7 +95,8 @@ PRODUCT_TEMPLATES = [
         "grouped_unit": QuantizedUnit.PCS,
         "grouped_quantity_choices": [6, 8, 10, 12],
         "images": [
-            "https://images.unsplash.com/photo-1625220194771-7ebdea0b70b9",
+            "https://images.unsplash.com/photo-1534422298391-e4f8517d9b99?w=800",
+            "https://images.unsplash.com/photo-1567188040759-fb8a883dc6d8?w=800",
         ],
     },
     {
@@ -100,7 +108,7 @@ PRODUCT_TEMPLATES = [
         "grouped_unit": QuantizedUnit.PCS,
         "grouped_quantity_choices": [6, 8, 10, 12],
         "images": [
-            "https://images.unsplash.com/photo-1625220194771-7ebdea0b70b9",
+            "https://images.unsplash.com/photo-1534422298391-e4f8517d9b99?w=800",
         ],
     },
     {
@@ -112,10 +120,35 @@ PRODUCT_TEMPLATES = [
         "grouped_unit": QuantizedUnit.PCS,
         "grouped_quantity_choices": [6, 8, 10, 12],
         "images": [
-            "https://images.unsplash.com/photo-1625220194771-7ebdea0b70b9",
+            "https://images.unsplash.com/photo-1567188040759-fb8a883dc6d8?w=800",
         ],
     },
-    # ── PIZZA ─────────────────────────────────────────────────────────────
+    {
+        "name": "Fried Momo",
+        "category": "Momo",
+        "ingredients": ["Cabbage", "Carrot", "Flour", "Onion", "Oil", "Garlic"],
+        "price": (140, 270),
+        "prep_time": (20, 30),
+        "grouped_unit": QuantizedUnit.PCS,
+        "grouped_quantity_choices": [6, 8, 10],
+        "images": [
+            "https://images.unsplash.com/photo-1534422298391-e4f8517d9b99?w=800",
+            "https://images.unsplash.com/photo-1567188040759-fb8a883dc6d8?w=800",
+        ],
+    },
+    {
+        "name": "C-Momo",
+        "category": "Momo",
+        "ingredients": ["Cabbage", "Flour", "Tomato Sauce", "Onion", "Chili", "Garlic"],
+        "price": (160, 300),
+        "prep_time": (20, 35),
+        "grouped_unit": QuantizedUnit.PCS,
+        "grouped_quantity_choices": [6, 8, 10],
+        "images": [
+            "https://images.unsplash.com/photo-1567188040759-fb8a883dc6d8?w=800",
+        ],
+    },
+    # ── PIZZA ─────────────────────────────────
     {
         "name": "Margherita Pizza",
         "category": "Pizza",
@@ -125,8 +158,8 @@ PRODUCT_TEMPLATES = [
         "grouped_unit": QuantizedUnit.PCS,
         "grouped_quantity_choices": [6, 8],
         "images": [
-            "https://images.unsplash.com/photo-1574071318508-1cdbab80d002",
-            "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38",
+            "https://images.unsplash.com/photo-1574071318508-1cdbab80d002?w=800",
+            "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=800",
         ],
     },
     {
@@ -138,7 +171,8 @@ PRODUCT_TEMPLATES = [
         "grouped_unit": QuantizedUnit.PCS,
         "grouped_quantity_choices": [6, 8],
         "images": [
-            "https://images.unsplash.com/photo-1574071318508-1cdbab80d002",
+            "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=800",
+            "https://images.unsplash.com/photo-1574071318508-1cdbab80d002?w=800",
         ],
     },
     {
@@ -150,10 +184,29 @@ PRODUCT_TEMPLATES = [
         "grouped_unit": QuantizedUnit.PCS,
         "grouped_quantity_choices": [6, 8],
         "images": [
-            "https://images.unsplash.com/photo-1574071318508-1cdbab80d002",
+            "https://images.unsplash.com/photo-1574071318508-1cdbab80d002?w=800",
         ],
     },
-    # ── BURGER ────────────────────────────────────────────────────────────
+    {
+        "name": "BBQ Mushroom Pizza",
+        "category": "Pizza",
+        "ingredients": [
+            "Mushroom",
+            "BBQ Sauce",
+            "Cheese",
+            "Onion",
+            "Capsicum",
+            "Flour",
+        ],
+        "price": (520, 980),
+        "prep_time": (20, 40),
+        "grouped_unit": QuantizedUnit.PCS,
+        "grouped_quantity_choices": [6, 8],
+        "images": [
+            "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=800",
+        ],
+    },
+    # ── BURGER ────────────────────────────────
     {
         "name": "Veg Burger",
         "category": "Burger",
@@ -163,8 +216,8 @@ PRODUCT_TEMPLATES = [
         "grouped_unit": QuantizedUnit.PCS,
         "grouped_quantity_choices": [1, 2],
         "images": [
-            "https://images.unsplash.com/photo-1568901346375-23c9450c58cd",
-            "https://images.unsplash.com/photo-1550547660-d9450f859349",
+            "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=800",
+            "https://images.unsplash.com/photo-1550547660-d9450f859349?w=800",
         ],
     },
     {
@@ -176,7 +229,8 @@ PRODUCT_TEMPLATES = [
         "grouped_unit": QuantizedUnit.PCS,
         "grouped_quantity_choices": [1, 2],
         "images": [
-            "https://images.unsplash.com/photo-1568901346375-23c9450c58cd",
+            "https://images.unsplash.com/photo-1550547660-d9450f859349?w=800",
+            "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=800",
         ],
     },
     {
@@ -188,10 +242,29 @@ PRODUCT_TEMPLATES = [
         "grouped_unit": QuantizedUnit.PCS,
         "grouped_quantity_choices": [1, 2],
         "images": [
-            "https://images.unsplash.com/photo-1568901346375-23c9450c58cd",
+            "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=800",
         ],
     },
-    # ── CHOWMEIN ──────────────────────────────────────────────────────────
+    {
+        "name": "Double Cheese Burger",
+        "category": "Burger",
+        "ingredients": [
+            "Potato Patty",
+            "Double Cheese",
+            "Bun",
+            "Lettuce",
+            "Tomato",
+            "Mustard",
+        ],
+        "price": (320, 600),
+        "prep_time": (15, 30),
+        "grouped_unit": QuantizedUnit.PCS,
+        "grouped_quantity_choices": [1, 2],
+        "images": [
+            "https://images.unsplash.com/photo-1550547660-d9450f859349?w=800",
+        ],
+    },
+    # ── CHOWMEIN ──────────────────────────────
     {
         "name": "Veg Chowmein",
         "category": "Chowmein",
@@ -201,8 +274,8 @@ PRODUCT_TEMPLATES = [
         "grouped_unit": QuantizedUnit.NA,
         "grouped_quantity_choices": [0],
         "images": [
-            "https://images.unsplash.com/photo-1585032226651-759b368d7246",
-            "https://images.unsplash.com/photo-1569718212165-3a8278d5f624",
+            "https://images.unsplash.com/photo-1585032226651-759b368d7246?w=800",
+            "https://images.unsplash.com/photo-1569718212165-3a8278d5f624?w=800",
         ],
     },
     {
@@ -214,10 +287,29 @@ PRODUCT_TEMPLATES = [
         "grouped_unit": QuantizedUnit.NA,
         "grouped_quantity_choices": [0],
         "images": [
-            "https://images.unsplash.com/photo-1585032226651-759b368d7246",
+            "https://images.unsplash.com/photo-1569718212165-3a8278d5f624?w=800",
         ],
     },
-    # ── THUKPA ────────────────────────────────────────────────────────────
+    {
+        "name": "Schezwan Chowmein",
+        "category": "Chowmein",
+        "ingredients": [
+            "Noodles",
+            "Schezwan Sauce",
+            "Capsicum",
+            "Onion",
+            "Garlic",
+            "Cabbage",
+        ],
+        "price": (170, 340),
+        "prep_time": (15, 25),
+        "grouped_unit": QuantizedUnit.NA,
+        "grouped_quantity_choices": [0],
+        "images": [
+            "https://images.unsplash.com/photo-1585032226651-759b368d7246?w=800",
+        ],
+    },
+    # ── THUKPA ────────────────────────────────
     {
         "name": "Veg Thukpa",
         "category": "Thukpa",
@@ -227,8 +319,8 @@ PRODUCT_TEMPLATES = [
         "grouped_unit": QuantizedUnit.NA,
         "grouped_quantity_choices": [0],
         "images": [
-            "https://images.unsplash.com/photo-1547592180-85f173990554",
-            "https://images.unsplash.com/photo-1569718212165-3a8278d5f624",
+            "https://images.unsplash.com/photo-1569718212165-3a8278d5f624?w=800",
+            "https://images.unsplash.com/photo-1547592180-85f173990554?w=800",
         ],
     },
     {
@@ -240,10 +332,22 @@ PRODUCT_TEMPLATES = [
         "grouped_unit": QuantizedUnit.NA,
         "grouped_quantity_choices": [0],
         "images": [
-            "https://images.unsplash.com/photo-1547592180-85f173990554",
+            "https://images.unsplash.com/photo-1547592180-85f173990554?w=800",
         ],
     },
-    # ── SNACKS ────────────────────────────────────────────────────────────
+    {
+        "name": "Spicy Thukpa",
+        "category": "Thukpa",
+        "ingredients": ["Noodles", "Chili", "Garlic", "Mushroom", "Carrot", "Onion"],
+        "price": (190, 360),
+        "prep_time": (20, 30),
+        "grouped_unit": QuantizedUnit.NA,
+        "grouped_quantity_choices": [0],
+        "images": [
+            "https://images.unsplash.com/photo-1569718212165-3a8278d5f624?w=800",
+        ],
+    },
+    # ── SNACKS ────────────────────────────────
     {
         "name": "French Fries",
         "category": "Snacks",
@@ -253,8 +357,8 @@ PRODUCT_TEMPLATES = [
         "grouped_unit": QuantizedUnit.NA,
         "grouped_quantity_choices": [0],
         "images": [
-            "https://images.unsplash.com/photo-1573080496219-bb080dd4f877",
-            "https://images.unsplash.com/photo-1576107232684-1279f390859f",
+            "https://images.unsplash.com/photo-1573080496219-bb080dd4f877?w=800",
+            "https://images.unsplash.com/photo-1576107232684-1279f390859f?w=800",
         ],
     },
     {
@@ -266,7 +370,7 @@ PRODUCT_TEMPLATES = [
         "grouped_unit": QuantizedUnit.NA,
         "grouped_quantity_choices": [0],
         "images": [
-            "https://images.unsplash.com/photo-1573080496219-bb080dd4f877",
+            "https://images.unsplash.com/photo-1576107232684-1279f390859f?w=800",
         ],
     },
     {
@@ -284,7 +388,7 @@ PRODUCT_TEMPLATES = [
         "grouped_unit": QuantizedUnit.PCS,
         "grouped_quantity_choices": [4, 6, 8],
         "images": [
-            "https://images.unsplash.com/photo-1563245372-f21724e3856d",
+            "https://images.unsplash.com/photo-1563245372-f21724e3856d?w=800",
         ],
     },
     {
@@ -296,7 +400,7 @@ PRODUCT_TEMPLATES = [
         "grouped_unit": QuantizedUnit.PCS,
         "grouped_quantity_choices": [4, 6, 8],
         "images": [
-            "https://images.unsplash.com/photo-1567188040759-fb8a883dc6d6",
+            "https://images.unsplash.com/photo-1567188040759-fb8a883dc6d8?w=800",
         ],
     },
     {
@@ -308,10 +412,42 @@ PRODUCT_TEMPLATES = [
         "grouped_unit": QuantizedUnit.PCS,
         "grouped_quantity_choices": [4, 6, 8],
         "images": [
-            "https://images.unsplash.com/photo-1573080496219-bb080dd4f877",
+            "https://images.unsplash.com/photo-1573080496219-bb080dd4f877?w=800",
         ],
     },
-    # ── DRINKS ────────────────────────────────────────────────────────────
+    {
+        "name": "Veg Samosa",
+        "category": "Snacks",
+        "ingredients": [
+            "Potato",
+            "Peas",
+            "Pastry Sheet",
+            "Cumin",
+            "Coriander",
+            "Chili",
+        ],
+        "price": (60, 150),
+        "prep_time": (10, 20),
+        "grouped_unit": QuantizedUnit.PCS,
+        "grouped_quantity_choices": [2, 4, 6],
+        "images": [
+            "https://images.unsplash.com/photo-1601050690597-df0568f70950?w=800",
+            "https://images.unsplash.com/photo-1563245372-f21724e3856d?w=800",
+        ],
+    },
+    {
+        "name": "Garlic Bread",
+        "category": "Snacks",
+        "ingredients": ["Bread", "Butter", "Garlic", "Parsley", "Cheese"],
+        "price": (150, 280),
+        "prep_time": (10, 15),
+        "grouped_unit": QuantizedUnit.PCS,
+        "grouped_quantity_choices": [4, 6],
+        "images": [
+            "https://images.unsplash.com/photo-1573140247632-f8fd74997d5c?w=800",
+        ],
+    },
+    # ── DRINKS ────────────────────────────────
     {
         "name": "Coke",
         "category": "Drinks",
@@ -321,8 +457,8 @@ PRODUCT_TEMPLATES = [
         "grouped_unit": QuantizedUnit.ML,
         "grouped_quantity_choices": [250, 330, 500],
         "images": [
-            "https://images.unsplash.com/photo-1544145945-f90425340c7e",
-            "https://images.unsplash.com/photo-1554866585-cd94860890b7",
+            "https://images.unsplash.com/photo-1554866585-cd94860890b7?w=800",
+            "https://images.unsplash.com/photo-1544145945-f90425340c7e?w=800",
         ],
     },
     {
@@ -334,7 +470,7 @@ PRODUCT_TEMPLATES = [
         "grouped_unit": QuantizedUnit.ML,
         "grouped_quantity_choices": [250, 500],
         "images": [
-            "https://images.unsplash.com/photo-1621263764928-df1444c5e859",
+            "https://images.unsplash.com/photo-1621263764928-df1444c5e859?w=800",
         ],
     },
     {
@@ -346,7 +482,7 @@ PRODUCT_TEMPLATES = [
         "grouped_unit": QuantizedUnit.ML,
         "grouped_quantity_choices": [250, 500],
         "images": [
-            "https://images.unsplash.com/photo-1585032226651-759b368d7246",
+            "https://images.unsplash.com/photo-1553361371-9b22f78e8b1d?w=800",
         ],
     },
     {
@@ -358,7 +494,7 @@ PRODUCT_TEMPLATES = [
         "grouped_unit": QuantizedUnit.ML,
         "grouped_quantity_choices": [150, 250],
         "images": [
-            "https://images.unsplash.com/photo-1556679343-c7306c1976bc",
+            "https://images.unsplash.com/photo-1556679343-c7306c1976bc?w=800",
         ],
     },
     {
@@ -370,10 +506,34 @@ PRODUCT_TEMPLATES = [
         "grouped_unit": QuantizedUnit.ML,
         "grouped_quantity_choices": [250, 500],
         "images": [
-            "https://images.unsplash.com/photo-1461023058943-07fcbe16d735",
+            "https://images.unsplash.com/photo-1461023058943-07fcbe16d735?w=800",
         ],
     },
-    # ── DESSERTS ──────────────────────────────────────────────────────────
+    {
+        "name": "Strawberry Milkshake",
+        "category": "Drinks",
+        "ingredients": ["Strawberry", "Milk", "Ice Cream", "Sugar"],
+        "price": (180, 320),
+        "prep_time": (5, 10),
+        "grouped_unit": QuantizedUnit.ML,
+        "grouped_quantity_choices": [250, 500],
+        "images": [
+            "https://images.unsplash.com/photo-1553361371-9b22f78e8b1d?w=800",
+        ],
+    },
+    {
+        "name": "Fresh Orange Juice",
+        "category": "Drinks",
+        "ingredients": ["Orange", "Sugar", "Ice"],
+        "price": (120, 220),
+        "prep_time": (3, 8),
+        "grouped_unit": QuantizedUnit.ML,
+        "grouped_quantity_choices": [250, 500],
+        "images": [
+            "https://images.unsplash.com/photo-1621263764928-df1444c5e859?w=800",
+        ],
+    },
+    # ── DESSERTS ──────────────────────────────
     {
         "name": "Chocolate Cake",
         "category": "Desserts",
@@ -383,8 +543,8 @@ PRODUCT_TEMPLATES = [
         "grouped_unit": QuantizedUnit.PCS,
         "grouped_quantity_choices": [6, 8],
         "images": [
-            "https://images.unsplash.com/photo-1578985545062-69928b1d9587",
-            "https://images.unsplash.com/photo-1606890737304-57a1ca8a5b62",
+            "https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=800",
+            "https://images.unsplash.com/photo-1606890737304-57a1ca8a5b62?w=800",
         ],
     },
     {
@@ -396,7 +556,7 @@ PRODUCT_TEMPLATES = [
         "grouped_unit": QuantizedUnit.PCS,
         "grouped_quantity_choices": [6, 8],
         "images": [
-            "https://images.unsplash.com/photo-1586788680434-30d324b2d46f",
+            "https://images.unsplash.com/photo-1586788680434-30d324b2d46f?w=800",
         ],
     },
     {
@@ -408,7 +568,7 @@ PRODUCT_TEMPLATES = [
         "grouped_unit": QuantizedUnit.PCS,
         "grouped_quantity_choices": [2, 4, 6],
         "images": [
-            "https://images.unsplash.com/photo-1601303516534-bf4b22de4f1f",
+            "https://images.unsplash.com/photo-1601303516534-bf4b22de4f1f?w=800",
         ],
     },
     {
@@ -420,7 +580,7 @@ PRODUCT_TEMPLATES = [
         "grouped_unit": QuantizedUnit.NA,
         "grouped_quantity_choices": [0],
         "images": [
-            "https://images.unsplash.com/photo-1631452180519-c014fe946bc7",
+            "https://images.unsplash.com/photo-1631452180519-c014fe946bc7?w=800",
         ],
     },
     {
@@ -432,10 +592,22 @@ PRODUCT_TEMPLATES = [
         "grouped_unit": QuantizedUnit.PCS,
         "grouped_quantity_choices": [1, 2],
         "images": [
-            "https://images.unsplash.com/photo-1564355808539-22fda35bed7e",
+            "https://images.unsplash.com/photo-1564355808539-22fda35bed7e?w=800",
         ],
     },
-    # ── SWEETS ────────────────────────────────────────────────────────────
+    {
+        "name": "Mango Kulfi",
+        "category": "Desserts",
+        "ingredients": ["Mango", "Milk", "Sugar", "Cardamom", "Cream"],
+        "price": (120, 220),
+        "prep_time": (5, 10),
+        "grouped_unit": QuantizedUnit.PCS,
+        "grouped_quantity_choices": [1, 2],
+        "images": [
+            "https://images.unsplash.com/photo-1631452180519-c014fe946bc7?w=800",
+        ],
+    },
+    # ── SWEETS ────────────────────────────────
     {
         "name": "Rasgulla",
         "category": "Sweets",
@@ -445,7 +617,7 @@ PRODUCT_TEMPLATES = [
         "grouped_unit": QuantizedUnit.PCS,
         "grouped_quantity_choices": [2, 4, 6],
         "images": [
-            "https://images.unsplash.com/photo-1605197788044-f5e0fcfdf6a8",
+            "https://images.unsplash.com/photo-1601303516534-bf4b22de4f1f?w=800",
         ],
     },
     {
@@ -457,7 +629,7 @@ PRODUCT_TEMPLATES = [
         "grouped_unit": QuantizedUnit.PCS,
         "grouped_quantity_choices": [4, 6, 8],
         "images": [
-            "https://images.unsplash.com/photo-1631452180519-c014fe946bc7",
+            "https://images.unsplash.com/photo-1631452180519-c014fe946bc7?w=800",
         ],
     },
     {
@@ -469,7 +641,7 @@ PRODUCT_TEMPLATES = [
         "grouped_unit": QuantizedUnit.NA,
         "grouped_quantity_choices": [0],
         "images": [
-            "https://images.unsplash.com/photo-1601303516534-bf4b22de4f1f",
+            "https://images.unsplash.com/photo-1601303516534-bf4b22de4f1f?w=800",
         ],
     },
     {
@@ -481,7 +653,7 @@ PRODUCT_TEMPLATES = [
         "grouped_unit": QuantizedUnit.NA,
         "grouped_quantity_choices": [0],
         "images": [
-            "https://images.unsplash.com/photo-1631452180519-c014fe946bc7",
+            "https://images.unsplash.com/photo-1631452180519-c014fe946bc7?w=800",
         ],
     },
     {
@@ -493,10 +665,10 @@ PRODUCT_TEMPLATES = [
         "grouped_unit": QuantizedUnit.PCS,
         "grouped_quantity_choices": [2, 4, 6],
         "images": [
-            "https://images.unsplash.com/photo-1631452180519-c014fe946bc7",
+            "https://images.unsplash.com/photo-1631452180519-c014fe946bc7?w=800",
         ],
     },
-    # ── MAIN COURSE ───────────────────────────────────────────────────────
+    # ── MAIN COURSE ───────────────────────────
     {
         "name": "Dal Bhat Tarkari",
         "category": "Main Course",
@@ -506,8 +678,8 @@ PRODUCT_TEMPLATES = [
         "grouped_unit": QuantizedUnit.NA,
         "grouped_quantity_choices": [0],
         "images": [
-            "https://images.unsplash.com/photo-1547592180-85f173990554",
-            "https://images.unsplash.com/photo-1631452180519-c014fe946bc7",
+            "https://images.unsplash.com/photo-1547592180-85f173990554?w=800",
+            "https://images.unsplash.com/photo-1631452180519-c014fe946bc7?w=800",
         ],
     },
     {
@@ -519,7 +691,7 @@ PRODUCT_TEMPLATES = [
         "grouped_unit": QuantizedUnit.NA,
         "grouped_quantity_choices": [0],
         "images": [
-            "https://images.unsplash.com/photo-1589302168068-964664d93dc0",
+            "https://images.unsplash.com/photo-1589302168068-964664d93dc0?w=800",
         ],
     },
     {
@@ -531,7 +703,7 @@ PRODUCT_TEMPLATES = [
         "grouped_unit": QuantizedUnit.NA,
         "grouped_quantity_choices": [0],
         "images": [
-            "https://images.unsplash.com/photo-1631452180519-c014fe946bc7",
+            "https://images.unsplash.com/photo-1631452180519-c014fe946bc7?w=800",
         ],
     },
     {
@@ -543,7 +715,7 @@ PRODUCT_TEMPLATES = [
         "grouped_unit": QuantizedUnit.NA,
         "grouped_quantity_choices": [0],
         "images": [
-            "https://images.unsplash.com/photo-1547592180-85f173990554",
+            "https://images.unsplash.com/photo-1547592180-85f173990554?w=800",
         ],
     },
     {
@@ -555,12 +727,39 @@ PRODUCT_TEMPLATES = [
         "grouped_unit": QuantizedUnit.NA,
         "grouped_quantity_choices": [0],
         "images": [
-            "https://images.unsplash.com/photo-1547592180-85f173990554",
+            "https://images.unsplash.com/photo-1547592180-85f173990554?w=800",
+        ],
+    },
+    {
+        "name": "Veg Fried Rice",
+        "category": "Main Course",
+        "ingredients": ["Rice", "Carrot", "Peas", "Capsicum", "Soy Sauce", "Onion"],
+        "price": (180, 350),
+        "prep_time": (15, 30),
+        "grouped_unit": QuantizedUnit.NA,
+        "grouped_quantity_choices": [0],
+        "images": [
+            "https://images.unsplash.com/photo-1589302168068-964664d93dc0?w=800",
+        ],
+    },
+    {
+        "name": "Palak Paneer",
+        "category": "Main Course",
+        "ingredients": ["Spinach", "Paneer", "Onion", "Garlic", "Cream", "Spices"],
+        "price": (280, 550),
+        "prep_time": (20, 35),
+        "grouped_unit": QuantizedUnit.NA,
+        "grouped_quantity_choices": [0],
+        "images": [
+            "https://images.unsplash.com/photo-1631452180519-c014fe946bc7?w=800",
         ],
     },
 ]
 
 
+# ─────────────────────────────────────────────
+#  SEEDER FUNCTIONS
+# ─────────────────────────────────────────────
 async def seed_categories(session) -> list[Category]:
     categories = [Category(category_name=name) for name in CATEGORY_NAMES]
     for category in categories:
@@ -577,7 +776,6 @@ async def seed_users(session, count: int = USER_COUNT) -> list[User]:
     for index in range(count):
         first_name = fake.first_name()
         last_name = fake.last_name()
-
         user = User(
             first_name=first_name,
             last_name=last_name,
@@ -596,7 +794,6 @@ async def seed_users(session, count: int = USER_COUNT) -> list[User]:
             provider="",
             provider_id=None,
         )
-
         user.profile = Profile(
             full_name=f"{first_name} {last_name}",
             image=None,
@@ -605,7 +802,6 @@ async def seed_users(session, count: int = USER_COUNT) -> list[User]:
             total_cart_items=random.randint(0, 10),
             loyality_points=random.randint(0, 12000),
         )
-
         session.add(user)
         users.append(user)
 
@@ -623,16 +819,14 @@ async def seed_products(
 
     for index in range(count):
         template = random.choice(PRODUCT_TEMPLATES)
-        category_name = template["category"]
-        category = category_map[category_name]
-
+        category = category_map[template["category"]]
         product = Product(
             product_name=f"{template['name']} #{index + 1}",
             product_description=(
                 f"Freshly prepared {template['name'].lower()} made with "
                 "100% vegetarian ingredients for an authentic taste."
             ),
-            category_label=category_name,
+            category_label=template["category"],
             is_available=random.choices([True, False], weights=[90, 10], k=1)[0],
             is_best_seller=random.choices([True, False], weights=[70, 30], k=1)[0],
             price=random.randint(*template["price"]),
@@ -652,7 +846,6 @@ async def seed_products(
                 else [template["images"][0]]
             ),
         )
-
         product.categories.append(category)
         session.add(product)
         products.append(product)
@@ -666,22 +859,19 @@ async def seed_reviews(
     session, users: list[User], products: list[Product]
 ) -> list[Review]:
     reviews = []
-
     for product in products:
         reviewers = random.sample(users, k=min(random.randint(0, 5), len(users)))
-
         for user in reviewers:
             review = Review(
                 user_id=user.id,
                 product_id=product.id,
                 review_title=random.choice(REVIEW_TITLES),
                 review_description=fake.sentence() if random.random() < 0.5 else None,
-                rating=random.choice([1.0, 2.0, 3.0, 3.5, 4.0, 4.5, 5.0]),
+                rating=random.choice([1, 2, 3, 4, 5]),
                 like_count=random.randint(0, 100),
             )
             session.add(review)
             reviews.append(review)
-
     await session.flush()
     print(f"✓ Created {len(reviews)} reviews")
     return reviews
@@ -691,17 +881,13 @@ async def seed_comments(
     session, users: list[User], reviews: list[Review]
 ) -> list[Comment]:
     comments = []
-
     for review in reviews:
-        # Each review can have multiple comments (one-to-many)
         num_comments = random.choices(
             population=[0, 1, 2, 3],
             weights=[30, 40, 20, 10],
             k=1,
         )[0]
-
         commenter_pool = random.sample(users, k=min(num_comments, len(users)))
-
         for user in commenter_pool:
             comment = Comment(
                 user_id=user.id,
@@ -710,12 +896,14 @@ async def seed_comments(
             )
             session.add(comment)
             comments.append(comment)
-
     await session.flush()
     print(f"✓ Created {len(comments)} comments")
     return comments
 
 
+# ─────────────────────────────────────────────
+#  MAIN
+# ─────────────────────────────────────────────
 async def main():
     print("\n" + "=" * 50)
     print("🌱 STARTING DATABASE SEED")
@@ -735,14 +923,14 @@ async def main():
             await session.commit()
 
             print("\n" + "=" * 50)
-            print("🌱 SEED COMPLETED SUCCESSFULLY")
+            print("✅ SEED COMPLETED SUCCESSFULLY")
             print("=" * 50 + "\n")
-            print(f"Users      : {len(users)}")
-            print(f"Categories : {len(categories)}")
-            print(f"Products   : {len(products)}")
-            print(f"Reviews    : {len(reviews)}")
-            print(f"Comments   : {len(comments)}")
-            print(f"\nLogin → seed_user_1@example.com / {SEED_PASSWORD}\n")
+            print(f"  Users      : {len(users)}")
+            print(f"  Categories : {len(categories)}")
+            print(f"  Products   : {len(products)}")
+            print(f"  Reviews    : {len(reviews)}")
+            print(f"  Comments   : {len(comments)}")
+            print(f"\n  Login → seed_user_1@example.com / {SEED_PASSWORD}\n")
 
         except Exception as exc:
             print(f"\n❌ SEED FAILED\nError: {exc}")

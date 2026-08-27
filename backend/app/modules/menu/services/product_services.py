@@ -10,6 +10,11 @@ from app.modules.menu.dependencies.filter_products import FilterProduct
 from app.modules.menu.exceptions.product_exceptions import ProductNotFound
 from app.modules.menu.repos.product_repo import ProductRepo
 from app.modules.menu.schemas.product import ProductCreate, ProductReadSingleCustomer
+from app.modules.menu.schemas.review import (
+    ReadReviewBasic,
+    ReviewReadResponse,
+    ReviewStats,
+)
 from app.modules.menu.utils import encode_image
 from app.schemas.common import SuccessResponse
 from app.tasks.menu_task import upload_product_main_image, upload_product_side_images
@@ -92,5 +97,19 @@ class ProductService:
         )
         return product_final
 
+    async def generate_distributed_stats(self, product_id: UUID):
+        avg, rows = await self.product_repo.rating_count(product_id)
+        distributed = {i: 0 for i in range(1, 6)}
+        for rating, rating_count in rows:
+            distributed[rating] = rating_count
+        return ReviewStats(distribution=distributed, avg_rating=float(avg or 0))
+
     async def read_product_reviews(self, product_id: UUID, pagination: Pagination):
-        return await self.product_repo.read_product_reviews(product_id, pagination)
+        meta, data = await self.product_repo.read_product_reviews(
+            product_id, pagination
+        )
+        stats = await self.generate_distributed_stats(product_id)
+        reviews: list[ReadReviewBasic] = [
+            ReadReviewBasic.model_validate(r) for r in data
+        ]
+        return ReviewReadResponse(meta=meta, data=reviews, stats=stats)

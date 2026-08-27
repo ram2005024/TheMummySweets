@@ -37,7 +37,7 @@ class Review(BaseModel):
     review_title: Mapped[str]
     review_description: Mapped[str | None]
     like_count: Mapped[int] = mapped_column(default=0)
-    rating: Mapped[float] = mapped_column(default=5)
+    rating: Mapped[int] = mapped_column(default=5)
     # sqlalchemy field
     comments: Mapped[list["Comment"] | None] = relationship(
         "Comment", back_populates="review"

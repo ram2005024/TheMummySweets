@@ -13,7 +13,7 @@ from app.modules.menu.schemas.product import (
     ProductReadBasicCustomer,
     ProductReadSingleCustomer,
 )
-from app.modules.menu.schemas.review import ReadReviewBasic
+from app.modules.menu.schemas.review import ReviewReadResponse
 from app.modules.menu.services.product_services import ProductService
 from app.schemas.common import SuccessResponse
 from app.schemas.pagination_schema import PaginatedResponse
@@ -60,7 +60,7 @@ async def read_single_product_endpoint(
 # Read  product reviews
 @product_api.get(
     "/reviews/{product_id}",
-    response_model=SuccessResponse[PaginatedResponse[list[ReadReviewBasic]]],
+    response_model=SuccessResponse[ReviewReadResponse],
 )
 async def read_product_reviews(
     product_id: UUID,

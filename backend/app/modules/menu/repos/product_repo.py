@@ -147,7 +147,7 @@ class ProductRepo:
             .all()
         )
         meta = pagination.pagination(total=total_count, filtered_total=filtered_count)
-        return PaginatedResponse(meta=meta, data=data)
+        return meta, data
 
     async def read_wishlist_products(
         self, filter_data: FilterProduct, pagination_data: Pagination, wishlist_id: UUID
@@ -194,3 +194,15 @@ class ProductRepo:
                 )
             )
         return PaginatedResponse(meta=meta, data=data)
+
+    async def rating_count(self, product_id: UUID):
+        distributed_stmt = select(
+            Review.rating,
+            func.count(Review.id).label("rating_count"),
+        ).group_by(Review.rating)
+        distrubuted_rows = (await self.db.execute(distributed_stmt)).all()
+        avg_stmt = select(func.coalesce(func.avg(Review.rating), 0)).where(
+            Review.product_id == product_id
+        )
+        avg_count = (await self.db.execute(avg_stmt)).scalar()
+        return avg_count, distrubuted_rows
