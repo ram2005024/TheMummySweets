@@ -95,7 +95,7 @@ PRODUCT_TEMPLATES = [
         "grouped_unit": QuantizedUnit.PCS,
         "grouped_quantity_choices": [6, 8, 10, 12],
         "images": [
-            "https://images.unsplash.com/photo-1534422298391-e4f8517d9b99?w=800",
+            "https://images.unsplash.com/photo-1625220194771-7ebdea0b70b9?q=80&w=1470&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
             "https://images.unsplash.com/photo-1567188040759-fb8a883dc6d8?w=800",
         ],
     },
@@ -108,7 +108,7 @@ PRODUCT_TEMPLATES = [
         "grouped_unit": QuantizedUnit.PCS,
         "grouped_quantity_choices": [6, 8, 10, 12],
         "images": [
-            "https://images.unsplash.com/photo-1534422298391-e4f8517d9b99?w=800",
+            "https://images.unsplash.com/photo-1738608084602-f9543952188e?q=80&w=1472&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
         ],
     },
     {
