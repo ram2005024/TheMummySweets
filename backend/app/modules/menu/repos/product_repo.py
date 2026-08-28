@@ -196,10 +196,14 @@ class ProductRepo:
         return PaginatedResponse(meta=meta, data=data)
 
     async def rating_count(self, product_id: UUID):
-        distributed_stmt = select(
-            Review.rating,
-            func.count(Review.id).label("rating_count"),
-        ).group_by(Review.rating)
+        distributed_stmt = (
+            select(
+                Review.rating,
+                func.count(Review.id).label("rating_count"),
+            )
+            .group_by(Review.rating)
+            .where(Review.product_id == product_id)
+        )
         distrubuted_rows = (await self.db.execute(distributed_stmt)).all()
         avg_stmt = select(func.coalesce(func.avg(Review.rating), 0)).where(
             Review.product_id == product_id
