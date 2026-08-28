@@ -1,7 +1,6 @@
 import { MenuService } from "@/services/menu.service";
 import { menuStore } from "@/store/menu.product";
-import { PaginatedResponse } from "@/type/common.type";
-import { ProductReview } from "@/type/menu.type";
+import { ReviewResponse } from "@/type/menu.type";
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 
 // To get the menu items
@@ -48,13 +47,13 @@ export const useGetMenuCategories = () =>
 // To get the product reviews
 export const useGetProductReviews = (
   product_id: string,
-  initialData?: PaginatedResponse<ProductReview>,
+  initialData?: ReviewResponse,
 ) => {
   return useInfiniteQuery({
     queryKey: ["product_reviews", product_id],
     queryFn: ({ pageParam }) =>
       MenuService.getProductReviews({
-        params: { page: pageParam, limit: 10 },
+        params: { page: pageParam, limit: 5 },
         product_id: product_id,
       }),
     getNextPageParam: (lastResult) => {

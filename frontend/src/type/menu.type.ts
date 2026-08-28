@@ -103,7 +103,7 @@ export interface ReviewParam {
   limit: number;
 }
 
-export interface ReviewResponse extends PaginatedResponse<ReviewResponse[]> {
+export interface ReviewResponse extends PaginatedResponse<ProductReview[]> {
   stats: {
     avg_rating: number;
     distribution: Record<number, number>;

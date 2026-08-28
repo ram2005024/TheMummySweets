@@ -4,8 +4,8 @@ import {
   CategoryReadBasic,
   MenuParams,
   MenuProduct,
-  ProductReview,
   ReviewParam,
+  ReviewResponse,
 } from "@/type/menu.type";
 
 export class MenuService {
@@ -32,7 +32,7 @@ export class MenuService {
   }: {
     params: ReviewParam;
     product_id: string;
-  }): Promise<PaginatedResponse<ProductReview>> => {
+  }): Promise<ReviewResponse> => {
     const res = await api.get(`/product/reviews/${product_id}`, {
       params,
     });
