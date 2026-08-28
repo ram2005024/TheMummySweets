@@ -8,12 +8,17 @@ const ProductDescriptionHeader = ({
 }: {
   product: SingleProductType;
 }) => {
+  const hasDiscount = product.discount_percentage > 0;
+
+  const originalPrice = product.price;
+  const finalPrice = hasDiscount ? product.total_amount : product.price;
+
   return (
     <div className="space-y-5">
-      {/* Tags */}
+      {/* Badge */}
       <div className="flex items-center gap-2">
         <span className="rounded-full bg-orange-100 px-3 py-1 text-xs font-medium text-orange-700">
-          Hot
+          {product.category_label}
         </span>
 
         {product.is_best_seller && (
@@ -23,14 +28,13 @@ const ProductDescriptionHeader = ({
         )}
       </div>
 
-      {/* Product Title */}
-      <h2 className="font-serif text-4xl font-bold leading-tight tracking-tight text-foreground md:text-4xl">
+      {/* Title */}
+      <h1 className="font-serif text-4xl font-bold leading-[1.1] tracking-tight text-foreground">
         {product.product_name}
-      </h2>
+      </h1>
 
-      {/* Rating + Preparation Time */}
-      <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-muted-foreground">
-        {/* Rating */}
+      {/* Rating + Preparation */}
+      <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-muted-foreground">
         <div className="flex items-center gap-1.5">
           <Star
             className="h-4 w-4 fill-amber-400 text-amber-400"
@@ -41,12 +45,11 @@ const ProductDescriptionHeader = ({
             {product.rating.toFixed(1)}
           </span>
 
-          <span className="text-muted-foreground">
-            ({product.review_count} reviews)
-          </span>
+          <span>({product.review_count} reviews)</span>
         </div>
 
-        {/* Preparation Time */}
+        <span className="h-1 w-1 rounded-full bg-muted-foreground/40" />
+
         <div className="flex items-center gap-1.5">
           <Clock className="h-4 w-4" strokeWidth={1.7} />
 
@@ -55,21 +58,37 @@ const ProductDescriptionHeader = ({
       </div>
 
       {/* Description */}
-      <p className="max-w-2xl text-base leading-7 text-muted-foreground md:text-lg">
+      <p className="max-w-2xl text-base leading-7 text-muted-foreground md:text-[17px]">
         {product.product_description}
       </p>
 
       {/* Price */}
       <div className="pt-1">
-        <div className="font-mono text-3xl font-bold tracking-tight text-foreground">
-          Rs. {product.price}
+        <div className="flex flex-wrap items-baseline gap-3">
+          {/* Final / Selling Price */}
+          <span className="font-mono text-3xl font-bold tracking-tight text-foreground">
+            Rs. {finalPrice.toFixed(2)}
+          </span>
+
+          {/* Original Price + Discount */}
+          {hasDiscount && (
+            <>
+              <span className="font-mono text-base font-medium text-muted-foreground line-through">
+                Rs. {originalPrice.toFixed(2)}
+              </span>
+
+              <span className="rounded-full bg-green-100 px-2.5 py-1 text-xs font-bold text-green-700">
+                -{product.discount_percentage}%
+              </span>
+            </>
+          )}
         </div>
 
         {/* Availability */}
         <div className="mt-3 flex items-center gap-2">
           <span
             className={`h-2 w-2 rounded-full ${
-              product.is_available ? "bg-green-500 animate-pulse" : "bg-red-500"
+              product.is_available ? "animate-pulse bg-green-500" : "bg-red-500"
             }`}
           />
 
