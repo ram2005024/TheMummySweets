@@ -9,7 +9,8 @@ from app.modules.menu.repos.product_repo import ProductRepo
 class CartService:
     CART_DELIVERY_FEE = 60
     TAX_RATE = 0.13
-    CART_TTL = 7  # In days
+    CART_TTL_USER = 7  # In days
+    CART_TTL_GUEST = 2  # In hours
 
     def __init__(self, redis: Redis, product_repo: ProductRepo) -> None:
         self.redis = redis
@@ -41,7 +42,12 @@ class CartService:
                 },
             )
         await self.redis.hincrby(key, quantity)
-        await self.redis.expire(key, self.CART_TTL * 24 * 60 * 60)
+        expire = (
+            self.CART_TTL_GUEST * 60 * 60
+            if guest_id
+            else self.CART_TTL_USER * 24 * 60 * 60
+        )
+        await self.redis.expire(key, expire)
 
     async def get_cart_details(self, user_id: str | None, guest_id: str | None):
         items: dict[str, dict] = {}
@@ -68,9 +74,9 @@ class CartService:
             sub_total += values["quantity"] * value["price"]
             cart_items.append(values)
         tax_amount = self.TAX_RATE * sub_total
-        delivery_fee = 0  # We will calculate
+        delivery_fee = self.CART_DELIVERY_FEE  # We will calculate
         items["items"] = cart_items
-        items["delivery_fee"] = self.CART_DELIVERY_FEE
+        items["delivery_fee"] = delivery_fee
         items["sub_total"] = sub_total
         items["total"] = sub_total + delivery_fee + tax_amount
         items["tax_amount"] = tax_amount
