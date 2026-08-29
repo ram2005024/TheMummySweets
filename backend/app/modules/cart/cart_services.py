@@ -5,7 +5,7 @@ from fastapi.responses import JSONResponse
 from redis.asyncio import Redis
 
 from app.core.config import settings
-from app.modules.menu.exceptions.product_exceptions import ProductNotFound
+from app.modules.menu.models.product_model import Product
 from app.modules.menu.repos.product_repo import ProductRepo
 from app.schemas.common import SuccessResponse
 
@@ -29,19 +29,17 @@ class CartService:
     async def add_cart_item(
         self,
         request: Request,
-        product_id: UUID,
+        product: Product,
         user_id: str | None = None,
         guest_id: str | None = None,
     ):
+        product_id = product.id
         key = self._key(user_id, guest_id)
         price_field = f"{product_id!s}:price"
         name_field = f"{product_id!s}:name"
         quantity = f"{product_id!s}:quantity"
 
         if not await self.redis.hexists(key, price_field):
-            product = await self.product_repo.read_product(product_id)
-            if not product:
-                raise ProductNotFound
             await self.redis.hset(
                 key,
                 mapping={
@@ -96,16 +94,17 @@ class CartService:
             return items
         cart_items = []
         sub_total = 0
-        for items in value.values():
-            sub_total += items["quantity"] * items["price"]
+        for field, items in value.items():
+            sub_total += int(items["quantity"]) * float(items["price"])
+            items["id"] = UUID(field.split(":")[0])
             cart_items.append(items)
         tax_amount = self.TAX_RATE * sub_total
         delivery_fee = self.CART_DELIVERY_FEE  # We will calculate
         items["items"] = cart_items
         items["delivery_fee"] = delivery_fee
-        items["sub_total"] = sub_total
-        items["total"] = sub_total + delivery_fee + tax_amount
-        items["tax_amount"] = tax_amount
+        items["sub_total"] = round(sub_total, 2)
+        items["total"] = round(sub_total + delivery_fee + tax_amount, 2)
+        items["tax_amount"] = round(tax_amount, 2)
         return items
 
     async def merge_cart_user(self, user_id: UUID, guest_id: str):
