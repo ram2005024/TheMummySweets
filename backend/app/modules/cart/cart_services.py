@@ -5,6 +5,7 @@ from fastapi.responses import JSONResponse
 from redis.asyncio import Redis
 
 from app.core.config import settings
+from app.modules.cart.cart_exceptions import CartAttributesMissing
 from app.modules.menu.models.product_model import Product
 from app.modules.menu.repos.product_repo import ProductRepo
 from app.schemas.common import SuccessResponse
@@ -38,6 +39,8 @@ class CartService:
         price_field = f"{product_id!s}:price"
         name_field = f"{product_id!s}:name"
         quantity = f"{product_id!s}:quantity"
+        main_image = f"{product_id!s}:main_image"
+        quantized_unit = f"{product_id!s}:quantized_unit"
 
         if not await self.redis.hexists(key, price_field):
             await self.redis.hset(
@@ -45,6 +48,8 @@ class CartService:
                 mapping={
                     price_field: product.total_amount,
                     name_field: product.product_name,
+                    main_image: product.main_image,
+                    quantized_unit: product.grouped_unit,
                 },
             )
         await self.redis.hincrby(key, quantity)
@@ -77,9 +82,15 @@ class CartService:
         items: dict[str, dict] = {}
         key = self._key(user_id, guest_id)
         raw = await self.redis.hgetall(key)
+        valid_attrs = ["name", "price", "quantity", "main_image", "quantized_unit"]
         for field, value in raw.items():
             pid, attr = field.split(":")  # type: ignore
             items.setdefault(pid, {})[attr] = value  # type: ignore
+        for pid, cart_items in items.items():
+            attrs = cart_items.keys()
+            for key in attrs:
+                if key not in valid_attrs:
+                    raise CartAttributesMissing
         return await self.get_cart_total_calculation(items)
 
     async def get_cart_total_calculation(self, value: dict[str, dict]):
@@ -94,10 +105,11 @@ class CartService:
             return items
         cart_items = []
         sub_total = 0
-        for field, items in value.items():
+        for id, items in value.items():
             sub_total += int(items["quantity"]) * float(items["price"])
-            items["id"] = UUID(field.split(":")[0])
+            items["id"] = UUID(id)
             cart_items.append(items)
+        print(cart_items)
         tax_amount = self.TAX_RATE * sub_total
         delivery_fee = self.CART_DELIVERY_FEE  # We will calculate
         items["items"] = cart_items
