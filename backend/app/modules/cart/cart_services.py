@@ -7,6 +7,7 @@ from app.modules.menu.repos.product_repo import ProductRepo
 
 
 class CartService:
+    CART_DELIVERY_FEE = 60
     TAX_RATE = 0.13
     CART_TTL = 7  # In days
 
@@ -69,7 +70,7 @@ class CartService:
         tax_amount = self.TAX_RATE * sub_total
         delivery_fee = 0  # We will calculate
         items["items"] = cart_items
-        items["delivery_fee"] = delivery_fee
+        items["delivery_fee"] = self.CART_DELIVERY_FEE
         items["sub_total"] = sub_total
         items["total"] = sub_total + delivery_fee + tax_amount
         items["tax_amount"] = tax_amount
