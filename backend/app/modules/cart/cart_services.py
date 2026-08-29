@@ -23,7 +23,7 @@ class CartService:
             return f"cart:user:{guest_id}"
 
     async def add_cart_item(
-        self, product_id: UUID, user_id: str | None, guest_id: str | None
+        self, product_id: UUID, user_id: str | None = None, guest_id: str | None = None
     ):
         key = self._key(user_id, guest_id)
         price_field = f"{product_id!s}:price"
@@ -49,7 +49,9 @@ class CartService:
         )
         await self.redis.expire(key, expire)
 
-    async def get_cart_details(self, user_id: str | None, guest_id: str | None):
+    async def get_cart_details(
+        self, user_id: str | None = None, guest_id: str | None = None
+    ):
         items: dict[str, dict] = {}
         key = self._key(user_id, guest_id)
         raw = await self.redis.hgetall(key)
@@ -70,9 +72,9 @@ class CartService:
             return items
         cart_items = []
         sub_total = 0
-        for values in value.values():
-            sub_total += values["quantity"] * value["price"]
-            cart_items.append(values)
+        for items in value.values():
+            sub_total += items["quantity"] * items["price"]
+            cart_items.append(items)
         tax_amount = self.TAX_RATE * sub_total
         delivery_fee = self.CART_DELIVERY_FEE  # We will calculate
         items["items"] = cart_items
@@ -81,3 +83,32 @@ class CartService:
         items["total"] = sub_total + delivery_fee + tax_amount
         items["tax_amount"] = tax_amount
         return items
+
+    async def merge_cart_user(self, user_id: UUID, guest_id: str):
+        # Get all cart items of the guest
+        guest_key = self._key(None, guest_id)
+        user_key = self._key(str(user_id), None)
+        guest_raw = await self.redis.hgetall(guest_key)
+        user_raw = await self.redis.hgetall(user_key)
+        if not guest_raw and not user_raw:
+            return
+        existing_cart_ids = [val.split(":")[0] for val in user_raw]  # type: ignore
+        for field, value in guest_raw.items():
+            pid, attr = field.split(":")  # type: ignore
+            if attr != "quantity":
+                continue
+            quantity_field = f"{pid}:quantity"
+            existing = pid in existing_cart_ids
+            if existing:
+                user_cart_item_quantity = (
+                    await self.redis.hget(user_key, quantity_field) or 0
+                )
+                await self.redis.hset(
+                    user_key,
+                    quantity_field,
+                    max(int(user_cart_item_quantity), int(value)),
+                )
+            else:
+                await self.add_cart_item(pid, str(user_id), None)  # type: ignore
+        await self.redis.delete(guest_key)
+        await self.redis.expire(user_key, self.CART_TTL_USER * 24 * 60 * 60)
