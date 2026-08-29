@@ -41,3 +41,36 @@ class CartService:
             )
         await self.redis.hincrby(key, quantity)
         await self.redis.expire(key, self.CART_TTL * 24 * 60 * 60)
+
+    async def get_cart_details(self, user_id: str | None, guest_id: str | None):
+        items: dict[str, dict] = {}
+        key = self._key(user_id, guest_id)
+        raw = await self.redis.hgetall(key)
+        for field, value in raw.items():
+            pid, attr = field.split(":")  # type: ignore
+            items.setdefault(pid, {})[attr] = value  # type: ignore
+        return await self.get_cart_total_calculation(items)
+
+    async def get_cart_total_calculation(self, value: dict[str, dict]):
+        items = {
+            "items": [],
+            "total": 0,
+            "tax_amount": 0,
+            "delivery_fee": 0,
+            "sub_total": 0,
+        }
+        if not value:
+            return items
+        cart_items = []
+        sub_total = 0
+        for values in value.values():
+            sub_total += values["quantity"] * value["price"]
+            cart_items.append(values)
+        tax_amount = self.TAX_RATE * sub_total
+        delivery_fee = 0  # We will calculate
+        items["items"] = cart_items
+        items["delivery_fee"] = delivery_fee
+        items["sub_total"] = sub_total
+        items["total"] = sub_total + delivery_fee + tax_amount
+        items["tax_amount"] = tax_amount
+        return items
