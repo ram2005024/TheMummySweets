@@ -117,6 +117,7 @@ class ProductRepo:
                 .where(Product.id == product_id)
             )
         ).one_or_none()
+        await self.db.flush()
         return product
 
     async def read_product_reviews(self, product_id: UUID, pagination: Pagination):
@@ -210,3 +211,9 @@ class ProductRepo:
         )
         avg_count = (await self.db.execute(avg_stmt)).scalar()
         return avg_count, distrubuted_rows
+
+    async def read_product(self, product_id: UUID):
+        product = (
+            await self.db.execute(select(Product).where(Product.id == product_id))
+        ).scalar_one_or_none()
+        return product
