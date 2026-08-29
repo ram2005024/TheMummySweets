@@ -1,9 +1,13 @@
 from uuid import UUID
 
+from fastapi import Request
+from fastapi.responses import JSONResponse
 from redis.asyncio import Redis
 
+from app.core.config import settings
 from app.modules.menu.exceptions.product_exceptions import ProductNotFound
 from app.modules.menu.repos.product_repo import ProductRepo
+from app.schemas.common import SuccessResponse
 
 
 class CartService:
@@ -23,7 +27,11 @@ class CartService:
             return f"cart:user:{guest_id}"
 
     async def add_cart_item(
-        self, product_id: UUID, user_id: str | None = None, guest_id: str | None = None
+        self,
+        request: Request,
+        product_id: UUID,
+        user_id: str | None = None,
+        guest_id: str | None = None,
     ):
         key = self._key(user_id, guest_id)
         price_field = f"{product_id!s}:price"
@@ -48,6 +56,22 @@ class CartService:
             else self.CART_TTL_USER * 24 * 60 * 60
         )
         await self.redis.expire(key, expire)
+        response = JSONResponse(
+            status_code=200,
+            content=SuccessResponse(
+                data=None, message="Item added into cart"
+            ).model_dump(),
+        )
+        if guest_id and not request.cookies.get("guest-session-id"):
+            response.set_cookie(
+                key="guest-session-id",
+                value=guest_id,
+                samesite=settings.SAMESITE,
+                httponly=True,
+                max_age=2 * 60 * 60,
+                secure=settings.SECURE,
+            )
+        return response
 
     async def get_cart_details(
         self, user_id: str | None = None, guest_id: str | None = None
