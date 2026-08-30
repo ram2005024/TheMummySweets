@@ -23,3 +23,14 @@ class CartNotFound(AppException):
         details: Any = None,
     ):
         super().__init__(message, status_code, error_code, details)
+
+
+class CartProductNotFound(AppException):
+    def __init__(
+        self,
+        message: str = "Product doesn't exist inside the cart ",
+        status_code: int = 404,
+        error_code: str | None = "MISSING_PRODUCT_IN_CART`",
+        details: Any = None,
+    ):
+        super().__init__(message, status_code, error_code, details)

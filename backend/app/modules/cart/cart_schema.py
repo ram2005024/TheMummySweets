@@ -1,3 +1,4 @@
+from typing import Literal
 from uuid import UUID
 
 from pydantic import BaseModel
@@ -20,3 +21,7 @@ class CartItemsRead(BaseModel):
     sub_total: float
     tax_amount: float
     delivery_fee: int
+
+
+class CartUpdate(BaseModel):
+    type: Literal["incr", "dcr"]

@@ -5,7 +5,12 @@ from fastapi.responses import JSONResponse
 from redis.asyncio import Redis
 
 from app.core.config import settings
-from app.modules.cart.cart_exceptions import CartAttributesMissing, CartNotFound
+from app.modules.cart.cart_exceptions import (
+    CartAttributesMissing,
+    CartNotFound,
+    CartProductNotFound,
+)
+from app.modules.cart.cart_schema import CartUpdate
 from app.modules.menu.models.product_model import Product
 from app.modules.menu.repos.product_repo import ProductRepo
 from app.schemas.common import SuccessResponse
@@ -148,12 +153,48 @@ class CartService:
         await self.redis.delete(guest_key)
         await self.redis.expire(user_key, self.CART_TTL_USER * 24 * 60 * 60)
 
+    async def decrement_or_increment_cart_quantity(
+        self,
+        type: CartUpdate,
+        key: str,
+        field: str,
+        key_hash: dict[str, str],
+        product_id: UUID,
+    ):
+        if type == "incr":
+            await self.redis.hincrby(key, field)
+        else:
+            qty = await self.redis.hincrby(key, field, -1)
+            if qty == 0:
+                for attr in key_hash:
+                    pid = attr.split(":")[0]
+                    if pid == str(product_id):
+                        await self.redis.hdel(key, attr)
+            else:
+                raise CartProductNotFound
+
     async def update_cart_quantity(
-        self, product_id: UUID, user_id: str | None = None, guest_id: str | None = None
+        self,
+        type: CartUpdate,
+        product_id: UUID,
+        user_id: str | None = None,
+        guest_id: str | None = None,
     ):
         key = self._key(user_id, guest_id)
         qty_field = f"{product_id!s:quantity}"
         existing = await self.redis.hgetall(key)
         if not existing:
             raise CartNotFound
-        await self.redis.hincrby(key, qty_field)
+        await self.decrement_or_increment_cart_quantity(
+            type,
+            key,
+            qty_field,
+            existing,  # type: ignore
+            product_id,
+        )
+        expire = (
+            self.CART_TTL_GUEST * 60 * 60
+            if guest_id
+            else self.CART_TTL_USER * 24 * 60 * 60
+        )
+        await self.redis.expire(key, expire)
