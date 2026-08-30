@@ -210,3 +210,12 @@ class CartService:
             pid = field.split(":")[0]  # type: ignore
             if pid == str(product_id):
                 await self.redis.hdel(key, field)
+
+    async def delete_entire_cart(
+        self, user_id: str | None = None, guest_id: str | None = None
+    ):
+        key = self._key(user_id, guest_id)
+        existing = await self.redis.hgetall(key)
+        if not existing:
+            raise CartNotFound
+        await self.redis.delete(key)
