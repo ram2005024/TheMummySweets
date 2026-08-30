@@ -1,7 +1,8 @@
 import base64
 import uuid
+from typing import Annotated
 
-from fastapi import HTTPException, Response, UploadFile
+from fastapi import Depends, HTTPException, Response, UploadFile
 from fastapi.responses import JSONResponse, RedirectResponse
 from starlette.requests import Request
 
@@ -28,6 +29,8 @@ from app.modules.auth.schemas.user_schema import (
     UserLogin,
     UserRegiser,
 )
+from app.modules.cart.cart_services import CartService
+from app.modules.cart.factories import get_cart_service
 from app.repos.session_repo import SessionRepo
 from app.repos.user_repo import UserRepo
 from app.schemas.common import SuccessResponse
@@ -36,9 +39,15 @@ from app.tasks.email_task import send_otp, send_reset_otp
 
 
 class AuthService:
-    def __init__(self, repo: UserRepo, session_repo: SessionRepo):
+    def __init__(
+        self,
+        repo: UserRepo,
+        session_repo: SessionRepo,
+        cart_service: Annotated[CartService, Depends(get_cart_service)],
+    ):
         self.repo = repo
         self.session_repo = session_repo
+        self.cart_service = cart_service
 
         # Auth services
 
@@ -151,7 +160,10 @@ class AuthService:
             await self.session_repo.put_jti_into_session(jti, session)
         else:
             session = await self.session_repo.create_session(
-                request, device_id, user.id, jti
+                request,
+                device_id,
+                user.id,
+                jti,  # type: ignore
             )  # type:ignore
         token_data = {
             "user_id": str(user.id),
@@ -161,6 +173,8 @@ class AuthService:
         refresh = Auth().generate_refresh(token_data)
         await Auth().set_refresh_into_redis(str(jti))
         access = Auth().generate_access(token_data)
+        # Merge the guest cart for the user if exists
+        await self.merge_guest_cart_with_user(request, user.id)
         response = JSONResponse(
             status_code=200,
             content=SuccessResponse(
@@ -176,6 +190,12 @@ class AuthService:
             max_age=settings.REFRESH_EXPIRY * 24 * 60 * 60,
         )
         return response
+
+    async def merge_guest_cart_with_user(self, request: Request, user_id: uuid.UUID):
+        guest_session_id = request.cookies.get("guest-session-id", None)
+        if not guest_session_id:
+            return
+        await self.cart_service.merge_cart_user(user_id, guest_session_id)
 
     async def verify_otp(self, data: OtpVerifySchema):
         user = await self.repo.get_user_by_field("id", uuid.UUID(data.user_id))
