@@ -198,3 +198,15 @@ class CartService:
             else self.CART_TTL_USER * 24 * 60 * 60
         )
         await self.redis.expire(key, expire)
+
+    async def delete_product_from_cart(
+        self, product_id: UUID, user_id: str | None = None, guest_id: str | None = None
+    ):
+        key = self._key(user_id, guest_id)
+        existing = await self.redis.hgetall(key)
+        if not existing:
+            raise CartNotFound
+        for field in existing:
+            pid = field.split(":")[0]  # type: ignore
+            if pid == str(product_id):
+                await self.redis.hdel(key, field)
