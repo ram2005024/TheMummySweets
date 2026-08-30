@@ -161,7 +161,7 @@ class CartService:
         key_hash: dict[str, str],
         product_id: UUID,
     ):
-        if type == "incr":
+        if type.type == "incr":
             await self.redis.hincrby(key, field)
         else:
             qty = await self.redis.hincrby(key, field, -1)
@@ -170,7 +170,7 @@ class CartService:
                     pid = attr.split(":")[0]
                     if pid == str(product_id):
                         await self.redis.hdel(key, attr)
-            else:
+            elif qty < 0:
                 raise CartProductNotFound
 
     async def update_cart_quantity(
@@ -181,7 +181,7 @@ class CartService:
         guest_id: str | None = None,
     ):
         key = self._key(user_id, guest_id)
-        qty_field = f"{product_id!s:quantity}"
+        qty_field = f"{product_id!s}:quantity"
         existing = await self.redis.hgetall(key)
         if not existing:
             raise CartNotFound
