@@ -5,7 +5,7 @@ from fastapi.responses import JSONResponse
 from redis.asyncio import Redis
 
 from app.core.config import settings
-from app.modules.cart.cart_exceptions import CartAttributesMissing
+from app.modules.cart.cart_exceptions import CartAttributesMissing, CartNotFound
 from app.modules.menu.models.product_model import Product
 from app.modules.menu.repos.product_repo import ProductRepo
 from app.schemas.common import SuccessResponse
@@ -147,3 +147,13 @@ class CartService:
                 await self.add_cart_item(pid, str(user_id), None)  # type: ignore
         await self.redis.delete(guest_key)
         await self.redis.expire(user_key, self.CART_TTL_USER * 24 * 60 * 60)
+
+    async def update_cart_quantity(
+        self, product_id: UUID, user_id: str | None = None, guest_id: str | None = None
+    ):
+        key = self._key(user_id, guest_id)
+        qty_field = f"{product_id!s:quantity}"
+        existing = await self.redis.hgetall(key)
+        if not existing:
+            raise CartNotFound
+        await self.redis.hincrby(key, qty_field)

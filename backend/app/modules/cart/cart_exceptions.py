@@ -12,3 +12,14 @@ class CartAttributesMissing(AppException):
         details: Any = None,
     ):
         super().__init__(message, status_code, error_code, details)
+
+
+class CartNotFound(AppException):
+    def __init__(
+        self,
+        message: str = "Cart not found",
+        status_code: int = 404,
+        error_code: str | None = "MISSING_CART",
+        details: Any = None,
+    ):
+        super().__init__(message, status_code, error_code, details)
