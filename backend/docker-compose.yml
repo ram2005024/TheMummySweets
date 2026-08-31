@@ -1,4 +1,17 @@
 services:
+  minio:
+    image: minio/minio:latest
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    env_file:
+      - .env
+    environment:
+      MINIO_ROOT_USER: ${MINIO_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_PASSWORD}
+    volumes:
+      - minio_data:/data
+    command: server /data --console-address ":9001"
   fastapi_app:
     build:
       context: .
@@ -60,3 +73,4 @@ services:
 volumes:
   pgData:
   redisData:
+  minio_data:

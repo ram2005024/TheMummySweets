@@ -4,10 +4,10 @@ import sentry_sdk
 from celery import Celery
 from sentry_sdk.integrations.celery import CeleryIntegration
 
-from app import models  #Noqa
+from app import models  # Noqa
 from app.core.config import settings
 
-celery_app=Celery(
+celery_app = Celery(
     broker=settings.REDIS_BROKER,
     backend=settings.REDIS_BACKEND,
 )
@@ -23,13 +23,10 @@ celery_app.conf.update(
 celery_app.autodiscover_tasks(["app.tasks"])
 
 
-logging.basicConfig(
-    level=logging.ERROR,
-    format="%(asctime)s %(levelname)s %(message)s"
-)
+logging.basicConfig(level=logging.ERROR, format="%(asctime)s %(levelname)s %(message)s")
 # Initialize Sentry
 sentry_sdk.init(
     dsn="https://135ed264a3002c80aebffc1f8dea1c9d@o4511752081768448.ingest.us.sentry.io/4511752084520960",
     integrations=[CeleryIntegration()],
-    traces_sample_rate=1.0
+    traces_sample_rate=1.0,
 )
