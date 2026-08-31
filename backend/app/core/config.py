@@ -8,48 +8,53 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class Settings(BaseSettings):
     # Session secret
-    SESSION_SECRET:str=""
+    SESSION_SECRET: str = ""
     # Frontend url
-    FRONTEND_URL:str=""
+    FRONTEND_URL: str = ""
     # DATABASE_CONFIG
     ASYNC_DATABASE_URL: str = ""
     SYNC_DATABASE_URL: str = ""
 
     # Cloudinary secrets
-    CLOUD_NAME:str=""
-    CLOUD_KEY:str=""
-    CLOUD_SECRET:str=""
+    CLOUD_NAME: str = ""
+    CLOUD_KEY: str = ""
+    CLOUD_SECRET: str = ""
 
     # Redis
-    REDIS_BROKER:str=""
-    REDIS_BACKEND:str=""
-    REDIS_HOST:str=""
-    REDIS_PORT:int=0
+    REDIS_BROKER: str = ""
+    REDIS_BACKEND: str = ""
+    REDIS_HOST: str = ""
+    REDIS_PORT: int = 0
     # MAIL CONF
-    MAIL_USERNAME:str=""
-    MAIL_PASSWORD:SecretStr=SecretStr("")
-    MAIL_FROM:str=""
-    MAIL_PORT:int=0
-    MAIL_SERVER:str=""
-    MAIL_STARTTLS:bool=False
-    MAIL_SSL_TLS:bool=False
+    MAIL_USERNAME: str = ""
+    MAIL_PASSWORD: SecretStr = SecretStr("")
+    MAIL_FROM: str = ""
+    MAIL_PORT: int = 0
+    MAIL_SERVER: str = ""
+    MAIL_STARTTLS: bool = False
+    MAIL_SSL_TLS: bool = False
 
-    WHATSAPP_TOKEN:str=""
-    WHATSAPP_PHONE_NUMBER_ID:str=""
+    WHATSAPP_TOKEN: str = ""
+    WHATSAPP_PHONE_NUMBER_ID: str = ""
 
-    DEBUG:bool=True
-    ACCESS_EXPIRY:int=10
-    REFRESH_EXPIRY:int=7
-    JWT_SECRET_KEY:str=""
+    DEBUG: bool = True
+    ACCESS_EXPIRY: int = 10
+    REFRESH_EXPIRY: int = 7
+    JWT_SECRET_KEY: str = ""
 
     # Cookie
-    SECURE:bool=True
-    SAMESITE:Literal["lax","none","strict"]="none"
+    SECURE: bool = True
+    SAMESITE: Literal["lax", "none", "strict"] = "none"
 
-    #Oauth
-    #-------Google-------
-    GOOGLE_CLIENT_ID:str=""
-    GOOGLE_CLIENT_SECRET:str=""
+    # Oauth
+    # -------Google-------
+    GOOGLE_CLIENT_ID: str = ""
+    GOOGLE_CLIENT_SECRET: str = ""
+
+    # MINIO
+    MINIO_ENDPOINT: str = ""
+    MINIO_ACCESS: str = ""
+    MINIO_SECRET: str = ""
 
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
@@ -60,5 +65,5 @@ settings = Settings()
 cloudinary.config(
     cloud_name=settings.CLOUD_NAME,
     api_key=settings.CLOUD_KEY,
-    api_secret=settings.CLOUD_SECRET
+    api_secret=settings.CLOUD_SECRET,
 )
