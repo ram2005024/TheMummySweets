@@ -11,6 +11,7 @@ from app.services.image_services import ImageService
 image_api = APIRouter(prefix="/admin", tags=["Admin Image Endpoints"])
 
 
+# To upload the product image
 @image_api.post("/image/upload/product", response_model=SuccessResponse[ImageResponse])
 async def upload_product_image_endpoint(
     service: Annotated[ImageService, Depends(get_image_service)],
