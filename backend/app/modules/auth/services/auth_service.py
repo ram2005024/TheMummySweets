@@ -166,6 +166,7 @@ class AuthService:
         token_data = {
             "user_id": str(user.id),
             "jti": str(jti),
+            "role": user.role.value,
             "session_id": str(session.id),
         }
         refresh = Auth().generate_refresh(token_data)
