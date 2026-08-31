@@ -9,11 +9,10 @@ export async function adminMiddleware(request: NextRequest) {
   try {
     const secret = new TextEncoder().encode(process.env.JWT_SECRET);
     const { payload } = await jwtVerify(refreshToken, secret);
-    console.log(payload);
     if (payload.role !== "admin") {
       return NextResponse.rewrite(new URL("/not-found", request.url));
     }
-    return NextResponse.next();
+    return null;
   } catch {
     return NextResponse.rewrite(new URL("/not-found", request.url));
   }

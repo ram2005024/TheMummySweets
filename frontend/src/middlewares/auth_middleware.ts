@@ -5,5 +5,5 @@ export function authMiddleware(request: NextRequest) {
   if (!token) {
     return NextResponse.redirect(new URL("/login", request.url));
   }
-  return NextResponse.next();
+  return null;
 }

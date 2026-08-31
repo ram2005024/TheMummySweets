@@ -1,5 +1,6 @@
 import Footer from "@/components/Footer";
 import NavBar from "@/components/NavBar";
+import AuthProvider from "@/providers/AuthProvider";
 
 export default function PublicLayout({
   children,
@@ -8,8 +9,10 @@ export default function PublicLayout({
 }>) {
   return (
     <div className="min-h-full flex flex-col">
-      <NavBar />
-      {children}
+      <AuthProvider>
+        <NavBar />
+        {children}
+      </AuthProvider>
       <Footer />
     </div>
   );

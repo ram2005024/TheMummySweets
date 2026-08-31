@@ -6,11 +6,8 @@ export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   if (pathname.startsWith("/admin")) {
-    const authResult = authMiddleware(request);
-    if (authResult instanceof NextResponse) return authResult;
-    const adminResult = await adminMiddleware(request);
-    if (adminResult instanceof NextResponse) return adminResult;
-
+    authMiddleware(request);
+    await adminMiddleware(request);
     return NextResponse.next();
   }
   //   if (pathname.startsWith("/dashboard")) {
@@ -23,5 +20,5 @@ export async function middleware(request: NextRequest) {
 
 // Configure which routes middleware applies to
 export const config = {
-  matchers: ["/admin/:path*"],
+  matcher: ["/admin/:path*"],
 };
