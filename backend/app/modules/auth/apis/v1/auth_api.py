@@ -42,6 +42,7 @@ async def login_endpoint(
     auth_service: Annotated[AuthService, Depends(get_auth_service)],
 ):
     response = await auth_service.login_user(data, request)
+    return response
 
 
 # For verification

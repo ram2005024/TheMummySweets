@@ -1,8 +1,7 @@
 import base64
 import uuid
-from typing import Annotated
 
-from fastapi import Depends, HTTPException, Response, UploadFile
+from fastapi import HTTPException, Response, UploadFile
 from fastapi.responses import JSONResponse, RedirectResponse
 from starlette.requests import Request
 
@@ -30,7 +29,6 @@ from app.modules.auth.schemas.user_schema import (
     UserRegiser,
 )
 from app.modules.cart.cart_services import CartService
-from app.modules.cart.factories import get_cart_service
 from app.repos.session_repo import SessionRepo
 from app.repos.user_repo import UserRepo
 from app.schemas.common import SuccessResponse
@@ -43,7 +41,7 @@ class AuthService:
         self,
         repo: UserRepo,
         session_repo: SessionRepo,
-        cart_service: Annotated[CartService, Depends(get_cart_service)],
+        cart_service: CartService,
     ):
         self.repo = repo
         self.session_repo = session_repo
@@ -371,7 +369,7 @@ class AuthService:
             jti = payload["jti"]
             await Auth().delete_refresh_from_redis(jti)
             response.delete_cookie("refresh")
-            return SuccessResponse(message="Logged out successfully", data=None)
+        return SuccessResponse(message="Logged out successfully", data=None)
 
     async def create_oauth_user_or_login(
         self, request: Request, user_data: dict, user_profile_data: dict
