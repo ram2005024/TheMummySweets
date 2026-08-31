@@ -3,10 +3,7 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { Metadata } from "next";
 import { Geist } from "next/font/google";
 import { Toaster } from "react-hot-toast";
-import Footer from "../components/Footer";
-import NavBar from "../components/NavBar";
 import queryClient from "../libs/queryClient";
-import AuthProvider from "../providers/AuthProvider";
 import "./globals.css";
 
 const geist = Geist({ subsets: ["latin"], variable: "--font-sans" });
@@ -27,12 +24,8 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col">
         <Toaster />
         <QueryClientProvider client={queryClient}>
-          <AuthProvider>
-            <NavBar />
-            {children}
-          </AuthProvider>
+          {children}
         </QueryClientProvider>
-        <Footer />
       </body>
     </html>
   );

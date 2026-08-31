@@ -1,5 +1,4 @@
-import ForgotPasswordCard from "../../components/auth/forgetPassword/forgetForm";
-
+import ForgotPasswordCard from "../../../components/auth/forgetPassword/forgetForm";
 
 export default function Page() {
   return (

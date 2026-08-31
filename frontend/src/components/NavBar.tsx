@@ -15,7 +15,6 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useLogout } from "../hooks/auth/useLogout";
 import { useUser } from "../hooks/auth/useUser";
-import { authStore } from "../store/auth";
 import NavBarLowerSection from "./Nav/NavBarLowerSection";
 import NavBarUpperSection from "./Nav/NavBarUpperSection";
 import UserIcon from "./Nav/UserIcon";
@@ -25,11 +24,7 @@ export default function NavBar() {
   const logoutMutation = useLogout();
   const [open, setOpen] = useState(false);
   const { data: user } = useUser();
-  console.log({
-    access: authStore.getState().access,
-    user,
-    status,
-  });
+
   const navLinks = [
     { name: "Home", href: "/" },
     { name: "Menu", href: "/menu" },
