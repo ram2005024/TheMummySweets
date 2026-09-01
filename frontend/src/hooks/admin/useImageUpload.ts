@@ -1,6 +1,7 @@
+import { ProductService } from "@/services/product.service";
+import { useProductStore } from "@/store/product_store";
+import { ImageSlot } from "@/type/admin/product.type";
 import axios from "axios";
-import { useProductStore } from "../store/productStore";
-import { ImageFile } from "../types/product.types";
 
 export function useImageUpload() {
   const {
@@ -14,119 +15,92 @@ export function useImageUpload() {
     removeSideImage,
   } = useProductStore();
 
-  // ─── Core: upload one file, report progress, support cancel ───
-  async function uploadFile(imageFile: ImageFile) {
-    const formData = new FormData();
-    formData.append("image", imageFile.file);
-
+  // ─── Core upload — calls service, tracks progress, handles cancel ───
+  async function uploadSlot(
+    slot: ImageSlot,
+    onProgress: (p: number) => void,
+    onDone: (
+      response: import("@/type/admin/product.type").ImageResponse,
+    ) => void,
+    onError: () => void,
+  ) {
     try {
-      const res = await axios.post<{ url: string }>(
-        "/api/products/upload-image",
-        formData,
-        {
-          headers: { "Content-Type": "multipart/form-data" },
-
-          // signal ties this request to the AbortController
-          // calling abortController.abort() cancels this axios call
-          signal: imageFile.abortController.signal,
-
-          onUploadProgress: (event) => {
-            if (!event.total) return;
-            const percent = Math.round((event.loaded * 100) / event.total);
-
-            // push live progress to zustand → UI re-renders
-            if (imageFile === mainImage || mainImage?.id === imageFile.id) {
-              updateMainImage(imageFile.id, { progress: percent });
-            } else {
-              updateSideImage(imageFile.id, { progress: percent });
-            }
-          },
-        },
+      const imageResponse = await ProductService.uploadProductImage(
+        slot.file,
+        slot.abortController.signal,
+        onProgress,
       );
-
-      return res.data.url; // success → return the uploaded URL
+      onDone(imageResponse);
     } catch (err) {
-      if (axios.isCancel(err)) {
-        return null; // cancelled — not an error
-      }
-      throw err; // real error — let caller handle
+      if (axios.isCancel(err)) return; // cancelled — silent
+      onError();
     }
   }
 
   // ─── Pick main image ───
   async function pickMainImage(file: File) {
-    // cancel previous main image upload if exists
-    mainImage?.abortController.abort();
+    mainImage?.abortController.abort(); // cancel previous if any
 
-    const newImage: ImageFile = {
+    const slot: ImageSlot = {
       id: crypto.randomUUID(),
       file,
-      preview: URL.createObjectURL(file), // instant local preview
+      preview: URL.createObjectURL(file),
       progress: 0,
       status: "uploading",
-      url: null,
+      imageResponse: null,
       abortController: new AbortController(),
     };
 
-    setMainImage(newImage); // show immediately in UI
+    setMainImage(slot);
 
-    try {
-      const url = await uploadFile(newImage);
-      if (url) {
-        updateMainImage(newImage.id, { status: "done", url, progress: 100 });
-      } else {
-        updateMainImage(newImage.id, { status: "cancelled" });
-      }
-    } catch {
-      updateMainImage(newImage.id, { status: "error" });
-    }
+    await uploadSlot(
+      slot,
+      (p) => updateMainImage(slot.id, { progress: p }),
+      (imageResponse) =>
+        updateMainImage(slot.id, {
+          status: "done",
+          progress: 100,
+          imageResponse, // { thumbnail, original, medium }
+        }),
+      () => updateMainImage(slot.id, { status: "error" }),
+    );
   }
 
-  // ─── Pick side images (multiple at once) ───
+  // ─── Pick multiple side images at once ───
   async function pickSideImages(files: FileList) {
     const remaining = 5 - sideImages.length;
     if (remaining <= 0) return;
 
-    // slice to only what fits
     const accepted = Array.from(files).slice(0, remaining);
 
-    // build all image objects immediately
-    const newImages: ImageFile[] = accepted.map((file) => ({
+    const slots: ImageSlot[] = accepted.map((file) => ({
       id: crypto.randomUUID(),
       file,
       preview: URL.createObjectURL(file),
       progress: 0,
       status: "uploading" as const,
-      url: null,
+      imageResponse: null,
       abortController: new AbortController(),
     }));
 
-    addSideImages(newImages); // show all immediately in UI
+    addSideImages(slots); // show all immediately
 
-    // upload all in parallel — each has its own progress tracking
+    // upload all in parallel — each tracks its own progress
     await Promise.allSettled(
-      newImages.map(async (img) => {
-        try {
-          const url = await uploadFile(img);
-          if (url) {
-            updateSideImage(img.id, { status: "done", url, progress: 100 });
-          } else {
-            updateSideImage(img.id, { status: "cancelled" });
-          }
-        } catch {
-          updateSideImage(img.id, { status: "error" });
-        }
-      }),
+      slots.map((slot) =>
+        uploadSlot(
+          slot,
+          (p) => updateSideImage(slot.id, { progress: p }),
+          (imageResponse) =>
+            updateSideImage(slot.id, {
+              status: "done",
+              progress: 100,
+              imageResponse,
+            }),
+          () => updateSideImage(slot.id, { status: "error" }),
+        ),
+      ),
     );
-  }
-
-  // ─── Cancel a specific side image upload ───
-  function cancelSideImage(id: string) {
-    removeSideImage(id); // abort() is called inside the store action
-  }
-
-  function cancelMainImage() {
-    removeMainImage(); // abort() is called inside the store action
   }
 
   return {
@@ -134,9 +108,7 @@ export function useImageUpload() {
     sideImages,
     pickMainImage,
     pickSideImages,
-    cancelMainImage,
-    cancelSideImage,
-    removeSideImage,
-    removeMainImage,
+    cancelMainImage: removeMainImage,
+    cancelSideImage: removeSideImage,
   };
 }

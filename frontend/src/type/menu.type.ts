@@ -1,8 +1,9 @@
+import { ImageResponse } from "./admin/product.type";
 import { PaginatedResponse } from "./common.type";
 
 export interface MenuProduct {
   id: string;
-  main_image: string;
+  main_image: ImageResponse;
   is_best_seller: boolean;
   category_label: string;
   product_name: string;
@@ -11,6 +12,7 @@ export interface MenuProduct {
   review_count: number;
   average_preparation_time: number;
   price: number;
+
   total_amount: number;
   discount_percentage: number;
 }
@@ -39,7 +41,7 @@ enum GroupedUnits {
 }
 export interface SingleProductType {
   id: string;
-  main_image: string;
+  main_image: ImageResponse;
   is_best_seller: boolean;
   category_label: string;
   product_name: string;
@@ -53,7 +55,7 @@ export interface SingleProductType {
   ingredients: string[];
   grouped_quantity: number;
   grouped_unit: GroupedUnits;
-  side_images: string[];
+  side_images: ImageResponse[];
   is_available: string;
 }
 

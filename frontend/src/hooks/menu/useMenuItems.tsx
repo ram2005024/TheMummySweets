@@ -34,9 +34,9 @@ export const useGetMenuProducts = () => {
     placeholderData: (prev) => prev,
     initialPageParam: 1,
     staleTime: 5 * 60 * 1000,
+    refetchOnMount: "always", // 👈 forces a real fetch every time this hook mounts
   });
 };
-
 // To get the multiple categories
 export const useGetMenuCategories = () =>
   useQuery({

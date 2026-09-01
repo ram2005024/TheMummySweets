@@ -1,6 +1,6 @@
 import { serverAPI } from "@/libs/server_api";
 import { ReviewResponse } from "@/type/menu.type";
-import ReviewCommentRead from "./reiview-comment-read";
+import ReviewCommentRead from "./review-comment-read";
 import ReviewCommentBox from "./review-comment-box";
 import ReviewLeaderborad from "./review-leaderboard";
 

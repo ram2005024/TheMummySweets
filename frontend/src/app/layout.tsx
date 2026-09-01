@@ -3,7 +3,7 @@ import AuthProvider from "@/providers/AuthProvider";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Metadata } from "next";
 import { Geist } from "next/font/google";
-import { Toaster } from "react-hot-toast";
+import { Toaster } from "sonner";
 import queryClient from "../libs/queryClient";
 import "./globals.css";
 
@@ -23,7 +23,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={cn("font-sans", geist.variable)}>
       <body className="min-h-full flex flex-col">
-        <Toaster />
+        <Toaster richColors position="top-right" />
         <AuthProvider>
           <QueryClientProvider client={queryClient}>
             {children}

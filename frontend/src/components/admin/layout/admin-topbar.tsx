@@ -1,5 +1,8 @@
 "use client";
 
+import { AddProductForm } from "@/app/(admin)/admin/dashboard/components/add-product-form";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { Bell, Menu, Search } from "lucide-react";
 import { useState } from "react";
 import { MobileSidebar } from "./mobile-sidebar";
@@ -41,10 +44,17 @@ export function AdminTopbar() {
           </button>
 
           {/* New product button */}
-          <button className="flex items-center gap-2 rounded-lg bg-orange-500 px-3 py-2 text-sm font-medium text-white hover:bg-orange-600 transition-colors">
-            <span>+</span>
-            <span className="hidden sm:inline">New product</span>
-          </button>
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button className="flex items-center gap-2 rounded-lg bg-orange-500 px-3 py-2 text-sm font-medium text-white hover:bg-orange-600 transition-colors">
+                <span>+</span>
+                <span className="hidden sm:inline">New product</span>
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto p-0">
+              <AddProductForm />
+            </DialogContent>
+          </Dialog>
         </div>
       </header>
     </>

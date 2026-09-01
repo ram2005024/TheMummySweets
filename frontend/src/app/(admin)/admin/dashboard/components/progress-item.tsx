@@ -1,71 +1,62 @@
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
+import { ImageSlot } from "@/type/admin/product.type";
 import { RotateCcw, X } from "lucide-react";
-import { ImageFile } from "../types/product.types";
+import Image from "next/image";
 
-interface ProgressItemProps {
-  image: ImageFile;
-  onCancel: () => void; // cancel upload or remove
-  onRetry?: () => void; // retry on error
+interface Props {
+  slot: ImageSlot;
+  onCancel: () => void;
+  onRetry?: () => void;
   size?: "sm" | "lg";
 }
 
-export function ProgressItem({
-  image,
-  onCancel,
-  onRetry,
-  size = "sm",
-}: ProgressItemProps) {
-  const isUploading = image.status === "uploading";
-  const isError = image.status === "error";
-  const isDone = image.status === "done";
+export function ProgressItem({ slot, onCancel, onRetry, size = "sm" }: Props) {
+  const isUploading = slot.status === "uploading";
+  const isDone = slot.status === "done";
+  const isError = slot.status === "error";
 
   return (
-    <div
-      className={cn(
-        "relative rounded-xl overflow-hidden border border-zinc-200 bg-white",
-        size === "lg" ? "w-full" : "w-full",
-      )}
-    >
-      {/* Image Preview */}
+    <div className="relative rounded-xl overflow-hidden border border-zinc-200 bg-white">
+      {/* Preview */}
       <div
         className={cn(
           "relative overflow-hidden",
           size === "lg" ? "h-44" : "h-20",
         )}
       >
-        <img
-          src={image.preview}
+        <Image
+          width={40}
+          height={40}
+          src={slot.preview}
           alt="preview"
           className="w-full h-full object-cover"
         />
-
-        {/* Dim overlay while uploading */}
         {isUploading && (
           <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
-            <span className="text-white text-xs font-semibold">
-              {image.progress}%
+            <span className="text-white text-xs font-bold">
+              {slot.progress}%
             </span>
           </div>
         )}
       </div>
 
-      {/* Cancel / Remove button — always visible */}
+      {/* Cancel / Remove */}
       <Button
         type="button"
         variant="destructive"
         size="icon"
-        className="absolute top-1.5 right-1.5 w-6 h-6 rounded-full shadow"
+        className="absolute top-1.5 right-1.5 w-6 h-6 rounded-full"
         onClick={onCancel}
       >
         <X className="w-3 h-3" />
       </Button>
 
-      {/* Progress bar + status */}
+      {/* Progress bar */}
       <div className="p-2 space-y-1">
         <Progress
-          value={image.progress}
+          value={slot.progress}
           className={cn(
             "h-1.5",
             isError && "[&>div]:bg-red-500",
@@ -84,13 +75,12 @@ export function ProgressItem({
                   : "text-muted-foreground",
             )}
           >
-            {isUploading && `Uploading ${image.progress}%`}
-            {isDone && "Uploaded"}
-            {isError && "Upload failed"}
-            {image.status === "cancelled" && "Cancelled"}
+            {isUploading && `Uploading ${slot.progress}%`}
+            {isDone && "✅ Uploaded"}
+            {isError && "❌ Failed"}
+            {slot.status === "cancelled" && "Cancelled"}
           </span>
 
-          {/* Retry button on error */}
           {isError && onRetry && (
             <Button
               type="button"

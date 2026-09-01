@@ -1,8 +1,8 @@
 /* eslint-disable react-hooks/set-state-in-effect */
-"use client"
+"use client";
 
-import React, { useState } from "react"
-import { Mail, RotateCcw } from "lucide-react"
+import { Mail } from "lucide-react";
+import React from "react";
 
 import {
   Dialog,
@@ -10,106 +10,104 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog"
+} from "@/components/ui/dialog";
 
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/button";
 
 import {
   InputOTP,
   InputOTPGroup,
   InputOTPSlot,
-} from "@/components/ui/input-otp"
-import { useVerifyOtp } from "../../../hooks/auth/useLogin"
-import toast from "react-hot-toast"
-import { AxiosError } from "axios"
-import { ErrorResponse } from "../../../type/common.type"
-import { unAuthenticatedLogin } from "../../../type/auth.type"
-import { useRouter } from "next/navigation"
-import { AuthService } from "../../../services/auth.service"
-
+} from "@/components/ui/input-otp";
+import { AxiosError } from "axios";
+import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
+import { useVerifyOtp } from "../../../hooks/auth/useLogin";
+import { AuthService } from "../../../services/auth.service";
+import { unAuthenticatedLogin } from "../../../type/auth.type";
+import { ErrorResponse } from "../../../type/common.type";
 
 interface Props {
-  open: boolean
-  onClose: () => void
-  data:unAuthenticatedLogin
-  onSuccessURL?:string
+  open: boolean;
+  onClose: () => void;
+  data: unAuthenticatedLogin;
+  onSuccessURL?: string;
 }
 
 export function UnauthenticatedDialog({
   open,
   onClose,
   data,
-  onSuccessURL="",
+  onSuccessURL = "",
 }: Props) {
-  const [otp, setOtp] = React.useState("")
-  const [timer, setTimer] = React.useState(60)
-  const intervalRef = React.useRef<NodeJS.Timeout | null>(null)
-  const router=useRouter()
-  const verifyMutation=useVerifyOtp()
+  const [otp, setOtp] = React.useState("");
+  const [timer, setTimer] = React.useState(60);
+  const intervalRef = React.useRef<NodeJS.Timeout | null>(null);
+  const router = useRouter();
+  const verifyMutation = useVerifyOtp();
   function startTimer() {
-  // clear any existing interval
-  if (intervalRef.current) {
-    clearInterval(intervalRef.current)
-  }
+    // clear any existing interval
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+    }
 
-  setTimer(60)
-  intervalRef.current = setInterval(() => {
-    setTimer((prev) => {
-      if (prev <= 1) {
-        if (intervalRef.current) clearInterval(intervalRef.current)
-        return 0
-      }
-      return prev - 1
-    })
-  }, 1000)
-}
+    setTimer(60);
+    intervalRef.current = setInterval(() => {
+      setTimer((prev) => {
+        if (prev <= 1) {
+          if (intervalRef.current) clearInterval(intervalRef.current);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+  }
   React.useEffect(() => {
-    if (!open) return
-    setTimer(60)
-    setOtp("")
-    startTimer()
+    if (!open) return;
+    setTimer(60);
+    setOtp("");
+    startTimer();
 
-  return () => {
-    if (intervalRef.current) clearInterval(intervalRef.current)
-  }
-  }, [open,data])
-
+    return () => {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+    };
+  }, [open, data]);
 
   async function handleVerify(e?: React.FormEvent) {
-    e?.preventDefault()
-    e?.stopPropagation()
-    if (otp.length !== 6 || verifyMutation.isPending) return
-    verifyMutation.mutate({user_id:data.user_id,otp:otp},{
-        onSuccess:(data)=>{
-            toast.success(data.message)
-            onClose()
-            if(onSuccessURL)router.push(onSuccessURL)
-        }
-    })
+    e?.preventDefault();
+    e?.stopPropagation();
+    if (otp.length !== 6 || verifyMutation.isPending) return;
+    verifyMutation.mutate(
+      { user_id: data.user_id, otp: otp },
+      {
+        onSuccess: (data) => {
+          toast.success(data.message);
+          onClose();
+          if (onSuccessURL) router.push(onSuccessURL);
+        },
+      },
+    );
   }
 
   async function handleResend() {
-    setTimer(60)
-    setOtp("")
-    startTimer()
+    setTimer(60);
+    setOtp("");
+    startTimer();
     try {
-      const res=await AuthService.resend_otp_register(data.user_id)
-      toast.success(res.message)
+      const res = await AuthService.resend_otp_register(data.user_id);
+      toast.success(res.message);
     } catch (err) {
       const error = err as AxiosError<{ message?: string }>;
       toast.error(
         error.response?.data?.message ||
           error.message ||
-          "Something went wrong"
+          "Something went wrong",
       );
     }
   }
 
   return (
-    <Dialog
-      open={open}
-      onOpenChange={(value) => !value && onClose()}
-    >
+    <Dialog open={open} onOpenChange={(value) => !value && onClose()}>
       <DialogContent className="sm:max-w-md rounded-3xl p-8">
         <DialogHeader className="space-y-5 text-center">
           <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full border bg-orange-50 dark:bg-orange-950/20">
@@ -122,25 +120,17 @@ export function UnauthenticatedDialog({
             </DialogTitle>
 
             <DialogDescription className="text-sm leading-6">
-              Enter the verification code we sent to your <strong>{data.field_name}</strong>
+              Enter the verification code we sent to your{" "}
+              <strong>{data.field_name}</strong>
             </DialogDescription>
 
-            <p className="font-medium break-all">
-           {data.field_value}
-            </p>
+            <p className="font-medium break-all">{data.field_value}</p>
           </div>
         </DialogHeader>
 
-        <form
-          onSubmit={handleVerify}
-          className="mt-6 space-y-8"
-        >
+        <form onSubmit={handleVerify} className="mt-6 space-y-8">
           <div className="flex justify-center">
-            <InputOTP
-              maxLength={6}
-              value={otp}
-              onChange={setOtp}
-            >
+            <InputOTP maxLength={6} value={otp} onChange={setOtp}>
               <InputOTPGroup className="gap-3 border-0">
                 {[0, 1, 2, 3, 4, 5].map((index) => (
                   <InputOTPSlot
@@ -151,28 +141,24 @@ export function UnauthenticatedDialog({
                 ))}
               </InputOTPGroup>
             </InputOTP>
-
           </div>
-           {verifyMutation.isError && (
-                <p className="text-xs mt-2 text-red-600">
-                    {(verifyMutation.error as AxiosError<ErrorResponse<null>>).response?.data?.message || "Something went wrong"}
-                </p>
-            )}
+          {verifyMutation.isError && (
+            <p className="text-xs mt-2 text-red-600">
+              {(verifyMutation.error as AxiosError<ErrorResponse<null>>)
+                .response?.data?.message || "Something went wrong"}
+            </p>
+          )}
 
           <Button
             type="submit"
             disabled={otp.length !== 6 && verifyMutation.isPending}
             className="h-12 w-full rounded-xl bg-orange-500 text-base font-medium hover:bg-orange-600"
           >
-         {verifyMutation.isPending ? "Verifying...":"Verify otp"}
+            {verifyMutation.isPending ? "Verifying..." : "Verify otp"}
           </Button>
 
           <div className="flex items-center justify-between text-sm">
-            <Button
-              type="button"
-              variant="ghost"
-              onClick={onClose}
-            >
+            <Button type="button" variant="ghost" onClick={onClose}>
               Cancel
             </Button>
 
@@ -184,11 +170,7 @@ export function UnauthenticatedDialog({
                 </span>
               </span>
             ) : (
-              <Button
-                type="button"
-                variant="ghost"
-                onClick={handleResend}
-              >
+              <Button type="button" variant="ghost" onClick={handleResend}>
                 <RotateCcw className="mr-2 h-4 w-4" />
                 Resend Code
               </Button>
@@ -197,5 +179,5 @@ export function UnauthenticatedDialog({
         </form>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

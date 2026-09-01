@@ -1,12 +1,11 @@
+import { useImageUpload } from "@/hooks/admin/useImageUpload";
 import { ImagePlus } from "lucide-react";
-import { useImageUpload } from "../hooks/useImageUpload";
-import { ProgressItem } from "./ProgressItem";
+import { ProgressItem } from "./progress-item";
 
 export function SideImagesGrid() {
   const { sideImages, pickSideImages, cancelSideImage } = useImageUpload();
 
   const remaining = 5 - sideImages.length;
-  // always show exactly 5 slots
   const emptySlots = Array(remaining).fill(null);
 
   return (
@@ -19,17 +18,17 @@ export function SideImagesGrid() {
       </div>
 
       <div className="grid grid-cols-5 gap-2">
-        {/* Filled slots — each has its OWN progress bar */}
-        {sideImages.map((img) => (
+        {/* Filled slots — each with its own progress */}
+        {sideImages.map((slot) => (
           <ProgressItem
-            key={img.id}
-            image={img}
-            onCancel={() => cancelSideImage(img.id)}
+            key={slot.id}
+            slot={slot}
+            onCancel={() => cancelSideImage(slot.id)}
             size="sm"
           />
         ))}
 
-        {/* Empty slots — clicking opens file picker */}
+        {/* Empty slots */}
         {emptySlots.map((_, i) => (
           <label
             key={`empty-${i}`}
@@ -39,12 +38,10 @@ export function SideImagesGrid() {
             <input
               type="file"
               accept="image/*"
-              multiple // allow picking multiple at once
+              multiple
               className="hidden"
               onChange={(e) => {
-                if (e.target.files?.length) {
-                  pickSideImages(e.target.files); // pass entire FileList
-                }
+                if (e.target.files?.length) pickSideImages(e.target.files);
                 e.target.value = "";
               }}
             />
@@ -53,7 +50,7 @@ export function SideImagesGrid() {
       </div>
 
       <p className="text-xs text-muted-foreground">
-        You can select multiple images at once. Max 5 total.
+        Select multiple images at once. Max 5 total.
       </p>
     </div>
   );

@@ -1,30 +1,33 @@
 "use client";
 
+import { ImageResponse } from "@/type/admin/product.type";
 import { SingleProductType } from "@/type/menu.type";
 import Image from "next/image";
 import { useState } from "react";
 
 const ImageShowcase = ({ product }: { product: SingleProductType }) => {
-  const images = [product.main_image, ...(product.side_images ?? [])];
+  // combine main + side into one flat array
+  const images: ImageResponse[] = [
+    product.main_image,
+    ...(product.side_images ?? []),
+  ];
 
   const [selectedIndex, setSelectedIndex] = useState(0);
-
-  const selectedImage = images[selectedIndex];
+  const selected = images[selectedIndex];
 
   return (
     <div className="w-full sm:w-[35%]">
-      {/* Main Image */}
-      <div className="relative mx-auto w-full max-w-[520px] overflow-hidden rounded-2xl bg-muted/30">
+      {/* ── Main display — use original for full quality ── */}
+      <div className="relative mx-auto w-full max-w-130 overflow-hidden rounded-2xl bg-muted/30">
         <Image
-          src={selectedImage}
+          src={selected.original}
           alt={product.product_name}
           width={800}
           height={600}
           priority={selectedIndex === 0}
-          className="h-[280px] w-full object-cover sm:h-[360px] lg:h-[400px]"
+          className="h-70 w-full object-cover sm:h-90 lg:h-100"
         />
 
-        {/* Image Counter */}
         {images.length > 1 && (
           <div className="absolute bottom-3 right-3 rounded-full bg-black/60 px-3 py-1.5 text-xs font-medium text-white backdrop-blur-sm">
             {selectedIndex + 1} / {images.length}
@@ -32,14 +35,13 @@ const ImageShowcase = ({ product }: { product: SingleProductType }) => {
         )}
       </div>
 
-      {/* Thumbnails */}
-      <div className="mx-auto mt-4 flex max-w-[520px] gap-3 overflow-x-auto pb-1">
+      {/* ── Thumbnails — use thumbnail for small previews ── */}
+      <div className="mx-auto mt-4 flex max-w-130 gap-3 overflow-x-auto pb-1">
         {images.map((image, index) => {
           const isActive = selectedIndex === index;
-
           return (
             <button
-              key={`${image}-${index}`}
+              key={index}
               type="button"
               onClick={() => setSelectedIndex(index)}
               aria-label={`View image ${index + 1}`}
@@ -50,12 +52,13 @@ const ImageShowcase = ({ product }: { product: SingleProductType }) => {
                   : "opacity-70 hover:opacity-100"
               }`}
             >
+              {/* use thumbnail for small grid previews — fast load */}
               <Image
-                src={image}
-                alt={`${product.product_name} image ${index + 1}`}
+                src={image.thumbnail}
+                alt={`${product.product_name} ${index + 1}`}
                 width={90}
                 height={90}
-                className="h-[70px] w-[70px] object-cover sm:h-[80px] sm:w-[80px]"
+                className="h-17.5 w-17.5 object-cover sm:h-20 sm:w-20"
               />
             </button>
           );
