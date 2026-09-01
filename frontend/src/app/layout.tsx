@@ -1,3 +1,4 @@
+import { BfcacheRefresher } from "@/components/bf-cache-refresher";
 import { cn } from "@/lib/utils";
 import AuthProvider from "@/providers/AuthProvider";
 import { QueryClientProvider } from "@tanstack/react-query";
@@ -26,6 +27,7 @@ export default function RootLayout({
         <Toaster richColors position="top-right" />
         <AuthProvider>
           <QueryClientProvider client={queryClient}>
+            <BfcacheRefresher />
             {children}
           </QueryClientProvider>
         </AuthProvider>
