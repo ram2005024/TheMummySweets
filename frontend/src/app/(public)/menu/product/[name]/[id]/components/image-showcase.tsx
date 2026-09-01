@@ -2,7 +2,6 @@
 
 import { ImageResponse } from "@/type/admin/product.type";
 import { SingleProductType } from "@/type/menu.type";
-import Image from "next/image";
 import { useState } from "react";
 
 const ImageShowcase = ({ product }: { product: SingleProductType }) => {
@@ -19,12 +18,11 @@ const ImageShowcase = ({ product }: { product: SingleProductType }) => {
     <div className="w-full sm:w-[35%]">
       {/* ── Main display — use original for full quality ── */}
       <div className="relative mx-auto w-full max-w-130 overflow-hidden rounded-2xl bg-muted/30">
-        <Image
+        <img
           src={selected.original}
           alt={product.product_name}
           width={800}
           height={600}
-          priority={selectedIndex === 0}
           className="h-70 w-full object-cover sm:h-90 lg:h-100"
         />
 
@@ -53,11 +51,9 @@ const ImageShowcase = ({ product }: { product: SingleProductType }) => {
               }`}
             >
               {/* use thumbnail for small grid previews — fast load */}
-              <Image
+              <img
                 src={image.thumbnail}
                 alt={`${product.product_name} ${index + 1}`}
-                width={90}
-                height={90}
                 className="h-17.5 w-17.5 object-cover sm:h-20 sm:w-20"
               />
             </button>

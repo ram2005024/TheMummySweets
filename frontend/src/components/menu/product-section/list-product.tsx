@@ -3,7 +3,6 @@
 import { useGetMenuProducts } from "@/hooks/menu/useMenuItems";
 import { MenuProduct } from "@/type/menu.type";
 import { Clock3, Heart, Plus, Star } from "lucide-react";
-import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { slugify } from "./../../../utils/slugify";
 
@@ -32,12 +31,11 @@ const ListProducts = () => {
             className="relative aspect-4/3 overflow-hidden bg-[#f7eee5] cursor-pointer"
           >
             {/* use thumbnail for cards — small + fast */}
-            <Image
+            <img
               src={item.main_image.medium}
               alt={item.product_name}
-              fill
               sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 40vw"
-              className="object-cover transition-transform duration-500 ease-out group-hover:scale-[1.04]"
+              className="object-cover size-full transition-transform duration-500 ease-out group-hover:scale-[1.04]"
             />
 
             <div className="absolute inset-x-0 bottom-0 h-20 bg-linear-to-t from-black/25 to-transparent opacity-70" />
