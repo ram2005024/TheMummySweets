@@ -10,7 +10,7 @@ if TYPE_CHECKING:
 
 
 class CoupenModel(BaseModel):
-    __table_name__ = "coupens"
+    __tablename__ = "coupens"
     code: Mapped[str]
     expiry_date: Mapped[datetime.datetime]
     required_amount: Mapped[float]

@@ -13,7 +13,7 @@ if TYPE_CHECKING:
     from app.modules.order.models.payment_model import PaymentModel
 
 
-class OrderStatus(Enum, str):
+class OrderStatus(str, Enum):
     PLACED = "placed"
     PREPARING = "preparing"
     SHIPPED = "shipped"
@@ -23,6 +23,7 @@ class OrderStatus(Enum, str):
 
 
 class OrderModel(BaseModel):
+    __tablename__ = "orders"
     order_status: Mapped[OrderStatus] = mapped_column(
         ENUM(name="order_status"), default=OrderStatus.PREPARING
     )

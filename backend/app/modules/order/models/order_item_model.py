@@ -12,7 +12,7 @@ if TYPE_CHECKING:
 
 
 class OrderItem(BaseModel):
-    __table_name__ = "order_items"
+    __tablename__ = "order_items"
     product_id: Mapped[UUID] = mapped_column(
         ForeignKey("products.id", ondelete="CASCADE")
     )
