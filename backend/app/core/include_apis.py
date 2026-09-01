@@ -13,4 +13,4 @@ def include_apis(app: FastAPI):
     app.include_router(menu_apis_v1.wishlist_api, prefix="/api/v1")
     app.include_router(cart_api_v1.cart_api, prefix="/api/v1")
     # Admin router
-    app.include_router(admin_apis_v1.image_api, prefix="/ap1/v1")
+    app.include_router(admin_apis_v1.image_api, prefix="/api/v1")

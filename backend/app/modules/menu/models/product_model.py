@@ -2,7 +2,7 @@ from enum import Enum
 from typing import TYPE_CHECKING
 
 from sqlalchemy import ARRAY, CheckConstraint, String
-from sqlalchemy.dialects.postgresql import ENUM
+from sqlalchemy.dialects.postgresql import ENUM, JSONB
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -43,9 +43,10 @@ class Product(BaseModel):
         ARRAY(String), default=list, server_default="{}"
     )
     stock_quantity: Mapped[int]
-    main_image: Mapped[str] = mapped_column(nullable=True)
-    side_images: Mapped[list[str]] = mapped_column(
-        ARRAY(String), default=list, server_default="{}"
+    main_image: Mapped[dict] = mapped_column(JSONB)
+    side_images: Mapped[list[dict]] = mapped_column(
+        JSONB,
+        default=list,
     )
     is_best_seller: Mapped[bool] = mapped_column(default=False)
     reviews: Mapped[list["Review"]] = relationship(

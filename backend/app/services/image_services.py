@@ -49,7 +49,7 @@ class ImageService:
         return image.convert("RGB")
 
     def get_public_url(self, key: str):
-        return f"{settings.MINIO_ENDPOINT}/{self.BUCKET}/{key}"
+        return f"{settings.MINIO_ENDPOINT_LOCAL}/{self.BUCKET}/{key}"
 
     async def upload_image(self, buffer: BinaryIO, key: str):
         await asyncio.to_thread(

@@ -1,7 +1,6 @@
-from typing import Annotated
 from uuid import UUID
 
-from fastapi import File, UploadFile
+from fastapi import UploadFile
 from fastapi.responses import JSONResponse
 
 from app.core.security import Auth
@@ -28,11 +27,9 @@ class ProductService:
     async def create_product_service(
         self,
         data: ProductCreate,
-        main_image: Annotated[UploadFile, File(...)],
-        side_images: Annotated[list[UploadFile] | None, File(None)],
     ):
-        new_product = await self.product_repo.create(data)
-        await self.handle_image_upload(main_image, str(new_product.id), side_images)
+        await self.product_repo.create(data)
+
         return JSONResponse(
             status_code=200,
             content=SuccessResponse(data=None, message="Product created").model_dump(),

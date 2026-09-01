@@ -53,6 +53,7 @@ class Settings(BaseSettings):
 
     # MINIO
     MINIO_ENDPOINT: str = ""
+    MINIO_ENDPOINT_LOCAL: str = ""
     MINIO_ACCESS: str = ""
     MINIO_SECRET: str = ""
 

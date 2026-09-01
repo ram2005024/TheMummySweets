@@ -800,6 +800,26 @@ PRODUCT_TEMPLATES = [
 
 
 # ─────────────────────────────────────────────
+#  IMAGE HELPERS
+# ─────────────────────────────────────────────
+def make_image_response(url: str) -> dict:
+    """Build an ImageResponse-shaped dict ({thumbnail, original, medium})
+    from a single source URL.
+
+    Reuses the same base image at different sizes via the `w` query param
+    so thumbnail/medium/original all resolve to valid, distinct URLs. This
+    matches the frontend's `ImageResponse` interface and the JSONB shape
+    now expected by `Product.main_image` / `Product.side_images`.
+    """
+    base = url.split("?")[0]
+    return {
+        "thumbnail": f"{base}?w=200",
+        "medium": f"{base}?w=500",
+        "original": f"{base}?w=1200",
+    }
+
+
+# ─────────────────────────────────────────────
 #  SEEDER FUNCTIONS — MENU / USERS
 # ─────────────────────────────────────────────
 async def seed_categories(session) -> list[Category]:
@@ -867,7 +887,7 @@ async def seed_products(
         extra_images = random.sample(
             DEMO_PRODUCT_IMAGES, k=min(2, len(DEMO_PRODUCT_IMAGES))
         )
-        side_images = list(dict.fromkeys(base_images[1:] + extra_images)) or [
+        side_image_urls = list(dict.fromkeys(base_images[1:] + extra_images)) or [
             base_images[0]
         ]
 
@@ -890,8 +910,8 @@ async def seed_products(
                 k=random.randint(2, len(template["ingredients"])),
             ),
             stock_quantity=random.randint(0, 100),
-            main_image=base_images[0],
-            side_images=side_images,
+            main_image=make_image_response(base_images[0]),
+            side_images=[make_image_response(url) for url in side_image_urls],
         )
         product.categories.append(category)
         session.add(product)
