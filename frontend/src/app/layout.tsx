@@ -1,4 +1,5 @@
 import { cn } from "@/lib/utils";
+import AuthProvider from "@/providers/AuthProvider";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Metadata } from "next";
 import { Geist } from "next/font/google";
@@ -23,9 +24,11 @@ export default function RootLayout({
     <html lang="en" className={cn("font-sans", geist.variable)}>
       <body className="min-h-full flex flex-col">
         <Toaster />
-        <QueryClientProvider client={queryClient}>
-          {children}
-        </QueryClientProvider>
+        <AuthProvider>
+          <QueryClientProvider client={queryClient}>
+            {children}
+          </QueryClientProvider>
+        </AuthProvider>
       </body>
     </html>
   );

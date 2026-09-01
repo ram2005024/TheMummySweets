@@ -20,7 +20,7 @@ export function AdminSidebar() {
 
       <SidebarNav sections={navSections} />
 
-      <SidebarUser name="Kabita Thapa" role="Store manager" initials="KT" />
+      <SidebarUser />
     </aside>
   );
 }
