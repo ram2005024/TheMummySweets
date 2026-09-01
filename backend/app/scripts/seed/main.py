@@ -12,6 +12,14 @@ from app.modules.menu.models.category_model import Category
 from app.modules.menu.models.product_model import Product, QuantizedUnit
 from app.modules.menu.models.review_model import Comment, Review
 from app.modules.menu.models.wishlist_model import WishList  # noqa
+from app.modules.order.models.coupen_model import CoupenModel
+from app.modules.order.models.order_item_model import OrderItem
+from app.modules.order.models.order_model import OrderModel, OrderStatus
+from app.modules.order.models.payment_model import (
+    PaymentMethod,
+    PaymentModel,
+    PaymentStatus,
+)
 
 fake = Faker()
 
@@ -20,6 +28,8 @@ fake = Faker()
 # ─────────────────────────────────────────────
 USER_COUNT = 20
 PRODUCT_COUNT = 120
+COUPON_COUNT = 10
+ORDER_COUNT_RANGE = (0, 5)  # orders per profile
 SEED_PASSWORD = "Password123"
 
 CATEGORY_NAMES = [
@@ -66,6 +76,38 @@ REVIEW_COMMENTS = [
     "Dherai dinpachi yo khana khaera khushi bhaye.",
     "Service pani ramro, khana pani mito!",
     "Swad ma koi compromise chhaina!",
+]
+
+COUPON_CODES = [
+    "WELCOME10",
+    "FIRSTORDER",
+    "SAVE20",
+    "MOMO50",
+    "FESTIVE15",
+    "BIGSAVE25",
+    "NEWUSER",
+    "FLAT100",
+    "WEEKEND20",
+    "LOYAL30",
+]
+
+# Extra demo images mixed into product side_images for visual variety
+DEMO_PRODUCT_IMAGES = [
+    "https://images.unsplash.com/photo-1567188040759-fb8a883dc6d8?w=800",
+    "https://images.unsplash.com/photo-1606755962773-0cbbf3f8f8a6?w=800",
+    "https://images.unsplash.com/photo-1548365328-8b6dbb3a3f3f?w=800",
+    "https://images.unsplash.com/photo-1601924582971-b7f6f3f8f8a6?w=800",
+    "https://images.unsplash.com/photo-1525755662778-989d0524087e?w=800",
+    "https://images.unsplash.com/photo-1603133872878-684f3f8f8a6?w=800",
+    "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=800",
+    "https://images.unsplash.com/photo-1604908177522-0f3f8f8f8a6?w=800",
+    "https://images.unsplash.com/photo-1553621042-f6e147245754?w=800",
+    "https://images.unsplash.com/photo-1606788075761-0f3f8f8f8a6?w=800",
+    "https://images.unsplash.com/photo-1601979034091-0f3f8f8f8a6?w=800",
+    "https://images.unsplash.com/photo-1600891964599-0f3f8f8f8a6?w=800",
+    "https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=800",
+    "https://images.unsplash.com/photo-1511920170033-f3f8f8f8a6?w=800",
+    "https://images.unsplash.com/photo-1600891964599-34f3f8f8f8a6?w=800",
 ]
 
 # ─────────────────────────────────────────────
@@ -758,7 +800,7 @@ PRODUCT_TEMPLATES = [
 
 
 # ─────────────────────────────────────────────
-#  SEEDER FUNCTIONS
+#  SEEDER FUNCTIONS — MENU / USERS
 # ─────────────────────────────────────────────
 async def seed_categories(session) -> list[Category]:
     categories = [Category(category_name=name) for name in CATEGORY_NAMES]
@@ -820,6 +862,15 @@ async def seed_products(
     for index in range(count):
         template = random.choice(PRODUCT_TEMPLATES)
         category = category_map[template["category"]]
+
+        base_images = template["images"]
+        extra_images = random.sample(
+            DEMO_PRODUCT_IMAGES, k=min(2, len(DEMO_PRODUCT_IMAGES))
+        )
+        side_images = list(dict.fromkeys(base_images[1:] + extra_images)) or [
+            base_images[0]
+        ]
+
         product = Product(
             product_name=f"{template['name']} #{index + 1}",
             product_description=(
@@ -839,12 +890,8 @@ async def seed_products(
                 k=random.randint(2, len(template["ingredients"])),
             ),
             stock_quantity=random.randint(0, 100),
-            main_image=template["images"][0],
-            side_images=(
-                template["images"][1:]
-                if len(template["images"]) > 1
-                else [template["images"][0]]
-            ),
+            main_image=base_images[0],
+            side_images=side_images,
         )
         product.categories.append(category)
         session.add(product)
@@ -902,6 +949,163 @@ async def seed_comments(
 
 
 # ─────────────────────────────────────────────
+#  SEEDER FUNCTIONS — COUPONS / ORDERS / PAYMENTS
+# ─────────────────────────────────────────────
+async def seed_coupens(session, count: int = COUPON_COUNT) -> list[CoupenModel]:
+    coupens = []
+    for i in range(count):
+        code = COUPON_CODES[i] if i < len(COUPON_CODES) else f"PROMO{i + 1}"
+        coupen = CoupenModel(
+            code=code,
+            expiry_date=datetime.now() + timedelta(days=random.randint(10, 120)),
+            required_amount=random.choice([500, 1000, 1500, 2000]),
+            discount_percentage=random.choice([10, 15, 20, 25, 30]),
+            max_discount_amount=random.choice([100, 200, 300, 500]),
+            max_use_count=random.randint(50, 500),
+            used_count=0,
+            is_active=random.choices([True, False], weights=[85, 15], k=1)[0],
+        )
+        session.add(coupen)
+        coupens.append(coupen)
+    await session.flush()
+    print(f"✓ Created {len(coupens)} coupens")
+    return coupens
+
+
+async def assign_coupen_users(
+    session, users: list[User], coupens: list[CoupenModel]
+) -> None:
+    """
+    IMPORTANT: coupens here are already flushed/persistent objects, so their
+    `coupen_valid_users` / `coupen_used_users` relationships have never been
+    loaded into memory. Calling `.extend()` directly would trigger an
+    implicit (unawaited) lazy-load in the async driver -> MissingGreenlet.
+    We explicitly `await session.refresh(...)` those attributes first so
+    SQLAlchemy loads them properly, then it's safe to mutate the in-memory
+    collections.
+    """
+    for coupen in coupens:
+        await session.refresh(
+            coupen, attribute_names=["coupen_valid_users", "coupen_used_users"]
+        )
+
+        valid_pool_size = min(random.randint(5, 15), len(users))
+        valid_users = random.sample(users, k=valid_pool_size)
+        coupen.coupen_valid_users.extend(valid_users)
+
+        used_count = random.randint(0, len(valid_users))
+        used_users = random.sample(valid_users, k=used_count)
+        coupen.coupen_used_users.extend(used_users)
+        coupen.used_count = used_count
+
+    await session.flush()
+    print("✓ Linked coupens to users (valid + used)")
+
+
+async def seed_orders_with_payments(
+    session,
+    profiles: list[Profile],
+    products: list[Product],
+    coupens: list[CoupenModel],
+) -> tuple[list[PaymentModel], list[OrderModel], list[OrderItem]]:
+    payments: list[PaymentModel] = []
+    orders: list[OrderModel] = []
+    order_items: list[OrderItem] = []
+
+    order_status_population = [
+        OrderStatus.PLACED,
+        OrderStatus.PREPARING,
+        OrderStatus.SHIPPED,
+        OrderStatus.ARRIVING,
+        OrderStatus.DELIVERED,
+        OrderStatus.CANCELED,
+    ]
+    order_status_weights = [10, 15, 15, 10, 45, 5]
+
+    for profile in profiles:
+        num_orders = random.randint(*ORDER_COUNT_RANGE)
+
+        for _ in range(num_orders):
+            order_products = random.sample(products, k=random.randint(1, 5))
+            line_items = [
+                {"product": p, "quantity": random.randint(1, 3)} for p in order_products
+            ]
+            subtotal = sum(li["product"].price * li["quantity"] for li in line_items)
+
+            coupen = None
+            discount = 0.0
+            if coupens and random.random() < 0.3:
+                candidate = random.choice(coupens)
+                if candidate.is_active and subtotal >= candidate.required_amount:
+                    coupen = candidate
+                    discount = min(
+                        subtotal * (candidate.discount_percentage / 100),
+                        candidate.max_discount_amount,
+                    )
+
+            total_amount = round(max(subtotal - discount, 0), 2)
+
+            # NOTE: assumes `payments.profile_id` FK exists to back
+            # PaymentModel.payment_user <-> Profile.payments. Remove/adjust
+            # this line if that column lives elsewhere in your PaymentModel.
+            payment = PaymentModel(
+                amount=total_amount,
+                payment_reference=(
+                    {"transaction_id": fake.uuid4()} if random.random() < 0.8 else None
+                ),
+                payment_status=random.choices(
+                    population=[PaymentStatus.PAID, PaymentStatus.UNPAID],
+                    weights=[80, 20],
+                    k=1,
+                )[0],
+                payment_method=random.choices(
+                    population=[
+                        PaymentMethod.STRIPE,
+                        PaymentMethod.ESEWA,
+                        PaymentMethod.COD,
+                    ],
+                    weights=[35, 35, 30],
+                    k=1,
+                )[0],
+                coupen_id=coupen.id if coupen else None,
+                profile_id=profile.id,
+            )
+            session.add(payment)
+            await session.flush()
+
+            order = OrderModel(
+                order_status=random.choices(
+                    population=order_status_population,
+                    weights=order_status_weights,
+                    k=1,
+                )[0],
+                profile_id=profile.id,
+                payment_id=payment.id,
+            )
+            session.add(order)
+            await session.flush()
+
+            for li in line_items:
+                order_item = OrderItem(
+                    product_id=li["product"].id,
+                    quantity=li["quantity"],
+                    price=li["product"].price,
+                    order_id=order.id,
+                )
+                session.add(order_item)
+                order_items.append(order_item)
+
+            payments.append(payment)
+            orders.append(order)
+
+    await session.flush()
+    print(f"✓ Created {len(payments)} payments")
+    print(f"✓ Created {len(orders)} orders")
+    print(f"✓ Created {len(order_items)} order items")
+    return payments, orders, order_items
+
+
+# ─────────────────────────────────────────────
 #  MAIN
 # ─────────────────────────────────────────────
 async def main():
@@ -920,16 +1124,28 @@ async def main():
             reviews = await seed_reviews(session, users, products)
             comments = await seed_comments(session, users, reviews)
 
+            coupens = await seed_coupens(session)
+            await assign_coupen_users(session, users, coupens)
+
+            profiles = [u.profile for u in users if u.profile is not None]
+            payments, orders, order_items = await seed_orders_with_payments(
+                session, profiles, products, coupens
+            )
+
             await session.commit()
 
             print("\n" + "=" * 50)
             print("✅ SEED COMPLETED SUCCESSFULLY")
             print("=" * 50 + "\n")
-            print(f"  Users      : {len(users)}")
-            print(f"  Categories : {len(categories)}")
-            print(f"  Products   : {len(products)}")
-            print(f"  Reviews    : {len(reviews)}")
-            print(f"  Comments   : {len(comments)}")
+            print(f"  Users        : {len(users)}")
+            print(f"  Categories   : {len(categories)}")
+            print(f"  Products     : {len(products)}")
+            print(f"  Reviews      : {len(reviews)}")
+            print(f"  Comments     : {len(comments)}")
+            print(f"  Coupens      : {len(coupens)}")
+            print(f"  Payments     : {len(payments)}")
+            print(f"  Orders       : {len(orders)}")
+            print(f"  Order Items  : {len(order_items)}")
             print(f"\n  Login → seed_user_1@example.com / {SEED_PASSWORD}\n")
 
         except Exception as exc:

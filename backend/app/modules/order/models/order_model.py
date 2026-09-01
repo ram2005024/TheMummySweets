@@ -2,18 +2,19 @@ from enum import Enum
 from typing import TYPE_CHECKING
 from uuid import UUID
 
+from sqlalchemy import Enum as SQLEnum
 from sqlalchemy import ForeignKey
-from sqlalchemy.dialects.postgresql import ENUM
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.modules.auth.models.base import BaseModel
 
 if TYPE_CHECKING:
     from app.modules.auth.models.user import Profile
+    from app.modules.order.models.order_item_model import OrderItem
     from app.modules.order.models.payment_model import PaymentModel
 
 
-class OrderStatus(str, Enum):
+class OrderStatus(Enum):
     PLACED = "placed"
     PREPARING = "preparing"
     SHIPPED = "shipped"
@@ -25,7 +26,7 @@ class OrderStatus(str, Enum):
 class OrderModel(BaseModel):
     __tablename__ = "orders"
     order_status: Mapped[OrderStatus] = mapped_column(
-        ENUM(name="order_status"), default=OrderStatus.PREPARING
+        SQLEnum(OrderStatus, name="order_status"), default=OrderStatus.PREPARING
     )
     profile_id: Mapped[UUID] = mapped_column(
         ForeignKey("profiles.id", ondelete="CASCADE")
@@ -39,10 +40,15 @@ class OrderModel(BaseModel):
         "PaymentModel",
         uselist=False,
         back_populates="order",
-        cascade="all,delete-orphan",
     )
     user: Mapped["Profile"] = relationship(
-        "Profile", backref="orders", cascade="all,delete-orphan"
+        "Profile",
+        back_populates="orders",
+    )
+    order_items: Mapped[list["OrderItem"]] = relationship(
+        "OrderItem",
+        back_populates="order",
+        cascade="all,delete-orphan",
     )
 
 

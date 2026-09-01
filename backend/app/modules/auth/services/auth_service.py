@@ -20,6 +20,7 @@ from app.modules.auth.exceptions.auth_exception import (
     UserDoesnotExist,
     UserNotAuthenticated,
 )
+from app.modules.auth.models.user import User
 from app.modules.auth.schemas.user_schema import (
     ChangePasswordResetSchema,
     ForgetPassSchema,
@@ -387,13 +388,11 @@ class AuthService:
             new_user = await self.repo.create_user(user_data)
             user_profile_data["user_id"] = new_user.id
             await self.repo.create_profile(user_profile_data)
-            return await self.check_user_session_and_create_response(
-                request, new_user.id
-            )
-        return await self.check_user_session_and_create_response(request, user.id)
+            return await self.check_user_session_and_create_response(request, new_user)
+        return await self.check_user_session_and_create_response(request, user)
 
     async def check_user_session_and_create_response(
-        self, request: Request, user_id: uuid.UUID
+        self, request: Request, user: User
     ):
         new_jti = uuid.uuid4()
         device_id = request.query_params.get("state")
@@ -401,19 +400,20 @@ class AuthService:
             raise MissingDeviceID
         # Check for the session
         session = await self.session_repo.get_session_by_device_id_user_id(
-            device_id, user_id
+            device_id, user.id
         )
         if session:
             await self.session_repo.put_jti_into_session(new_jti, session)
         else:
             session = await self.session_repo.create_session(
-                request, device_id, user_id, new_jti
+                request, device_id, user.id, new_jti
             )  # type: ignore
         refresh = Auth().generate_refresh(
             {
                 "jti": str(new_jti),
                 "session_id": str(session.id),
-                "user_id": str(user_id),
+                "user_id": str(user.id),
+                "role": user.role.value,
             }
         )
         await Auth().set_refresh_into_redis(str(new_jti))

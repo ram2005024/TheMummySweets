@@ -4,9 +4,10 @@ from typing import TYPE_CHECKING
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.modules.auth.models.base import BaseModel
+from app.modules.order.models.relationship import coupen_used_users, coupen_valid_users
 
 if TYPE_CHECKING:
-    from app.modules.auth.models.user import User  # Noqa
+    from app.modules.auth.models.user import User
 
 
 class CoupenModel(BaseModel):
@@ -20,9 +21,9 @@ class CoupenModel(BaseModel):
     used_count: Mapped[int] = mapped_column(default=0)
     is_active: Mapped[bool] = mapped_column(default=True)
     # relationship
-    coupen_used_users = relationship(
-        "User", secondary="coupen_used_users", backref="used_coupens"
+    coupen_used_users: Mapped[list["User"]] = relationship(
+        "User", secondary=coupen_used_users, backref="used_coupens"
     )
-    coupen_valid_users = relationship(
-        "User", secondary="coupen_valid_users", backref="valid_coupens"
+    coupen_valid_users: Mapped[list["User"]] = relationship(
+        "User", secondary=coupen_valid_users, backref="valid_coupens"
     )

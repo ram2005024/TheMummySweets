@@ -23,7 +23,6 @@ async def create_category_endpoint(
 
 @category_api.get("/", response_model=SuccessResponse[list[CategoryReadBasic]])
 async def read_all_categories_endpoint(
-    user: Annotated[User, Depends(RolePermission(["member", "admin"]))],
     service: Annotated[CategoryService, Depends(get_category_service)],
 ):
     categories = await service.get_categories()

@@ -20,9 +20,8 @@ class OrderItem(BaseModel):
     price: Mapped[float]
     order_id: Mapped[UUID] = mapped_column(ForeignKey("orders.id", ondelete="CASCADE"))
 
-    product: Mapped["Product"] = relationship("Product", cascade="all,delete-orphan")
+    product: Mapped["Product"] = relationship("Product")
     order: Mapped["OrderModel"] = relationship(
         "OrderModel",
-        backref="order_items",
-        cascade="all,delete-orphan",
+        back_populates="order_items",
     )
