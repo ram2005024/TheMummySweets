@@ -1,4 +1,5 @@
 from enum import Enum
+from typing import TYPE_CHECKING
 from uuid import UUID
 
 from sqlalchemy import JSON, ForeignKey, UniqueConstraint
@@ -6,9 +7,11 @@ from sqlalchemy.dialects.postgresql import ENUM
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.modules.auth.models.base import BaseModel
-from app.modules.auth.models.user import User
-from app.modules.order.models.coupen_model import CoupenModel
-from app.modules.order.models.order_model import OrderModel
+
+if TYPE_CHECKING:
+    from app.modules.auth.models.user import Profile
+    from app.modules.order.models.coupen_model import CoupenModel
+    from app.modules.order.models.order_model import OrderModel
 
 
 class PaymentStatus(Enum, str):
@@ -37,7 +40,7 @@ class PaymentModel(BaseModel):
         ForeignKey("coupens.id", ondelete="SET NULL")
     )
     payment_user_id: Mapped[UUID] = mapped_column(
-        ForeignKey("users.id", ondelete="CASCADE")
+        ForeignKey("profiles.id", ondelete="CASCADE")
     )
 
     # Contraints check
@@ -48,8 +51,8 @@ class PaymentModel(BaseModel):
     )
 
     # relationships
-    payment_user: Mapped["User"] = relationship(
-        "User", back_populates="user_payments", cascade="all,delete-orphan"
+    payment_user: Mapped["Profile"] = relationship(
+        "Profile", back_populates="payments", cascade="all,delete-orphan"
     )
     payment_coupen: Mapped["CoupenModel"] = relationship(
         "CoupenModel", backref="used_payments", cascade="save-update,merge"
@@ -57,6 +60,6 @@ class PaymentModel(BaseModel):
     order: Mapped["OrderModel"] = relationship(
         "OrderModel",
         uselist=False,
-        backref="order_payment",
-        cascade="all,delete-orphan",
+        back_populates="payment",
+        cascade="save-update,merge",
     )

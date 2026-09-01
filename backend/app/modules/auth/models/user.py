@@ -8,6 +8,7 @@ from sqlalchemy import ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.modules.auth.models.base import BaseModel
+from app.modules.order.models.order_model import OrderModel
 
 if TYPE_CHECKING:
     from app.modules.menu.models.wishlist_model import WishList
