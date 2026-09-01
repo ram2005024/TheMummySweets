@@ -1,0 +1,46 @@
+from enum import Enum
+from uuid import UUID
+
+from sqlalchemy import JSON, ForeignKey, UniqueConstraint
+from sqlalchemy.dialects.postgresql import ENUM
+from sqlalchemy.orm import Mapped, mapped_column
+
+from app.modules.auth.models.base import BaseModel
+
+
+class PaymentStatus(Enum, str):
+    PAID = "paid"
+    UNPAID = "unpaid"
+
+
+class PaymentMethod(Enum, str):
+    STRIPE = "stripe"
+    ESEWA = "esewa"
+    COD = "cod"
+
+
+class PaymentModel(BaseModel):
+    __table_name__ = "payments"
+    amount: Mapped[float]
+    payment_reference: Mapped[dict | None] = mapped_column(JSON, nullable=True)
+    payment_status: Mapped[PaymentStatus] = mapped_column(
+        ENUM(name="payment_status"), default=PaymentStatus.UNPAID
+    )
+    payment_method: Mapped[PaymentMethod] = mapped_column(
+        ENUM(name="payment_method"), default=PaymentMethod.COD
+    )
+    order_id: Mapped[UUID] = mapped_column(ForeignKey("orders.id", ondelete="CASCADE"))
+    coupen_id: Mapped[UUID | None] = mapped_column(
+        ForeignKey("coupens.id", ondelete="SET NULL")
+    )
+    vat_amount: Mapped[float | None]
+    payment_user_id: Mapped[UUID] = mapped_column(ForeignKey("users.id"))
+
+    # Contraints check
+    __table_args__ = (
+        UniqueConstraint(
+            "order_id", "payment_user_id", "id", name="uq_user_order_payment"
+        ),
+    )
+
+    # relationships
