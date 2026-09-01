@@ -3,9 +3,12 @@ from uuid import UUID
 
 from sqlalchemy import JSON, ForeignKey, UniqueConstraint
 from sqlalchemy.dialects.postgresql import ENUM
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.modules.auth.models.base import BaseModel
+from app.modules.auth.models.user import User
+from app.modules.order.models.coupen_model import CoupenModel
+from app.modules.order.models.order_model import OrderModel
 
 
 class PaymentStatus(Enum, str):
@@ -33,7 +36,9 @@ class PaymentModel(BaseModel):
     coupen_id: Mapped[UUID | None] = mapped_column(
         ForeignKey("coupens.id", ondelete="SET NULL")
     )
-    payment_user_id: Mapped[UUID] = mapped_column(ForeignKey("users.id"))
+    payment_user_id: Mapped[UUID] = mapped_column(
+        ForeignKey("users.id", ondelete="CASCADE")
+    )
 
     # Contraints check
     __table_args__ = (
@@ -43,3 +48,15 @@ class PaymentModel(BaseModel):
     )
 
     # relationships
+    payment_user: Mapped["User"] = relationship(
+        "User", back_populates="user_payments", cascade="all,delete-orphan"
+    )
+    payment_coupen: Mapped["CoupenModel"] = relationship(
+        "CoupenModel", backref="used_payments", cascade="save-update,merge"
+    )
+    order: Mapped["OrderModel"] = relationship(
+        "OrderModel",
+        uselist=False,
+        backref="order_payment",
+        cascade="all,delete-orphan",
+    )
