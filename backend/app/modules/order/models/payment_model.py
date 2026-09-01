@@ -33,7 +33,6 @@ class PaymentModel(BaseModel):
     coupen_id: Mapped[UUID | None] = mapped_column(
         ForeignKey("coupens.id", ondelete="SET NULL")
     )
-    vat_amount: Mapped[float | None]
     payment_user_id: Mapped[UUID] = mapped_column(ForeignKey("users.id"))
 
     # Contraints check
