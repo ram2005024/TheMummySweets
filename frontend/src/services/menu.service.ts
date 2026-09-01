@@ -1,4 +1,4 @@
-import api from "@/libs/api";
+import { publicAPI } from "@/libs/api";
 import { PaginatedResponse, SuccessResponse } from "@/type/common.type";
 import {
   CategoryReadBasic,
@@ -13,7 +13,7 @@ export class MenuService {
   static getMenuItems = async (
     params: MenuParams,
   ): Promise<PaginatedResponse<MenuProduct[]>> => {
-    const res = await api.get("/product/", {
+    const res = await publicAPI.get("/product/", {
       params,
     });
     return res.data.data;
@@ -22,7 +22,7 @@ export class MenuService {
   static getMultipleCategories = async (): Promise<
     SuccessResponse<CategoryReadBasic[]>
   > => {
-    const res = await api.get("/category/");
+    const res = await publicAPI.get("/category/");
     return res.data;
   };
   // To get product reviews
@@ -33,7 +33,7 @@ export class MenuService {
     params: ReviewParam;
     product_id: string;
   }): Promise<ReviewResponse> => {
-    const res = await api.get(`/product/reviews/${product_id}`, {
+    const res = await publicAPI.get(`/product/reviews/${product_id}`, {
       params,
     });
     return res.data.data;
