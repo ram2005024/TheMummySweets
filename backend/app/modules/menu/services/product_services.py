@@ -16,7 +16,6 @@ from app.modules.menu.schemas.review import (
 )
 from app.modules.menu.utils import encode_image
 from app.schemas.common import SuccessResponse
-from app.tasks.menu_task import upload_product_main_image, upload_product_side_images
 
 
 class ProductService:
