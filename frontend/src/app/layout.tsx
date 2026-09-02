@@ -1,11 +1,8 @@
-import { BfcacheRefresher } from "@/components/bf-cache-refresher";
 import { cn } from "@/lib/utils";
-import AuthProvider from "@/providers/AuthProvider";
-import { QueryClientProvider } from "@tanstack/react-query";
+import Providers from "@/providers/Providers";
 import { Metadata } from "next";
 import { Geist } from "next/font/google";
 import { Toaster } from "sonner";
-import queryClient from "../libs/queryClient";
 import "./globals.css";
 
 const geist = Geist({ subsets: ["latin"], variable: "--font-sans" });
@@ -25,12 +22,7 @@ export default function RootLayout({
     <html lang="en" className={cn("font-sans", geist.variable)}>
       <body className="min-h-full flex flex-col">
         <Toaster richColors position="top-right" />
-        <AuthProvider>
-          <QueryClientProvider client={queryClient}>
-            <BfcacheRefresher />
-            {children}
-          </QueryClientProvider>
-        </AuthProvider>
+        <Providers>{children}</Providers>
       </body>
     </html>
   );

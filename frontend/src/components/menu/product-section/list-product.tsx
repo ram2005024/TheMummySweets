@@ -1,6 +1,7 @@
 "use client";
 
 import { useGetMenuProducts } from "@/hooks/menu/useMenuItems";
+import { useCartStore } from "@/store/cart_store";
 import { MenuProduct } from "@/type/menu.type";
 import { Clock3, Heart, Plus, Star } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -8,7 +9,7 @@ import { slugify } from "./../../../utils/slugify";
 
 const ListProducts = () => {
   const { data } = useGetMenuProducts();
-
+  const { setCartItem, calculate } = useCartStore();
   const products: MenuProduct[] =
     data?.pages.flatMap((page) => page.data) ?? [];
 
@@ -126,6 +127,10 @@ const ListProducts = () => {
 
               <button
                 type="button"
+                onClick={() => {
+                  setCartItem(item.id, item);
+                  calculate();
+                }}
                 aria-label={`Add ${item.product_name} to cart`}
                 className="group/add flex h-10 cursor-pointer items-center gap-2 rounded-full bg-[#e8832a] px-4 text-[12px] font-semibold text-white shadow-sm transition-all duration-200 hover:bg-[#d8731d] hover:shadow-[0_7px_18px_-8px_rgba(232,131,42,0.7)] active:scale-95"
               >

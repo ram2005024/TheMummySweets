@@ -1,3 +1,4 @@
+import CartDialog from "@/components/cart/CartDialog";
 import Footer from "@/components/Footer";
 import NavBar from "@/components/NavBar";
 
@@ -7,8 +8,9 @@ export default function PublicLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <div className="min-h-full flex flex-col">
+    <div className="min-h-screen flex flex-col">
       <NavBar />
+      <CartDialog />
       {children}
       <Footer />
     </div>

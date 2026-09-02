@@ -10,8 +10,8 @@ import {
   LuLocateFixed,
   LuMapPin,
   LuSearch,
-  LuShoppingBag,
 } from "react-icons/lu";
+import CartButton from "../cart/CartButton";
 
 interface ReverseGeocodeResponse {
   address?: {
@@ -247,18 +247,7 @@ const NavBarUpperSection = () => {
 
             <LuChevronDown size={12} className="text-[#968980]" />
           </button>
-
-          <Link
-            href="/cart"
-            aria-label="Shopping cart"
-            className="relative flex h-10 w-10 cursor-pointer items-center justify-center rounded-full bg-[#f47b20] text-white shadow-sm transition-all duration-200 hover:bg-[#df6812] hover:shadow-md"
-          >
-            <LuShoppingBag size={19} strokeWidth={1.8} />
-
-            <span className="absolute -right-1 -top-1 flex h-[17px] min-w-[17px] items-center justify-center rounded-full border-2 border-white bg-[#30251f] px-1 text-[7px] font-bold text-white">
-              3
-            </span>
-          </Link>
+          <CartButton />
         </div>
       </div>
     </header>

@@ -1,20 +1,13 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
-import {
-  LogOut,
-  Menu,
-  Phone,
-  Search,
-  ShoppingCart,
-  User,
-  X,
-} from "lucide-react";
+import { LogOut, Menu, Phone, Search, User, X } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useLogout } from "../hooks/auth/useLogout";
 import { useUser } from "../hooks/auth/useUser";
+import CartButton from "./cart/CartButton";
 import NavBarLowerSection from "./Nav/NavBarLowerSection";
 import NavBarUpperSection from "./Nav/NavBarUpperSection";
 import UserIcon from "./Nav/UserIcon";
@@ -33,7 +26,7 @@ export default function NavBar() {
     { name: "Contact", href: "/contact" },
   ];
   return (
-    <header className="sticky top-0 z-100 border-b border-gray-200 bg-background backdrop-blur-lg shadow-xs">
+    <header className="fixed z-100 top-0  w-screen border-b border-gray-200 bg-background backdrop-blur-lg shadow-xs">
       <div className="mx-auto flex h-30 max-w-7xl items-center justify-between px-5 lg:px-8">
         {/* Desktop Navigation */}
         <nav className="hidden items-center gap-3 lg:flex flex-col w-full">
@@ -50,13 +43,7 @@ export default function NavBar() {
               <div className="relative">
                 <UserIcon />
               </div>
-              <button className="relative rounded-full bg-gray-50 border border-gray-100 p-3 transition hover:bg-orange-50">
-                <ShoppingCart size={20} />
-
-                <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-orange-500 text-[10px] text-white">
-                  2
-                </span>
-              </button>
+              <CartButton />
               <div
                 onClick={() => setOpen(!open)}
                 className="rounded-full p-2 transition hover:bg-orange-100 "

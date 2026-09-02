@@ -1,6 +1,12 @@
 import { ImageResponse } from "./admin/product.type";
 import { PaginatedResponse } from "./common.type";
 
+enum GroupedUnits {
+  LTR = "ltr",
+  ML = "ml",
+  PCS = "pcs",
+  NA = "na",
+}
 export interface MenuProduct {
   id: string;
   main_image: ImageResponse;
@@ -12,7 +18,7 @@ export interface MenuProduct {
   review_count: number;
   average_preparation_time: number;
   price: number;
-
+  grouped_unit: GroupedUnits;
   total_amount: number;
   discount_percentage: number;
 }
@@ -33,12 +39,6 @@ export interface CategoryReadBasic {
   product_count: number;
 }
 // ENUM FOR GROUPED UNITS
-enum GroupedUnits {
-  LTR = "ltr",
-  ML = "ml",
-  PCS = "pcs",
-  NA = "na",
-}
 export interface SingleProductType {
   id: string;
   main_image: ImageResponse;
@@ -110,4 +110,13 @@ export interface ReviewResponse extends PaginatedResponse<ProductReview[]> {
     avg_rating: number;
     distribution: Record<number, number>;
   };
+}
+
+export interface CartProduct {
+  id: string;
+  name: string;
+  quantity: number;
+  price: number;
+  main_image: ImageResponse;
+  quantized_unit: string;
 }
