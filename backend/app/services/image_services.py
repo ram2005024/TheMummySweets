@@ -2,6 +2,7 @@ import asyncio
 import io
 from typing import BinaryIO
 
+import sentry_sdk
 from fastapi import UploadFile
 from PIL import Image
 
@@ -26,8 +27,8 @@ class ImageService:
                 return file_type
         raise InvalidImageFormat
 
-    async def generate_key(self, size: str, item_id: str, field: str):
-        return f"{field}/{item_id}/{size}.jpeg"
+    async def generate_key(self, size: str, field_id: str, field: str):
+        return f"{field}/{field_id}/{size}.jpeg"
 
     async def _thumbnail(self, image: Image.Image, required_size: int = 400):
         image = image.convert("RGB")
@@ -62,24 +63,36 @@ class ImageService:
         return self.get_public_url(key)
 
     async def process_image_upload(
-        self, file: UploadFile, item_id: str, field_name: str
+        self, file: UploadFile, field_id: str, field_name: str
     ):
         # Verify the image
-        file_type = await self.validate_image(file)
+        await self.validate_image(file)
         raw_bytes = await file.read()
         img = Image.open(io.BytesIO(raw_bytes))
+        # Generate the image in different viewport
+        thum_task = self._thumbnail(img, 400)
+        medium_task = self._medium(img)
+        original_task = self._originial(img)
+        thumb, medium, original = await asyncio.gather(
+            thum_task, medium_task, original_task, return_exceptions=True
+        )
         versions = {
-            "thumbnail": await self._thumbnail(img, 400),
-            "medium": await self._medium(img),
-            "original": await self._originial(img),
+            "thumbnail": thumb,
+            "medium": medium,
+            "original": original,
         }
         urls = {}
         for file_type, original_image in versions.items():
+            if isinstance(original_image, Exception):
+                print(f"{file_type} upload failed:{original_image}")
+                sentry_sdk.capture_exception(original_image)
+                urls[file_type] = ""
+                continue
             buffer = io.BytesIO()
             quality = 60 if file_type == "thumbnail" else 80
-            original_image.save(buffer, format="jpeg", quality=quality, optimize=True)
+            original_image.save(buffer, format="jpeg", quality=quality, optimize=True)  # type: ignore
             buffer.seek(0)
-            key = await self.generate_key(file_type, item_id, field_name)
+            key = await self.generate_key(file_type, field_id, field_name)
             url = await self.upload_image(buffer, key)
             urls[file_type] = url
         return urls
