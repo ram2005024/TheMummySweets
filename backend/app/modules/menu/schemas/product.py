@@ -39,6 +39,7 @@ class ProductReadBasicCustomer(BaseModel):
     review_count: int = 0
     average_preparation_time: int
     price: int
+    grouped_unit: QuantizedUnit
     total_amount: float
     discount_percentage: float
 
