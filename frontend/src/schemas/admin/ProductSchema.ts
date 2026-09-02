@@ -19,20 +19,27 @@ export const productSchema = z.object({
     .min(1, { message: "Select at least one category" }),
 
   price: z.number().positive({ message: "Price must be greater than 0" }),
-
-  discount_percentage: z
-    .number()
-    .min(0, { message: "Discount cannot be negative" })
-    .max(100, { message: "Discount cannot exceed 100%" })
-    .optional(),
+  discount_percentage: z.preprocess(
+    (val) => (val === "" ? undefined : Number(val)),
+    z
+      .number({
+        error: "Field required",
+      })
+      .min(0, { error: "Discount can't be negative" })
+      .max(100, { error: "Discount can't be more than 100%" }),
+  ),
 
   average_preparation_time: z
-    .number()
+    .number({
+      error: "Field required",
+    })
     .int({ message: "Must be an integer" })
     .positive({ message: "Must be a positive number" }),
 
   stock_quantity: z
-    .number()
+    .number({
+      error: "Field required",
+    })
     .int({ message: "Must be an integer" })
     .min(0, { message: "Stock cannot be negative" }),
 

@@ -122,6 +122,7 @@ export function AddProductForm() {
         },
         onSuccess: () => {
           queryClient.invalidateQueries({ queryKey: ["menu-products"] });
+          queryClient.invalidateQueries({ queryKey: ["categories"] });
         },
       },
     );

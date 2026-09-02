@@ -42,6 +42,7 @@ export const useGetMenuCategories = () =>
   useQuery({
     queryKey: ["categories"],
     queryFn: MenuService.getMultipleCategories,
+    placeholderData: (prev) => prev,
   });
 
 // To get the product reviews
