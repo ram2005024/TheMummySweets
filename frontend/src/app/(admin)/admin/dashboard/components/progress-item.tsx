@@ -76,8 +76,8 @@ export function ProgressItem({ slot, onCancel, onRetry, size = "sm" }: Props) {
             )}
           >
             {isUploading && `Uploading ${slot.progress}%`}
-            {isDone && "✅ Uploaded"}
-            {isError && "❌ Failed"}
+            {isDone && "Uploaded"}
+            {isError && "Failed"}
             {slot.status === "cancelled" && "Cancelled"}
           </span>
 
