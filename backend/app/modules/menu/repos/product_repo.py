@@ -5,7 +5,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from app.dependencies.pagination import Pagination
-from app.models.image import Image
 from app.modules.auth.models.user import User
 from app.modules.menu.dependencies.filter_products import FilterProduct
 from app.modules.menu.models.category_model import Category
@@ -40,25 +39,6 @@ class ProductRepo:
         self.db.add(new_product)
         await self.db.commit()
         return new_product
-
-    async def find_image_by_hash(self, hash_value):
-        return (
-            await self.db.execute(select(Image).where(Image.hash_value == hash_value))
-        ).scalar_one_or_none()
-
-    async def upload_main_product_image(self, image: str, product_id: UUID):
-        product = (
-            await self.db.execute(select(Product).where(Product.id == product_id))
-        ).scalar_one()
-        product.main_image = image
-        await self.db.commit()
-
-    async def upload_side_product_images(self, image: list[str], product_id: UUID):
-        product = (
-            await self.db.execute(select(Product).where(Product.id == product_id))
-        ).scalar_one()
-        product.side_images = image
-        await self.db.commit()
 
     async def read_multiple_products(
         self, filter_data: FilterProduct, pagination_data: Pagination
