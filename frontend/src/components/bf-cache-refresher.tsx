@@ -9,7 +9,6 @@ export function BfcacheRefresher() {
 
   useEffect(() => {
     function handlePageShow(event: PageTransitionEvent) {
-      console.log("pageshow fired, persisted:", event.persisted);
       if (event.persisted) {
         queryClient.invalidateQueries();
       }
