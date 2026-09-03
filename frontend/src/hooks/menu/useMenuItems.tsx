@@ -1,3 +1,4 @@
+import { CartService } from "@/services/cart.service";
 import { MenuService } from "@/services/menu.service";
 import { menuStore } from "@/store/menu.product";
 import { ReviewResponse } from "@/type/menu.type";
@@ -69,5 +70,14 @@ export const useGetProductReviews = (
     },
     initialPageParam: 1,
     staleTime: 5 * 60 * 1000,
+  });
+};
+
+// To get the cart
+export const useGetCart = () => {
+  return useQuery({
+    queryKey: ["cart"],
+    queryFn: CartService.getCart,
+    placeholderData: (prev) => prev,
   });
 };
