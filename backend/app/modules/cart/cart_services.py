@@ -1,3 +1,4 @@
+import json
 from uuid import UUID
 
 from fastapi import Request
@@ -52,8 +53,9 @@ class CartService:
                 mapping={
                     price_field: str(product.total_amount),
                     name_field: str(product.product_name),
-                    main_image: str(product.main_image),
+                    main_image: json.dumps(product.main_image),
                     quantized_unit: str(product.grouped_unit.value),
+                    quantity: 1,
                 },
             )
         else:
@@ -90,12 +92,16 @@ class CartService:
         valid_attrs = ["name", "price", "quantity", "main_image", "quantized_unit"]
         for field, value in raw.items():
             pid, attr = field.split(":")  # type: ignore
+            if attr == "main_image":
+                try:
+                    value = json.loads(value)
+                except (json.JSONDecodeError, TypeError):
+                    pass
             items.setdefault(pid, {})[attr] = value  # type: ignore
         for pid, cart_items in items.items():
             attrs = cart_items.keys()
-            for key in attrs:
-                if key not in valid_attrs:
-                    raise CartAttributesMissing
+            if not all(attr in attrs for attr in valid_attrs):
+                raise CartAttributesMissing
         return await self.get_cart_total_calculation(items)
 
     async def get_cart_total_calculation(self, value: dict[str, dict]):
