@@ -179,14 +179,8 @@ export const useCartStore = create<CartInterface>((set, get) => ({
     const existing_cart = get().cart_items.find((val) => val.id === id);
     if (!existing_cart) return;
     const cart_count = existing_cart.quantity;
-    if (cart_count == 1) {
-      set((s) => {
-        return {
-          cart_items: s.cart_items.filter((val) => val.id === id),
-        };
-      });
-      get().remove_cart_item(id);
-    }
+    if (cart_count == 1) get().remove_cart_item(id);
+
     set((s) => {
       return {
         cart_items: s.cart_items.map((val) =>
