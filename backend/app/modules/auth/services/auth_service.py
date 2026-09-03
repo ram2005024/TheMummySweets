@@ -389,6 +389,7 @@ class AuthService:
             user_profile_data["user_id"] = new_user.id
             await self.repo.create_profile(user_profile_data)
             return await self.check_user_session_and_create_response(request, new_user)
+
         return await self.check_user_session_and_create_response(request, user)
 
     async def check_user_session_and_create_response(
@@ -417,6 +418,7 @@ class AuthService:
             }
         )
         await Auth().set_refresh_into_redis(str(new_jti))
+        await self.merge_guest_cart_with_user(request, user.id)
         response = RedirectResponse(url=settings.FRONTEND_URL)
         response.set_cookie(
             key="refresh",

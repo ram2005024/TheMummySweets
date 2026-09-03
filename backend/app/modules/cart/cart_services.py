@@ -135,28 +135,54 @@ class CartService:
         user_key = self._key(str(user_id), None)
         guest_raw = await self.redis.hgetall(guest_key)
         user_raw = await self.redis.hgetall(user_key)
-        if not guest_raw and not user_raw:
+        if not guest_raw:
             return
-        existing_cart_ids = [val.split(":")[0] for val in user_raw]  # type: ignore
         for field, value in guest_raw.items():
             pid, attr = field.split(":")  # type: ignore
-            if attr != "quantity":
-                continue
-            quantity_field = f"{pid}:quantity"
-            existing = pid in existing_cart_ids
-            if existing:
-                user_cart_item_quantity = (
-                    await self.redis.hget(user_key, quantity_field) or 0
-                )
+            has_product = self.exists_in_user_cart(str(pid), user_raw)
+            if has_product:
+                if attr != "quantity":
+                    continue
+                quantity_field = f"{pid}:quantity"
+                user_qty_value = await self.redis.hget(user_key, quantity_field) or 0
+                guest_qty_value = await self.redis.hget(guest_key, quantity_field) or 0
+
                 await self.redis.hset(
                     user_key,
                     quantity_field,
-                    max(int(user_cart_item_quantity), int(value)),
+                    max(int(guest_qty_value), int(user_qty_value)),
                 )
             else:
-                await self.add_cart_item(pid, str(user_id), None)  # type: ignore
+                await self.put_cart_items_from_guest_to_user_cart(
+                    guest_raw, str(pid), user_key
+                )
         await self.redis.delete(guest_key)
-        await self.redis.expire(user_key, self.CART_TTL_USER * 24 * 60 * 60)
+        await self.redis.expire(user_key, self.CART_TTL_USER * 60 * 60 * 24)
+        return
+
+    async def put_cart_items_from_guest_to_user_cart(
+        self, guest_raw: dict[bytes | str, bytes | str], pid: str, user_key: str
+    ):
+        valid_cart_attrs = ["quantity", "price", "main_image", "name", "quantized_unit"]
+        related_fields = {
+            field: value
+            for field, value in guest_raw.items()
+            if field.startswith(f"{pid}:")  # type: ignore
+        }
+        if related_fields:
+            attrs = []
+            for field in related_fields:
+                attrs.append(field.split(":")[1])  # type: ignore
+            if not any(attr in attrs for attr in valid_cart_attrs):
+                raise CartAttributesMissing
+            await self.redis.hset(user_key, mapping=related_fields)  # type: ignore
+
+    def exists_in_user_cart(self, pid: str, user_raw: dict[bytes | str, bytes | str]):
+        for key in user_raw:
+            user_product_id = key.split(":")[0]  # type: ignore
+            if user_product_id == pid:
+                return True
+        return False
 
     async def update_quantity(
         self,
