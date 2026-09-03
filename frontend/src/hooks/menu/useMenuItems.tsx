@@ -79,5 +79,6 @@ export const useGetCart = () => {
     queryKey: ["cart"],
     queryFn: CartService.getCart,
     placeholderData: (prev) => prev,
+    staleTime: 5 * 60 * 1000,
   });
 };

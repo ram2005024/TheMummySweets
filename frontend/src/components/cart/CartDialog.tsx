@@ -8,7 +8,6 @@ import { useRouter } from "next/navigation";
 import { SummaryRow } from "./SummaryRow";
 
 const DELIVERY_THRESHOLD = 620;
-const VAT_RATE = 0.13;
 
 const CartDialog = () => {
   const navigate = useRouter();
@@ -19,13 +18,15 @@ const CartDialog = () => {
     decrease_cart_quantity,
     total,
     sub_total,
-    vat,
+    vat_amount,
     delivery,
     open,
     onOpenChange,
   } = useCartStore();
 
-  const remaining = Math.max(0, DELIVERY_THRESHOLD - total);
+  const remaining = Math.round(Math.max(0, DELIVERY_THRESHOLD - total)).toFixed(
+    0,
+  );
   const deliveryProgress = Math.min((total / DELIVERY_THRESHOLD) * 100, 100);
   const isFreeDelivery = total >= DELIVERY_THRESHOLD;
 
@@ -133,83 +134,86 @@ const CartDialog = () => {
                     {/* Cart items */}
                     <div className="space-y-3">
                       <AnimatePresence initial={false}>
-                        {cart_items.map((item) => (
-                          <motion.div
-                            key={item.id}
-                            layout
-                            initial={{ opacity: 0, x: -20 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            exit={{ opacity: 0, x: -20 }}
-                            transition={{ duration: 0.2 }}
-                            className="flex items-center gap-3 rounded-xl border border-gray-100 bg-gray-50 p-3"
-                          >
-                            {/* Image */}
-                            {item.main_image ? (
-                              <img
-                                src={item.main_image.thumbnail}
-                                alt={item.name}
-                                className="h-16 w-16 shrink-0 rounded-lg object-cover"
-                              />
-                            ) : (
-                              <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-lg bg-orange-100 text-xl">
-                                🍽️
+                        {cart_items.map((item) => {
+                          console.log(item);
+                          return (
+                            <motion.div
+                              key={item.id}
+                              layout
+                              initial={{ opacity: 0, x: -20 }}
+                              animate={{ opacity: 1, x: 0 }}
+                              exit={{ opacity: 0, x: -20 }}
+                              transition={{ duration: 0.2 }}
+                              className="flex items-center gap-3 rounded-xl border border-gray-100 bg-gray-50 p-3"
+                            >
+                              {/* Image */}
+                              {item.main_image ? (
+                                <img
+                                  src={item.main_image.thumbnail}
+                                  alt={item.name}
+                                  className="h-16 w-16 shrink-0 rounded-lg object-cover"
+                                />
+                              ) : (
+                                <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-lg bg-orange-100 text-xl">
+                                  🍽️
+                                </div>
+                              )}
+
+                              {/* Info + quantity */}
+                              <div className="min-w-0 flex-1">
+                                <h3 className="truncate text-sm font-semibold text-gray-900">
+                                  {item.name}
+                                </h3>
+                                <p className="mt-1 text-xs font-medium text-orange-600">
+                                  Rs. {Math.round(item.price)}
+                                </p>
+
+                                <div className="mt-2 flex w-fit items-center overflow-hidden rounded-lg border border-gray-200 bg-white">
+                                  <button
+                                    type="button"
+                                    aria-label="Decrease quantity"
+                                    onClick={() => {
+                                      decrease_cart_quantity(item.id);
+                                    }}
+                                    className="flex h-7 w-7 items-center justify-center text-gray-600 transition hover:bg-gray-100"
+                                  >
+                                    <Minus size={12} />
+                                  </button>
+                                  <span className="flex h-7 min-w-7 items-center justify-center border-x border-gray-200 px-1.5 text-xs font-medium">
+                                    {item.quantity}
+                                  </span>
+                                  <button
+                                    type="button"
+                                    aria-label="Increase quantity"
+                                    onClick={() => {
+                                      increase_cart_quantity(item.id);
+                                    }}
+                                    className="flex h-7 w-7 items-center justify-center text-gray-600 transition hover:bg-gray-100"
+                                  >
+                                    <Plus size={12} />
+                                  </button>
+                                </div>
                               </div>
-                            )}
 
-                            {/* Info + quantity */}
-                            <div className="min-w-0 flex-1">
-                              <h3 className="truncate text-sm font-semibold text-gray-900">
-                                {item.name}
-                              </h3>
-                              <p className="mt-1 text-xs font-medium text-orange-600">
-                                Rs. {item.price}
-                              </p>
-
-                              <div className="mt-2 flex w-fit items-center overflow-hidden rounded-lg border border-gray-200 bg-white">
-                                <button
-                                  type="button"
-                                  aria-label="Decrease quantity"
-                                  onClick={() => {
-                                    decrease_cart_quantity(item.id);
-                                  }}
-                                  className="flex h-7 w-7 items-center justify-center text-gray-600 transition hover:bg-gray-100"
-                                >
-                                  <Minus size={12} />
-                                </button>
-                                <span className="flex h-7 min-w-7 items-center justify-center border-x border-gray-200 px-1.5 text-xs font-medium">
-                                  {item.quantity}
+                              {/* Price + remove */}
+                              <div className="flex shrink-0 flex-col items-end gap-2">
+                                <span className="text-sm font-semibold text-gray-900">
+                                  Rs. {Math.round(item.price * item.quantity)}
                                 </span>
                                 <button
                                   type="button"
-                                  aria-label="Increase quantity"
+                                  aria-label={`Remove ${item.name}`}
                                   onClick={() => {
-                                    increase_cart_quantity(item.id);
+                                    remove_cart_item(item.id);
                                   }}
-                                  className="flex h-7 w-7 items-center justify-center text-gray-600 transition hover:bg-gray-100"
+                                  className="flex h-7 w-7 items-center justify-center rounded-full text-gray-400 transition hover:bg-red-50 hover:text-red-500"
                                 >
-                                  <Plus size={12} />
+                                  <Trash2 size={14} />
                                 </button>
                               </div>
-                            </div>
-
-                            {/* Price + remove */}
-                            <div className="flex shrink-0 flex-col items-end gap-2">
-                              <span className="text-sm font-semibold text-gray-900">
-                                Rs. {item.price * item.quantity}
-                              </span>
-                              <button
-                                type="button"
-                                aria-label={`Remove ${item.name}`}
-                                onClick={() => {
-                                  remove_cart_item(item.id);
-                                }}
-                                className="flex h-7 w-7 items-center justify-center rounded-full text-gray-400 transition hover:bg-red-50 hover:text-red-500"
-                              >
-                                <Trash2 size={14} />
-                              </button>
-                            </div>
-                          </motion.div>
-                        ))}
+                            </motion.div>
+                          );
+                        })}
                       </AnimatePresence>
                     </div>
                   </div>
@@ -218,15 +222,12 @@ const CartDialog = () => {
                 {/* ── Summary + checkout ── */}
                 <div className="shrink-0 border-t border-gray-200 bg-white px-6 py-5">
                   <div className="mb-5 space-y-3">
-                    <SummaryRow label="Subtotal" value={`Rs. ${total}`} />
+                    <SummaryRow label="Subtotal" value={`Rs. ${sub_total}`} />
                     <SummaryRow
                       label="Delivery"
                       value={delivery === 0 ? "FREE" : `Rs. ${delivery}`}
                     />
-                    <SummaryRow
-                      label={`VAT (${vat * 100}%)`}
-                      value={`Rs. ${Math.round(total * VAT_RATE)}`}
-                    />
+                    <SummaryRow label={`VAT 13%`} value={`Rs. ${vat_amount}`} />
                     <div className="border-t border-gray-200 pt-3">
                       <div className="flex items-center justify-between">
                         <span className="font-semibold text-gray-900">
@@ -238,7 +239,7 @@ const CartDialog = () => {
                           animate={{ scale: 1 }}
                           className="text-xl font-bold text-orange-600"
                         >
-                          Rs. {sub_total}
+                          Rs. {total}
                         </motion.span>
                       </div>
                     </div>
@@ -248,7 +249,7 @@ const CartDialog = () => {
                     type="button"
                     className="w-full rounded-xl bg-orange-500 py-3 text-sm font-semibold text-white transition hover:bg-orange-600 active:scale-[0.99]"
                   >
-                    Checkout · Rs. {sub_total}
+                    Checkout · Rs. {total}
                   </button>
                 </div>
               </>

@@ -1,8 +1,21 @@
 "use client";
 
+import { useCartStore } from "@/store/cart_store";
+import { SingleProductType } from "@/type/menu.type";
 import { Heart, Share2 } from "lucide-react";
 
-const ActionSection = ({ price }: { price: number }) => {
+const ActionSection = ({
+  price,
+  id,
+  value,
+}: {
+  price: number;
+  id: string;
+  value: SingleProductType;
+}) => {
+  const { setCartItem, cart_items, decrease_cart_quantity } = useCartStore();
+  const currentCartCount =
+    cart_items.find((val) => val.id == id)?.quantity || 0;
   return (
     <div className="space-y-3">
       {/* Quantity + Main Actions */}
@@ -10,6 +23,7 @@ const ActionSection = ({ price }: { price: number }) => {
         {/* Quantity */}
         <div className="flex h-11 items-center rounded-full border border-border bg-background px-2">
           <button
+            onClick={() => decrease_cart_quantity(id)}
             type="button"
             className="flex h-8 w-8 items-center justify-center rounded-full text-sm text-muted-foreground transition hover:bg-muted"
           >
@@ -17,10 +31,11 @@ const ActionSection = ({ price }: { price: number }) => {
           </button>
 
           <span className="w-7 text-center text-sm font-semibold tabular-nums">
-            1
+            {currentCartCount}
           </span>
 
           <button
+            onClick={() => setCartItem(id, value)}
             type="button"
             className="flex h-8 w-8 items-center justify-center rounded-full text-sm text-muted-foreground transition hover:bg-muted"
           >
@@ -31,6 +46,7 @@ const ActionSection = ({ price }: { price: number }) => {
         {/* Add to Cart */}
         <button
           type="button"
+          onClick={() => setCartItem(id, value)}
           className="h-11  rounded-full bg-primary px-5 text-sm font-semibold text-primary-foreground shadow-sm transition hover:opacity-90"
         >
           Add to cart · Rs. {price}

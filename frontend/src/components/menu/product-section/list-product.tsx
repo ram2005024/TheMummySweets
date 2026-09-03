@@ -108,11 +108,11 @@ const ListProducts = () => {
               <div className="leading-none">
                 <div className="flex items-baseline gap-2">
                   <span className="text-[19px] font-bold tracking-[-0.02em] text-[#2b1710]">
-                    Rs. {item.total_amount}
+                    Rs. {Math.round(item.total_amount)}
                   </span>
                   {item.discount_percentage > 0 && (
                     <span className="text-[11px] text-[#a99a91] line-through">
-                      Rs. {item.price}
+                      Rs. {Math.round(item.price)}
                     </span>
                   )}
                 </div>

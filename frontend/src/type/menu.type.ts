@@ -123,4 +123,8 @@ export interface CartProduct {
 
 export interface CartResponseType {
   items: CartProduct[];
+  total: number;
+  sub_total: number;
+  tax_amount: number;
+  delivery_fee: number;
 }

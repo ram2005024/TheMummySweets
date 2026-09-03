@@ -67,14 +67,14 @@ const ProductDescriptionHeader = ({
         <div className="flex flex-wrap items-baseline gap-3">
           {/* Final / Selling Price */}
           <span className="font-mono text-3xl font-bold tracking-tight text-foreground">
-            Rs. {finalPrice.toFixed(2)}
+            Rs. {Math.round(finalPrice)}
           </span>
 
           {/* Original Price + Discount */}
           {hasDiscount && (
             <>
               <span className="font-mono text-base font-medium text-muted-foreground line-through">
-                Rs. {originalPrice.toFixed(2)}
+                Rs. {Math.round(originalPrice)}
               </span>
 
               <span className="rounded-full bg-green-100 px-2.5 py-1 text-xs font-bold text-green-700">

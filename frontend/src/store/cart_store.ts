@@ -1,5 +1,10 @@
 import { CartService } from "@/services/cart.service";
-import { CartProduct, MenuProduct, SingleProductType } from "@/type/menu.type";
+import {
+  CartProduct,
+  CartResponseType,
+  MenuProduct,
+  SingleProductType,
+} from "@/type/menu.type";
 import { create } from "zustand";
 
 interface CartInterface {
@@ -13,7 +18,7 @@ interface CartInterface {
   onOpenChange: (val: boolean) => void;
   sub_total: number;
   delivery: number; //Hardcode for now
-  vat: number; //Hardcode for now
+  vat_amount: number; //Hardcode for now
   total: number;
   calculate: () => void;
   debounceTime: number;
@@ -21,12 +26,18 @@ interface CartInterface {
   debounceFunction: (pid: string) => void;
   timeoutFunction: (pid: string) => ReturnType<typeof setTimeout>;
   versionState: Map<string, number>;
-  setCartItems: (val: CartProduct[]) => void;
+  setCartItems: (val: CartResponseType) => void;
 }
 
 export const useCartStore = create<CartInterface>((set, get) => ({
   setCartItems: (val) => {
-    set({ cart_items: val });
+    set({
+      cart_items: val.items,
+      total: val.total,
+      sub_total: val.sub_total,
+      delivery: val.delivery_fee,
+      vat_amount: val.tax_amount,
+    });
   },
   versionState: new Map(),
   debounceTime: 400,
@@ -75,11 +86,11 @@ export const useCartStore = create<CartInterface>((set, get) => ({
   onOpenChange: (val) => set({ open: val }),
   sub_total: 0,
   delivery: 60, //Hardcode for now
-  vat: 0.13, //Hardcode for now
+  vat_amount: 0.13, //Hardcode for now
   total: 0,
-  setCartItem: (id, product) => {
+  setCartItem: async (id, product) => {
     const exists = get().cart_items.find((item) => item.id === id);
-    if (!exists)
+    if (!exists) {
       set((s) => {
         return {
           cart_items: [
@@ -96,16 +107,25 @@ export const useCartStore = create<CartInterface>((set, get) => ({
         };
       });
 
+      try {
+        await CartService.addCart(id);
+      } catch (error) {
+        console.log(`Something went wrong: ${error}`);
+        set({ cart_items: get().cart_items.filter((val) => val.id == id) });
+      }
+    } else {
+      get().increase_cart_quantity(id);
+    }
     get().calculate();
   },
 
   remove_cart_item: async (id) => {
+    const previousValue = get().cart_items.find((val) => val.id == id);
+    if (!previousValue) return;
     set((s) => ({
       cart_items: s.cart_items.filter((val) => val.id !== id),
     }));
     get().calculate();
-    const previousValue = get().cart_items.find((val) => val.id == id);
-    if (!previousValue) return;
     try {
       await CartService.deleteCart(id);
     } catch (error) {
@@ -143,20 +163,31 @@ export const useCartStore = create<CartInterface>((set, get) => ({
   calculate: () =>
     set((s) => {
       if (s.cart_items.length <= 0) return s;
-      const total = s.cart_items.reduce(
-        (total, val) => val.quantity * val.price,
+      const sub_total = s.cart_items.reduce(
+        (total, val) => total + val.quantity * val.price,
         0,
       );
-      const subtotal = total + s.vat * total + s.delivery;
+      const vat_amount = sub_total * 0.13;
+      const total = sub_total + vat_amount + s.delivery;
       return {
-        total: total,
-        sub_total: Math.round(subtotal),
+        total: Math.round(total),
+        sub_total: Math.round(sub_total),
+        vat_amount: Math.round(vat_amount),
       };
     }),
   decrease_cart_quantity: (id) => {
+    const existing_cart = get().cart_items.find((val) => val.id === id);
+    if (!existing_cart) return;
+    const cart_count = existing_cart.quantity;
+    if (cart_count == 1) {
+      set((s) => {
+        return {
+          cart_items: s.cart_items.filter((val) => val.id === id),
+        };
+      });
+      get().remove_cart_item(id);
+    }
     set((s) => {
-      const existing_cart = s.cart_items.find((val) => val.id === id);
-      if (!existing_cart || existing_cart.quantity === 1) return s;
       return {
         cart_items: s.cart_items.map((val) =>
           val.id === id ? { ...val, quantity: val.quantity - 1 } : val,
