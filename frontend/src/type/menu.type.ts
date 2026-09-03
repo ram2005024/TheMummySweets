@@ -120,3 +120,7 @@ export interface CartProduct {
   main_image: ImageResponse;
   quantized_unit: string;
 }
+
+export interface CartResponseType {
+  items: CartProduct[];
+}
