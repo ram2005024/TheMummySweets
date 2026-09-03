@@ -50,13 +50,14 @@ class CartService:
             await self.redis.hset(
                 key,
                 mapping={
-                    price_field: product.total_amount,
-                    name_field: product.product_name,
-                    main_image: product.main_image,
-                    quantized_unit: product.grouped_unit,
+                    price_field: str(product.total_amount),
+                    name_field: str(product.product_name),
+                    main_image: str(product.main_image),
+                    quantized_unit: str(product.grouped_unit.value),
                 },
             )
-        await self.redis.hincrby(key, quantity)
+        else:
+            await self.redis.hincrby(key, quantity)
         expire = (
             self.CART_TTL_GUEST * 60 * 60
             if guest_id
@@ -108,18 +109,17 @@ class CartService:
         if not value:
             return items
         cart_items = []
-        sub_total = 0
+        total = 0
         for id, items in value.items():
-            sub_total += int(items["quantity"]) * float(items["price"])
+            total += int(items["quantity"]) * float(items["price"])
             items["id"] = UUID(id)
             cart_items.append(items)
-        print(cart_items)
-        tax_amount = self.TAX_RATE * sub_total
+        tax_amount = self.TAX_RATE * total
         delivery_fee = self.CART_DELIVERY_FEE  # We will calculate
         items["items"] = cart_items
         items["delivery_fee"] = delivery_fee
-        items["sub_total"] = round(sub_total, 2)
-        items["total"] = round(sub_total + delivery_fee + tax_amount, 2)
+        items["total"] = round(total, 2)
+        items["sub_total"] = round(total + delivery_fee + tax_amount, 2)
         items["tax_amount"] = round(tax_amount, 2)
         return items
 
