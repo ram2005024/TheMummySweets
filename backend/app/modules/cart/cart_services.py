@@ -8,7 +8,6 @@ from app.core.config import settings
 from app.modules.cart.cart_exceptions import (
     CartAttributesMissing,
     CartNotFound,
-    CartProductNotFound,
 )
 from app.modules.cart.cart_schema import CartUpdate
 from app.modules.menu.models.product_model import Product
@@ -153,25 +152,13 @@ class CartService:
         await self.redis.delete(guest_key)
         await self.redis.expire(user_key, self.CART_TTL_USER * 24 * 60 * 60)
 
-    async def decrement_or_increment_cart_quantity(
+    async def update_quantity(
         self,
         type: CartUpdate,
         key: str,
         field: str,
-        key_hash: dict[str, str],
-        product_id: UUID,
     ):
-        if type.type == "incr":
-            await self.redis.hincrby(key, field)
-        else:
-            qty = await self.redis.hincrby(key, field, -1)
-            if qty == 0:
-                for attr in key_hash:
-                    pid = attr.split(":")[0]
-                    if pid == str(product_id):
-                        await self.redis.hdel(key, attr)
-            elif qty < 0:
-                raise CartProductNotFound
+        await self.redis.hset(key, field, type.quantity)
 
     async def update_cart_quantity(
         self,
@@ -185,13 +172,7 @@ class CartService:
         existing = await self.redis.hgetall(key)
         if not existing:
             raise CartNotFound
-        await self.decrement_or_increment_cart_quantity(
-            type,
-            key,
-            qty_field,
-            existing,  # type: ignore
-            product_id,
-        )
+        await self.update_quantity(type, key, qty_field)
         expire = (
             self.CART_TTL_GUEST * 60 * 60
             if guest_id

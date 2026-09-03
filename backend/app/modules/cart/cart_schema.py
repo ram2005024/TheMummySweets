@@ -1,7 +1,6 @@
-from typing import Literal
 from uuid import UUID
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from app.modules.menu.models.product_model import QuantizedUnit
 
@@ -24,4 +23,4 @@ class CartItemsRead(BaseModel):
 
 
 class CartUpdate(BaseModel):
-    type: Literal["incr", "dcr"]
+    quantity: int = Field(ge=1)
