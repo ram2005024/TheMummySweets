@@ -11,7 +11,7 @@ export default function PublicLayout({
     <div className="min-h-screen flex flex-col">
       <NavBar />
       <CartDialog />
-      {children}
+      <main className="mt-30">{children}</main>
       <Footer />
     </div>
   );
