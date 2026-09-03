@@ -115,18 +115,18 @@ class CartService:
         if not value:
             return items
         cart_items = []
-        total = 0
+        sub_total = 0
         for id, items in value.items():
-            total += int(items["quantity"]) * float(items["price"])
+            sub_total += int(items["quantity"]) * float(items["price"])
             items["id"] = UUID(id)
             cart_items.append(items)
-        tax_amount = self.TAX_RATE * total
+        tax_amount = self.TAX_RATE * sub_total
         delivery_fee = self.CART_DELIVERY_FEE  # We will calculate
         items["items"] = cart_items
         items["delivery_fee"] = delivery_fee
-        items["total"] = round(total, 2)
-        items["sub_total"] = round(total + delivery_fee + tax_amount, 2)
-        items["tax_amount"] = round(tax_amount, 2)
+        items["total"] = round(sub_total + delivery_fee + tax_amount)
+        items["sub_total"] = round(sub_total)
+        items["tax_amount"] = round(tax_amount)
         return items
 
     async def merge_cart_user(self, user_id: UUID, guest_id: str):
