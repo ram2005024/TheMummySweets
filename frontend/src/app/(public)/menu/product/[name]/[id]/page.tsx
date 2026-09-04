@@ -45,7 +45,11 @@ export default async function ProductPage({ params }: Props) {
         <ImageShowcase product={product} />
         <div className="flex flex-col gap-3">
           <ProductDescriptionHeader product={product} />
-          <ActionSection price={product.price} id={id} value={response} />
+          <ActionSection
+            price={product.price}
+            id={product.id}
+            value={response}
+          />
           <div className="flex flex-col gap-7 mt-3">
             <ProductQuality />
             <IngredientDetails ingredients={product.ingredients} />

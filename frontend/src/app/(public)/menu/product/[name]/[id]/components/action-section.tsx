@@ -1,8 +1,12 @@
 "use client";
 
+import { useGetWishlistedIDS } from "@/hooks/menu/useMenuItems";
+import { cn } from "@/lib/utils";
 import { useCartStore } from "@/store/cart_store";
+import { useWishlistStore } from "@/store/wishlist.store";
 import { SingleProductType } from "@/type/menu.type";
 import { Heart, Share2 } from "lucide-react";
+import { useEffect } from "react";
 
 const ActionSection = ({
   price,
@@ -16,6 +20,13 @@ const ActionSection = ({
   const { setCartItem, cart_items, decrease_cart_quantity } = useCartStore();
   const currentCartCount =
     cart_items.find((val) => val.id == id)?.quantity || 0;
+  const { isProductOnWishlist, update_wishlist, setWishlistIDS } =
+    useWishlistStore();
+  const { data, isFetching } = useGetWishlistedIDS([id]);
+  useEffect(() => {
+    if (!data) return;
+    setWishlistIDS(data.wishlisted_ids);
+  }, [isFetching, data, setWishlistIDS]);
   return (
     <div className="space-y-3">
       {/* Quantity + Main Actions */}
@@ -64,10 +75,18 @@ const ActionSection = ({
       {/* Secondary Actions */}
       <div className="flex items-center gap-2">
         <button
+          onClick={() => update_wishlist(id)}
           type="button"
-          className="flex h-8 items-center gap-1.5 rounded-full border border-border bg-background px-3 text-xs font-medium text-muted-foreground transition hover:bg-muted hover:text-foreground"
+          className={cn(
+            "flex h-8 items-center gap-1.5 rounded-full border border-border bg-background px-3 text-xs font-medium text-muted-foreground transition hover:bg-muted hover:text-foreground",
+          )}
         >
-          <Heart className="h-3.5 w-3.5" />
+          <Heart
+            className={cn(
+              "h-3.5 w-3.5",
+              isProductOnWishlist(id) && "fill-red-600 text-red-600",
+            )}
+          />
           Wishlist
         </button>
 

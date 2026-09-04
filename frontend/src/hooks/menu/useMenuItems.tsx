@@ -148,3 +148,9 @@ export const useDeleteWishlistProduct = () =>
       );
     },
   });
+export const useGetWishlistedIDS = (ids: string[]) =>
+  useQuery({
+    queryKey: ["wishlisted_ids"],
+    queryFn: () => WishlistService.readWishlistedIDS({ ids: ids }),
+    staleTime: 0,
+  });
