@@ -65,7 +65,10 @@ async def filter_wishlist_product_ids(
     product_ids: FilterIDSWishlist,
     wishlist_service: Annotated[WishlistService, Depends(get_wishlist_service)],
 ):
-    await wishlist_service.get_wishlisted_product_ids(product_ids.ids, user.profile.id)
+    data = await wishlist_service.get_wishlisted_product_ids(
+        product_ids.ids, user.profile.id
+    )
+    return SuccessResponse(data=data)
 
 
 # To delete the product from the wishlist
