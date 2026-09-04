@@ -63,12 +63,11 @@ class WishlistRepo:
     async def get_wishlist(self, profile_id: UUID):
         pass
 
-    async def filter_wishlisted_ids(
-        self, ids: list[UUID], user_wishlisted_profile_id: UUID
-    ):
+    async def filter_wishlisted_ids(self, user_wishlisted_profile_id: UUID):
         query = (
             select(Product.id)
-            .join(WishList, WishList.products)
+            .join(wishlist_product, wishlist_product.c.product_id == Product.id)
+            .join(WishList, WishList.id == wishlist_product.c.wishlist_id)
             .where(WishList.profile_id == user_wishlisted_profile_id)
         )
         return (await self.db.execute(query)).scalars().all()

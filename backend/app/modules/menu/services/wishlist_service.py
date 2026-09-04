@@ -44,9 +44,7 @@ class WishlistService:
     async def get_wishlisted_product_ids(
         self, product_ids: list[UUID], user_profile_id: UUID
     ):
-        wishlisted_ids = await self.wishlist_repo.filter_wishlisted_ids(
-            product_ids, user_profile_id
-        )
+        wishlisted_ids = await self.wishlist_repo.filter_wishlisted_ids(user_profile_id)
         if len(wishlisted_ids) == 0:
             return
         filtered_ids = [id for id in product_ids if id in wishlisted_ids]

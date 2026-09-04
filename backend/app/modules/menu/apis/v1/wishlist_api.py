@@ -58,7 +58,7 @@ async def read_wishlist_of_user(
 
 # To filter the wishlist ids from the given pids
 @wishlist_api.post(
-    "/wishlist/product/status", response_model=SuccessResponse[FilteredWishlistIDS]
+    "/status/product", response_model=SuccessResponse[FilteredWishlistIDS]
 )
 async def filter_wishlist_product_ids(
     user: Annotated[User, Depends(RolePermission(["admin", "member"]))],
@@ -69,7 +69,7 @@ async def filter_wishlist_product_ids(
 
 
 # To delete the product from the wishlist
-@wishlist_api.delete("/wishlist/{product_id}", response_model=SuccessResponse[None])
+@wishlist_api.delete("/{product_id}", response_model=SuccessResponse[None])
 async def delete_product_from_wishlist(
     user: Annotated[Profile, Depends(get_user_and_check_product)],
     product_id: UUID,
