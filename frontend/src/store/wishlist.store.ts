@@ -7,13 +7,13 @@ interface WishlistState {
 interface WishlistInterface {
   wishlist_limit: number;
   wishlist_search_by: string;
-  wishlist_category: string;
+  wishlist_category: string | null;
   wishlist_most_rated: boolean;
   wishlist_fast_prepare: boolean;
   wishlist_sort_by: string;
   set_wishlist_limit: (val: number) => void;
   set_wishlist_search_by: (val: string) => void;
-  set_wishlist_category: (val: string) => void;
+  set_wishlist_category: (val: string | null) => void;
   set_wishlist_most_rated: (val: boolean) => void;
   set_wishlist_fast_prepare: (val: boolean) => void;
   set_wishlist_sort_by: (val: string) => void;
