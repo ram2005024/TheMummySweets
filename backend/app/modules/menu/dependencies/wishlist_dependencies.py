@@ -14,7 +14,7 @@ from app.modules.menu.models.product_model import Product
 
 
 async def get_user_and_check_product(
-    user: Annotated[User, Depends(RolePermission(["member"]))],
+    user: Annotated[User, Depends(RolePermission(["member", "admin"]))],
     product_id: UUID,
     product: Annotated[Product, Depends(check_product)],
     db: Annotated[AsyncSession, Depends(get_db)],
