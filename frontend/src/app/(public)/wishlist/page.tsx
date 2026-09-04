@@ -1,10 +1,14 @@
+"use client";
 import WishlistProductBody from "./components/wishlist-body";
+import WishListCategoryAndFilter from "./components/wishlist-category-section";
+
 import WishlistHeader from "./components/wishlist-header";
 
 const WishlistPage = () => {
   return (
-    <div className="max-w-[80%] min-h-screen  w-full mx-auto space-y-3 pt-10 flex flex-col gap-5">
+    <div className="min-h-screen  flex flex-col">
       <WishlistHeader />
+      <WishListCategoryAndFilter />
       <WishlistProductBody />
     </div>
   );

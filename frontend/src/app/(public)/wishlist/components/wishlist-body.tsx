@@ -40,7 +40,7 @@ const WishlistProductBody = () => {
     setWishlistIDS(wishlistIDS);
   }, [data?.pages, data, setWishlistIDS]);
   return (
-    <section className="bg-background mb-10">
+    <section className="sm:max-w-[80%] w-full mx-auto py-10">
       <div>
         {isPending && <ProductGridSkeleton />}
         {!isPending && products.length > 0 ? (
