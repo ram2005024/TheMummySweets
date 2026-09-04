@@ -5,6 +5,7 @@ from uuid import UUID
 from fastapi import Depends
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
 from app.core.db import get_db
 from app.dependencies.permission import RolePermission
@@ -20,6 +21,10 @@ async def get_user_and_check_product(
     db: Annotated[AsyncSession, Depends(get_db)],
 ):
     profile = (
-        await db.execute(select(Profile).where(Profile.user_id == user.id))
+        await db.execute(
+            select(Profile)
+            .options(selectinload(Profile.wishlist))
+            .where(Profile.user_id == user.id)
+        )
     ).scalar_one()
     return profile, product

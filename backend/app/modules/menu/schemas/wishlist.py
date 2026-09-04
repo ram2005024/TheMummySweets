@@ -13,3 +13,11 @@ class WishlistRequest(BaseModel):
 class WishlistResponse(BaseModel):
     wishlist_id: UUID
     products: PaginatedResponse[list[ProductReadBasicCustomer]]
+
+
+class FilterIDSWishlist(BaseModel):
+    ids: list[UUID]
+
+
+class FilteredWishlistIDS(BaseModel):
+    wishlisted_ids: list[UUID]

@@ -3,6 +3,7 @@ from uuid import UUID
 from sqlalchemy import delete, insert, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.modules.menu.models.product_model import Product
 from app.modules.menu.models.relationship_model import wishlist_product
 from app.modules.menu.models.wishlist_model import WishList
 from app.modules.menu.repos.product_repo import ProductRepo
@@ -42,7 +43,7 @@ class WishlistRepo:
                 )
             )
         ).scalar_one_or_none()
-        return exists is not None
+        return exists
 
     async def add_product(self, wishlist_id: UUID, product_id: UUID):
         await self.db.execute(
@@ -61,3 +62,22 @@ class WishlistRepo:
 
     async def get_wishlist(self, profile_id: UUID):
         pass
+
+    async def filter_wishlisted_ids(
+        self, ids: list[UUID], user_wishlisted_profile_id: UUID
+    ):
+        query = (
+            select(Product.id)
+            .join(WishList, WishList.products)
+            .where(WishList.profile_id == user_wishlisted_profile_id)
+        )
+        return (await self.db.execute(query)).scalars().all()
+
+    async def find_wishlist_by_id(self, wishlist_id: UUID):
+        return (
+            await self.db.execute(select(WishList).where(WishList.id == wishlist_id))
+        ).scalar_one_or_none()
+
+    async def remove_product_from_wishlist(self, wishlist: WishList, product: Product):
+        wishlist.products.remove(product)
+        await self.db.commit()

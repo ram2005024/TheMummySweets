@@ -1,4 +1,5 @@
 from typing import Annotated
+from uuid import UUID
 
 from fastapi import APIRouter, Depends
 
@@ -11,7 +12,12 @@ from app.modules.menu.dependencies.wishlist_dependencies import (
     get_user_and_check_product,
 )
 from app.modules.menu.models.product_model import Product
-from app.modules.menu.schemas.wishlist import WishlistRequest, WishlistResponse
+from app.modules.menu.schemas.wishlist import (
+    FilteredWishlistIDS,
+    FilterIDSWishlist,
+    WishlistRequest,
+    WishlistResponse,
+)
 from app.modules.menu.services.wishlist_service import WishlistService
 from app.schemas.common import SuccessResponse
 
@@ -48,3 +54,26 @@ async def read_wishlist_of_user(
         user.profile.id, pagination_data, filter_data
     )
     return SuccessResponse(data=result)
+
+
+# To filter the wishlist ids from the given pids
+@wishlist_api.post(
+    "/wishlist/product/status", response_model=SuccessResponse[FilteredWishlistIDS]
+)
+async def filter_wishlist_product_ids(
+    user: Annotated[User, Depends(RolePermission(["admin", "member"]))],
+    product_ids: FilterIDSWishlist,
+    wishlist_service: Annotated[WishlistService, Depends(get_wishlist_service)],
+):
+    await wishlist_service.get_wishlisted_product_ids(product_ids.ids, user.profile.id)
+
+
+# To delete the product from the wishlist
+@wishlist_api.delete("/wishlist/{product_id}", response_model=SuccessResponse[None])
+async def delete_product_from_wishlist(
+    user: Annotated[Profile, Depends(get_user_and_check_product)],
+    product_id: UUID,
+    wishlist_service: Annotated[WishlistService, Depends(get_wishlist_service)],
+):
+    await wishlist_service.delete_wishlist_product(user.wishlist.id, product_id)
+    return SuccessResponse(message="Deleted product from wishlist", data=None)
