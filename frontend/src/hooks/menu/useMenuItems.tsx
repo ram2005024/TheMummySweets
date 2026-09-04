@@ -136,7 +136,8 @@ export const useDeleteWishlistProduct = () =>
       await api.delete(`wishlist/${product_id}`);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["wishlist-product"] });
+      queryClient.invalidateQueries({ queryKey: ["wishlist-products"] });
+      queryClient.invalidateQueries({ queryKey: ["menu-products"] });
     },
     onError: (err) => {
       const error = err as AxiosError<{ message?: string }>;
