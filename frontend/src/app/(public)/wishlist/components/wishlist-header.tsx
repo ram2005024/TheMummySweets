@@ -12,7 +12,7 @@ const WishlistHeader = () => {
   // meta info (from first page)
   const meta = data?.pages[0]?.products.meta;
   return (
-    <div className="mb-8">
+    <div className="mb-8 overflow-visible">
       {/* Title */}
       <h1 className="text-3xl font-serif font-extrabold  tracking-tight">
         Your Wishlist
