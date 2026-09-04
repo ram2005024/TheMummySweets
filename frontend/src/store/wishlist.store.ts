@@ -1,5 +1,4 @@
 import { WishlistService } from "@/services/wishlist.service";
-import { MenuProduct, SingleProductType } from "@/type/menu.type";
 import { create } from "zustand";
 interface WishlistState {
   product_id: string;
@@ -22,13 +21,9 @@ interface WishlistInterface {
   increaseWishlistCount: () => void;
   decreaseWishlistCount: () => void;
   setWishlistCount: (val: number) => void;
-  wishlistItems: MenuProduct[];
-  update_wishlist: (
-    item_id: string,
-    product: SingleProductType | MenuProduct,
-  ) => void;
-  open: boolean;
-  onOpenChange: (val: boolean) => void;
+  wishlistIDS: Set<string>;
+  isProductOnWishlist: (val: string) => boolean;
+  update_wishlist: (item_id: string) => void;
   debounceTime: number;
   debounceState: Map<WishlistState, ReturnType<typeof setTimeout>>;
   debounceFunction: (pid: string, wishlist_state: boolean) => void;
@@ -40,6 +35,12 @@ interface WishlistInterface {
 }
 
 export const useWishlistStore = create<WishlistInterface>((set, get) => ({
+  wishlistIDS: new Set(),
+  isProductOnWishlist: (pid) => {
+    const exists = get().wishlistIDS.has(pid);
+    if (exists) return true;
+    return false;
+  },
   wishlist_limit: 10,
   wishlist_search_by: "",
   wishlist_category: "",
@@ -71,9 +72,13 @@ export const useWishlistStore = create<WishlistInterface>((set, get) => ({
         if (currentCount < (get().versionState.get(pid) || 0)) return;
       } catch (error) {
         console.log(`Something went wrong on the server:${error}`);
-        set((s) => ({
-          wishlistItems: s.wishlistItems.filter((val) => val.id === pid),
-        }));
+        set((s) => {
+          const next = new Set(s.wishlistIDS);
+          next.delete(pid);
+          return {
+            wishlistIDS: next,
+          };
+        });
       }
     }, get().debounceTime);
     return timer;
@@ -95,18 +100,27 @@ export const useWishlistStore = create<WishlistInterface>((set, get) => ({
     const setTimeoutID = get().timeoutFunction(product_id, wishlist_state);
     get().debounceState.set({ product_id, wishlist_state }, setTimeoutID);
   },
-  open: false,
-  onOpenChange: (val) => set({ open: val }),
-  update_wishlist: (item_id, product) => {
-    const exists = get().wishlistItems.find((val) => val.id === item_id);
+  update_wishlist: (item_id) => {
+    const exists = get().wishlistIDS.has(item_id);
     if (!exists) {
-      set({ wishlistItems: [...get().wishlistItems, product] });
-      get().decreaseWishlistCount();
+      set((s) => {
+        const next = new Set(s.wishlistIDS);
+        next.add(item_id);
+        return {
+          wishlistIDS: next,
+        };
+      });
+
+      get().increaseWishlistCount();
     }
     if (exists) {
-      set((s) => ({
-        wishlistItems: s.wishlistItems.filter((val) => val.id !== item_id),
-      }));
+      set((s) => {
+        const next = new Set(s.wishlistIDS);
+        next.delete(item_id);
+        return {
+          wishlistIDS: next,
+        };
+      });
       get().decreaseWishlistCount();
     }
     get().debounceFunction(item_id, exists ? false : true);

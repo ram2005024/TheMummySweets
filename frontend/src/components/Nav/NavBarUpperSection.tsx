@@ -6,12 +6,12 @@ import { useState } from "react";
 import {
   LuBell,
   LuChevronDown,
-  LuHeart,
   LuLocateFixed,
   LuMapPin,
   LuSearch,
 } from "react-icons/lu";
 import CartButton from "../cart/CartButton";
+import WishlistbButton from "./WishlistbButton";
 
 interface ReverseGeocodeResponse {
   address?: {
@@ -196,17 +196,7 @@ const NavBarUpperSection = () => {
 
           <div className="h-7 w-px bg-[#e8e0d8]" />
 
-          <button
-            type="button"
-            aria-label="Wishlist"
-            className="relative flex h-9 w-9 cursor-pointer items-center justify-center text-[#554941] transition-all hover:text-[#e95d48]"
-          >
-            <LuHeart size={20} strokeWidth={1.7} />
-
-            <span className="absolute right-[1px] top-0 flex h-[13px] min-w-[13px] items-center justify-center rounded-full bg-[#e95d48] px-1 text-[7px] font-bold text-white">
-              2
-            </span>
-          </button>
+          <WishlistbButton />
 
           <button
             type="button"

@@ -36,12 +36,12 @@ const ProductSection = () => {
     <section className="bg-background">
       <div className="sm:max-w-[80%] w-full mx-auto py-10">
         {isPending && <ProductGridSkeleton />}
-        {!isPending && products.length > 0 ? (
+        {products.length > 0 ? (
           <>
             <ListProducts />
             {/* sentinel div for auto-load */}
             {hasNextPage && <div ref={loadMoreRef} className="h-10" />}
-            {isFetchingNextPage && (
+            {isFetchingNextPage && !isPending && (
               <p className="text-center text-sm text-muted-foreground mt-4">
                 Loading more...
               </p>

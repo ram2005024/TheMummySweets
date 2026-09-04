@@ -5,7 +5,7 @@ import { useGetWishlistProducts } from "@/hooks/menu/useMenuItems";
 import { MenuProduct } from "@/type/menu.type";
 import { useEffect, useRef } from "react";
 import NoWishlistItems from "./no-wishlist";
-import WishlistSubtitle from "./wishlist-subtitle";
+import WishlistProductList from "./wishlist-product";
 
 const WishlistProductBody = () => {
   const { data, isPending, fetchNextPage, hasNextPage, isFetchingNextPage } =
@@ -38,8 +38,7 @@ const WishlistProductBody = () => {
         {isPending && <ProductGridSkeleton />}
         {!isPending && products.length > 0 ? (
           <>
-            <WishlistSubtitle count={data?.pages[0].products.meta.total || 0} />
-            <WishlistProductBody />
+            <WishlistProductList />
             {/* sentinel div for auto-load */}
             {hasNextPage && <div ref={loadMoreRef} className="h-10" />}
             {isFetchingNextPage && (
