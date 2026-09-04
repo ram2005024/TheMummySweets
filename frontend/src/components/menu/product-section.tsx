@@ -14,8 +14,14 @@ import ProductGridSkeleton from "./product-section/product-grid-skeleton";
 const ProductSection = () => {
   const [isStatusLoading, setStatusLoading] = useState<boolean>(true);
   const { setWishlistIDS } = useWishlistStore();
-  const { data, isPending, fetchNextPage, hasNextPage, isFetchingNextPage } =
-    useGetMenuProducts();
+  const {
+    data,
+    isPending,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isLoading,
+  } = useGetMenuProducts();
 
   const products: MenuProduct[] =
     data?.pages.flatMap((page) => page.data) ?? [];
@@ -43,8 +49,10 @@ const ProductSection = () => {
     (async () => {
       try {
         setStatusLoading(true);
-        if (!data) return;
-        const latestPage = data.pages[-1];
+        if (!data) {
+          return;
+        }
+        const latestPage = data?.pages.at(-1);
         if (!latestPage) return;
         const loaded_ids = latestPage.data.map((val) => val.id);
         if (loaded_ids.length <= 0) return;
@@ -63,7 +71,7 @@ const ProductSection = () => {
         setStatusLoading(false);
       }
     })();
-  }, [data?.pages, data, setWishlistIDS]);
+  }, [data?.pages, data, setWishlistIDS, isLoading]);
   const isInitialPending = isPending && isStatusLoading && !data;
   return (
     <section className="bg-background">

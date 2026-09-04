@@ -1,8 +1,11 @@
 "use client";
 
-import { useGetWishlistProducts } from "@/hooks/menu/useMenuItems";
+import {
+  useDeleteWishlistProduct,
+  useGetWishlistProducts,
+} from "@/hooks/menu/useMenuItems";
+import { cn } from "@/lib/utils";
 import { useCartStore } from "@/store/cart_store";
-import { useWishlistStore } from "@/store/wishlist.store";
 import { MenuProduct } from "@/type/menu.type";
 import { slugify } from "@/utils/slugify";
 import { Clock3, Heart, Plus, Star } from "lucide-react";
@@ -10,7 +13,7 @@ import { useRouter } from "next/navigation";
 
 const WishlistProductList = () => {
   const { data } = useGetWishlistProducts();
-  const { update_wishlist } = useWishlistStore();
+  const deleteWishlist = useDeleteWishlistProduct();
   const { setCartItem, calculate } = useCartStore();
   const products: MenuProduct[] =
     data?.pages.flatMap((page) => page.products.data) ?? [];
@@ -58,12 +61,16 @@ const WishlistProductList = () => {
 
               <button
                 type="button"
-                onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
+                onClick={async (e: React.MouseEvent<HTMLButtonElement>) => {
                   e.stopPropagation();
-                  update_wishlist(item.id);
+                  deleteWishlist.mutate(item.id);
                 }}
                 aria-label={`Add ${item.product_name} to wishlist`}
-                className="absolute bottom-3 right-3 flex h-9 w-9 cursor-pointer items-center justify-center rounded-full border border-white/60 bg-white/90 text-[#5f5047] shadow-sm backdrop-blur-md transition-all duration-200 hover:bg-white hover:text-[#d9534f] hover:shadow-md"
+                className={cn(
+                  !deleteWishlist.isPending &&
+                    "absolute bottom-3 right-3 flex h-9 w-9 cursor-pointer items-center justify-center rounded-full border border-white/60 bg-white/90 text-[#5f5047] shadow-sm backdrop-blur-md transition-all duration-200 hover:bg-white hover:text-[#d9534f] hover:shadow-md",
+                  deleteWishlist.isPending && "",
+                )}
               >
                 <Heart size={17} strokeWidth={1.8} />
               </button>

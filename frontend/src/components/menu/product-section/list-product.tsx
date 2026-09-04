@@ -68,9 +68,8 @@ const ListProducts = ({ isStatusLoading }: { isStatusLoading: boolean }) => {
               >
                 <Heart
                   size={17}
-                  strokeWidth={1.8}
                   className={cn(
-                    isInWishlist && "fill-red-600",
+                    isInWishlist && "fill-red-600 text-red-600",
                     !isInWishlist && isStatusLoading && "animate-pulse ",
                   )}
                 />

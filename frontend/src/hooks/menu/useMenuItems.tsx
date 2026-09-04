@@ -1,10 +1,14 @@
+import api from "@/libs/api";
+import queryClient from "@/libs/queryClient";
 import { CartService } from "@/services/cart.service";
 import { MenuService } from "@/services/menu.service";
 import { WishlistService } from "@/services/wishlist.service";
 import { menuStore } from "@/store/menu.product";
 import { useWishlistStore } from "@/store/wishlist.store";
 import { ReviewResponse } from "@/type/menu.type";
-import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
+import { useInfiniteQuery, useMutation, useQuery } from "@tanstack/react-query";
+import { AxiosError } from "axios";
+import { toast } from "sonner";
 
 // To get the menu items
 export const useGetMenuProducts = () => {
@@ -125,3 +129,21 @@ export const useGetWishlistProducts = () => {
     refetchOnMount: "always",
   });
 };
+
+export const useDeleteWishlistProduct = () =>
+  useMutation({
+    mutationFn: async (product_id: string) => {
+      await api.delete(`wishlist/${product_id}`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["wishlist-product"] });
+    },
+    onError: (err) => {
+      const error = err as AxiosError<{ message?: string }>;
+      toast.error(
+        error.response?.data?.message ||
+          error.message ||
+          "Something went wrong",
+      );
+    },
+  });

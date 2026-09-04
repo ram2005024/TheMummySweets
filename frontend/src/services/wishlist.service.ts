@@ -29,9 +29,9 @@ export class WishlistService {
   }: {
     ids: string[];
   }): Promise<WishlistStatusIDS> => {
-    const res = await api.post("/wishlist/product/status", {
+    const res = await api.post("/wishlist/status/product", {
       ids,
     });
-    return res.data.data.wishlisted_ids;
+    return res.data.data;
   };
 }
