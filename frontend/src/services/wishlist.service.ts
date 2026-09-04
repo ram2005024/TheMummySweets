@@ -1,6 +1,6 @@
 import api from "@/libs/api";
 import { SuccessResponse } from "@/type/common.type";
-import { MenuParams, Wishlist } from "@/type/menu.type";
+import { MenuParams, Wishlist, WishlistStatusIDS } from "@/type/menu.type";
 
 export class WishlistService {
   static updateWishlist = async ({
@@ -21,5 +21,17 @@ export class WishlistService {
       params,
     });
     return res.data.data;
+  };
+
+  //   Get the wishlist status
+  static readWishlistedIDS = async ({
+    ids,
+  }: {
+    ids: string[];
+  }): Promise<WishlistStatusIDS> => {
+    const res = await api.post("/wishlist/product/status", {
+      ids,
+    });
+    return res.data.data.wishlisted_ids;
   };
 }

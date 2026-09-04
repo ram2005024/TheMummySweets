@@ -2,6 +2,7 @@
 
 import ProductGridSkeleton from "@/components/menu/product-section/product-grid-skeleton";
 import { useGetWishlistProducts } from "@/hooks/menu/useMenuItems";
+import { useWishlistStore } from "@/store/wishlist.store";
 import { MenuProduct } from "@/type/menu.type";
 import { useEffect, useRef } from "react";
 import NoWishlistItems from "./no-wishlist";
@@ -10,7 +11,7 @@ import WishlistProductList from "./wishlist-product";
 const WishlistProductBody = () => {
   const { data, isPending, fetchNextPage, hasNextPage, isFetchingNextPage } =
     useGetWishlistProducts();
-
+  const { setWishlistIDS } = useWishlistStore();
   const products: MenuProduct[] =
     data?.pages.flatMap((page) => page.products.data) ?? [];
 
@@ -31,7 +32,13 @@ const WishlistProductBody = () => {
     observer.observe(loadMoreRef.current);
     return () => observer.disconnect();
   }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
-
+  useEffect(() => {
+    if (!data?.pages) return;
+    const wishlistIDS = data.pages.flatMap((val) =>
+      val.products.data.map((val) => val.id),
+    );
+    setWishlistIDS(wishlistIDS);
+  }, [data?.pages, data, setWishlistIDS]);
   return (
     <section className="bg-background mb-10">
       <div>

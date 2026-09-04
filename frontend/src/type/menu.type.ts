@@ -133,3 +133,7 @@ export interface Wishlist {
   wishlist_id: string;
   products: PaginatedResponse<MenuProduct[]>;
 }
+
+export interface WishlistStatusIDS {
+  wishlisted_ids: string[];
+}

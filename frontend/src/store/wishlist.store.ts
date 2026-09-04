@@ -22,6 +22,7 @@ interface WishlistInterface {
   decreaseWishlistCount: () => void;
   setWishlistCount: (val: number) => void;
   wishlistIDS: Set<string>;
+  setWishlistIDS: (id: string[]) => void;
   isProductOnWishlist: (val: string) => boolean;
   update_wishlist: (item_id: string) => void;
   debounceTime: number;
@@ -40,6 +41,15 @@ export const useWishlistStore = create<WishlistInterface>((set, get) => ({
     const exists = get().wishlistIDS.has(pid);
     if (exists) return true;
     return false;
+  },
+  setWishlistIDS: (val) => {
+    set((state) => {
+      const next = new Set(state.wishlistIDS);
+      val.forEach((val) => next.add(val));
+      return {
+        wishlistIDS: next,
+      };
+    });
   },
   wishlist_limit: 10,
   wishlist_search_by: "",

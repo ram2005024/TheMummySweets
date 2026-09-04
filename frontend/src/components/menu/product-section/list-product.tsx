@@ -9,7 +9,7 @@ import { Clock3, Heart, Plus, Star } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { slugify } from "./../../../utils/slugify";
 
-const ListProducts = () => {
+const ListProducts = ({ isStatusLoading }: { isStatusLoading: boolean }) => {
   const { data } = useGetMenuProducts();
   const { update_wishlist, isProductOnWishlist } = useWishlistStore();
   const { setCartItem, calculate } = useCartStore();
@@ -61,7 +61,7 @@ const ListProducts = () => {
                 type="button"
                 onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
                   e.stopPropagation();
-                  update_wishlist(item.id, item);
+                  update_wishlist(item.id);
                 }}
                 aria-label={`Add ${item.product_name} to wishlist`}
                 className="absolute bottom-3 right-3 flex h-9 w-9 cursor-pointer items-center justify-center rounded-full border border-white/60 bg-white/90 text-[#5f5047] shadow-sm backdrop-blur-md transition-all duration-200 hover:bg-white hover:text-[#d9534f] hover:shadow-md"
@@ -69,7 +69,10 @@ const ListProducts = () => {
                 <Heart
                   size={17}
                   strokeWidth={1.8}
-                  className={cn(isInWishlist && "fill-red-600")}
+                  className={cn(
+                    isInWishlist && "fill-red-600",
+                    !isInWishlist && isStatusLoading && "animate-pulse ",
+                  )}
                 />
               </button>
             </div>
