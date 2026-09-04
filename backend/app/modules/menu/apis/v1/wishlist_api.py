@@ -74,9 +74,12 @@ async def filter_wishlist_product_ids(
 # To delete the product from the wishlist
 @wishlist_api.delete("/{product_id}", response_model=SuccessResponse[None])
 async def delete_product_from_wishlist(
-    user: Annotated[Profile, Depends(get_user_and_check_product)],
+    valid_profile_and_product: Annotated[
+        tuple[Profile, Product], Depends(get_user_and_check_product)
+    ],
     product_id: UUID,
     wishlist_service: Annotated[WishlistService, Depends(get_wishlist_service)],
 ):
-    await wishlist_service.delete_wishlist_product(user.wishlist.id, product_id)
+    profile, _ = valid_profile_and_product
+    await wishlist_service.delete_wishlist_product(profile.wishlist.id, product_id)
     return SuccessResponse(message="Deleted product from wishlist", data=None)

@@ -60,9 +60,6 @@ class WishlistRepo:
             )
         )
 
-    async def get_wishlist(self, profile_id: UUID):
-        pass
-
     async def filter_wishlisted_ids(self, user_wishlisted_profile_id: UUID):
         query = (
             select(Product.id)
@@ -77,6 +74,10 @@ class WishlistRepo:
             await self.db.execute(select(WishList).where(WishList.id == wishlist_id))
         ).scalar_one_or_none()
 
-    async def remove_product_from_wishlist(self, wishlist: WishList, product: Product):
-        wishlist.products.remove(product)
+    async def remove_product_from_wishlist(self, wishlist: WishList, product_id: UUID):
+        await self.db.execute(
+            delete(wishlist_product)
+            .where(wishlist_product.c.wishlist_id == wishlist.id)
+            .where(wishlist_product.c.product_id == product_id)
+        )
         await self.db.commit()
