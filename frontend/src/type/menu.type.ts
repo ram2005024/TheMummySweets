@@ -128,3 +128,8 @@ export interface CartResponseType {
   tax_amount: number;
   delivery_fee: number;
 }
+
+export interface Wishlist {
+  wishlist_id: string;
+  products: PaginatedResponse<MenuProduct[]>;
+}

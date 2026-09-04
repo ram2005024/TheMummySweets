@@ -1,6 +1,8 @@
 import { CartService } from "@/services/cart.service";
 import { MenuService } from "@/services/menu.service";
+import { WishlistService } from "@/services/wishlist.service";
 import { menuStore } from "@/store/menu.product";
+import { useWishlistStore } from "@/store/wishlist.store";
 import { ReviewResponse } from "@/type/menu.type";
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 
@@ -80,5 +82,46 @@ export const useGetCart = () => {
     queryFn: CartService.getCart,
     placeholderData: (prev) => prev,
     staleTime: 5 * 60 * 1000,
+  });
+};
+
+// To get the wishlist products
+export const useGetWishlistProducts = () => {
+  const {
+    wishlist_limit,
+    wishlist_search_by,
+    wishlist_category,
+    wishlist_most_rated,
+    wishlist_fast_prepare,
+    wishlist_sort_by,
+  } = useWishlistStore();
+  return useInfiniteQuery({
+    queryKey: [
+      "wishlist-products",
+      wishlist_limit,
+      wishlist_search_by,
+      wishlist_category,
+      wishlist_most_rated,
+      wishlist_fast_prepare,
+      wishlist_sort_by,
+    ],
+    queryFn: ({ pageParam }) =>
+      WishlistService.readWishlist({
+        page: pageParam,
+        limit: wishlist_limit,
+        search_by: wishlist_search_by,
+        category: wishlist_category,
+        most_rated: wishlist_most_rated,
+        fast_prepare: wishlist_fast_prepare,
+        sort_by: wishlist_sort_by,
+      }),
+    getNextPageParam: (lastResult) => {
+      const { meta } = lastResult.products;
+      return meta?.has_next ? meta.page_no + 1 : undefined;
+    },
+    placeholderData: (prev) => prev,
+    initialPageParam: 1,
+    staleTime: 5 * 60 * 1000,
+    refetchOnMount: "always",
   });
 };
