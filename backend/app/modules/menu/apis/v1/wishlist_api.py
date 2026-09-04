@@ -36,9 +36,7 @@ async def create_wishlist_endpoint(
 
 
 # To read wishlist of the user
-@wishlist_api.get(
-    "/product/{profile_id}", response_model=SuccessResponse[WishlistResponse]
-)
+@wishlist_api.get("/", response_model=SuccessResponse[WishlistResponse])
 async def read_wishlist_of_user(
     user: Annotated[User, Depends(RolePermission(["member"]))],
     wishlist_service: Annotated[WishlistService, Depends(get_wishlist_service)],
