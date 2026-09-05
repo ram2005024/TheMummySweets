@@ -1035,12 +1035,13 @@ async def seed_orders_with_payments(
     order_status_population = [
         OrderStatus.PLACED,
         OrderStatus.PREPARING,
+        OrderStatus.PENDING_PAYMENT,
         OrderStatus.SHIPPED,
         OrderStatus.ARRIVING,
         OrderStatus.DELIVERED,
         OrderStatus.CANCELED,
     ]
-    order_status_weights = [10, 15, 15, 10, 45, 5]
+    order_status_weights = [10, 15, 15, 10, 45, 5, 5]
 
     for profile in profiles:
         num_orders = random.randint(*ORDER_COUNT_RANGE)
@@ -1074,8 +1075,14 @@ async def seed_orders_with_payments(
                     {"transaction_id": fake.uuid4()} if random.random() < 0.8 else None
                 ),
                 payment_status=random.choices(
-                    population=[PaymentStatus.PAID, PaymentStatus.UNPAID],
-                    weights=[80, 20],
+                    population=[
+                        PaymentStatus.PAID,
+                        PaymentStatus.PENDING,
+                        PaymentStatus.CANCELED,
+                        PaymentStatus.FAILED,
+                        PaymentStatus.REFUNDED,
+                    ],
+                    weights=[60, 20, 10, 5, 5],
                     k=1,
                 )[0],
                 payment_method=random.choices(

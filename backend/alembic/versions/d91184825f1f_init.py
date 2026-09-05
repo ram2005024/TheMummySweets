@@ -1,8 +1,8 @@
 """init
 
-Revision ID: 51502852aee7
+Revision ID: d91184825f1f
 Revises: 
-Create Date: 2026-09-01 20:25:16.443485
+Create Date: 2026-09-05 07:24:54.208388
 
 """
 from typing import Sequence, Union
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
-revision: str = '51502852aee7'
+revision: str = 'd91184825f1f'
 down_revision: Union[str, Sequence[str], None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -42,17 +42,6 @@ def upgrade() -> None:
     sa.Column('updated_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
     sa.PrimaryKeyConstraint('id')
     )
-    op.create_table('images',
-    sa.Column('hash_value', sa.String(), nullable=False),
-    sa.Column('url', sa.String(), nullable=False),
-    sa.Column('width', sa.Integer(), nullable=True),
-    sa.Column('height', sa.Integer(), nullable=True),
-    sa.Column('id', sa.UUID(), nullable=False),
-    sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
-    sa.Column('updated_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
-    sa.PrimaryKeyConstraint('id')
-    )
-    op.create_index(op.f('ix_images_hash_value'), 'images', ['hash_value'], unique=True)
     op.create_table('products',
     sa.Column('product_name', sa.String(), nullable=False),
     sa.Column('product_description', sa.String(), nullable=True),
@@ -174,7 +163,7 @@ def upgrade() -> None:
     op.create_table('payments',
     sa.Column('amount', sa.Float(), nullable=False),
     sa.Column('payment_reference', sa.JSON(), nullable=True),
-    sa.Column('payment_status', sa.Enum('PAID', 'UNPAID', name='payment_status'), nullable=False),
+    sa.Column('payment_status', sa.Enum('FAILED', 'PENDING', 'CANCELED', 'PAID', 'REFUNDED', name='payment_status'), nullable=False),
     sa.Column('payment_method', sa.Enum('STRIPE', 'ESEWA', 'COD', name='payment_method'), nullable=False),
     sa.Column('profile_id', sa.UUID(), nullable=False),
     sa.Column('coupen_id', sa.UUID(), nullable=True),
@@ -194,7 +183,7 @@ def upgrade() -> None:
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('orders',
-    sa.Column('order_status', sa.Enum('PLACED', 'PREPARING', 'SHIPPED', 'ARRIVING', 'DELIVERED', 'CANCELED', name='order_status'), nullable=False),
+    sa.Column('order_status', sa.Enum('PLACED', 'PENDING_PAYMENT', 'PREPARING', 'SHIPPED', 'ARRIVING', 'DELIVERED', 'CANCELED', name='order_status'), nullable=False),
     sa.Column('profile_id', sa.UUID(), nullable=False),
     sa.Column('payment_id', sa.UUID(), nullable=False),
     sa.Column('id', sa.UUID(), nullable=False),
@@ -243,8 +232,6 @@ def downgrade() -> None:
     op.drop_table('users')
     op.drop_table('sessions')
     op.drop_table('products')
-    op.drop_index(op.f('ix_images_hash_value'), table_name='images')
-    op.drop_table('images')
     op.drop_table('coupens')
     op.drop_table('categories')
     # ### end Alembic commands ###
