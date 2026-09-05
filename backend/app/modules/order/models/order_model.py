@@ -16,6 +16,7 @@ if TYPE_CHECKING:
 
 class OrderStatus(Enum):
     PLACED = "placed"
+    PENDING_PAYMENT = "pending_payment"
     PREPARING = "preparing"
     SHIPPED = "shipped"
     ARRIVING = "arriving"

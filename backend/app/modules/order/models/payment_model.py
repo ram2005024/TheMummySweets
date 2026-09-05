@@ -15,8 +15,11 @@ if TYPE_CHECKING:
 
 
 class PaymentStatus(Enum):
+    FAILED = "failed"
+    PENDING = "pending"
+    CANCELED = "canceled"
     PAID = "paid"
-    UNPAID = "unpaid"
+    REFUNDED = "refunded"
 
 
 class PaymentMethod(Enum):
