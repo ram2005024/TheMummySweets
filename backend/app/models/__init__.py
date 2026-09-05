@@ -9,3 +9,4 @@ from app.modules.menu.models.wishlist_model import WishList  # Noqa
 from app.modules.order.models.order_item_model import OrderItem  # Noqa
 from app.modules.order.models.payment_model import PaymentModel  # Noqa
 from app.modules.order.models.coupen_model import CoupenModel  # Noqa
+from app.modules.order.models.delivery_details import DeliveryDetails  # Noqa

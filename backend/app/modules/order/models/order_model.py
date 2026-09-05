@@ -10,6 +10,7 @@ from app.modules.auth.models.base import BaseModel
 
 if TYPE_CHECKING:
     from app.modules.auth.models.user import Profile
+    from app.modules.order.models.delivery_details import DeliveryDetails
     from app.modules.order.models.order_item_model import OrderItem
     from app.modules.order.models.payment_model import PaymentModel
 
@@ -51,8 +52,6 @@ class OrderModel(BaseModel):
         back_populates="order",
         cascade="all,delete-orphan",
     )
-
-
-"""
-for order-items----->order_items
-"""
+    delivery: Mapped["DeliveryDetails"] = relationship(
+        backref="order", uselist=False, cascade="all,delete-orphan"
+    )
