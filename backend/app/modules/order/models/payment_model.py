@@ -34,7 +34,7 @@ class PaymentModel(BaseModel):
     payment_reference: Mapped[dict | None] = mapped_column(JSON, nullable=True)
     payment_status: Mapped[PaymentStatus] = mapped_column(
         SQLAlchemyENUM(PaymentStatus, name="payment_status"),
-        default=PaymentStatus.UNPAID,
+        default=PaymentStatus.PENDING,
     )
     payment_method: Mapped[PaymentMethod] = mapped_column(
         SQLAlchemyENUM(PaymentMethod, name="payment_method"), default=PaymentMethod.COD
