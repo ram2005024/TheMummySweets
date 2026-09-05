@@ -5,6 +5,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { ArrowRight, Minus, Plus, ShoppingBag, Trash2, X } from "lucide-react";
 
 import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 import { SummaryRow } from "./SummaryRow";
 
 const DELIVERY_THRESHOLD = 620;
@@ -21,7 +22,9 @@ const CartDialog = () => {
     vat_amount,
     delivery,
     open,
+    calculate,
     onOpenChange,
+    set_delivery,
   } = useCartStore();
 
   const remaining = Math.round(Math.max(0, DELIVERY_THRESHOLD - total)).toFixed(
@@ -29,7 +32,14 @@ const CartDialog = () => {
   );
   const deliveryProgress = Math.min((total / DELIVERY_THRESHOLD) * 100, 100);
   const isFreeDelivery = total >= DELIVERY_THRESHOLD;
-
+  useEffect(() => {
+    if (isFreeDelivery) {
+      set_delivery(0);
+    } else {
+      set_delivery(60);
+    }
+    calculate();
+  }, [total, set_delivery]);
   return (
     <AnimatePresence>
       {open && (
@@ -225,7 +235,7 @@ const CartDialog = () => {
                     <SummaryRow label="Subtotal" value={`Rs. ${sub_total}`} />
                     <SummaryRow
                       label="Delivery"
-                      value={delivery === 0 ? "FREE" : `Rs. ${delivery}`}
+                      value={delivery == 0 ? "FREE" : `Rs. ${delivery}`}
                     />
                     <SummaryRow label={`VAT 13%`} value={`Rs. ${vat_amount}`} />
                     <div className="border-t border-gray-200 pt-3">

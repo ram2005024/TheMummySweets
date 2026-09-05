@@ -17,7 +17,8 @@ interface CartInterface {
   open: boolean;
   onOpenChange: (val: boolean) => void;
   sub_total: number;
-  delivery: number; //Hardcode for now
+  delivery: number;
+  set_delivery: (val: number) => void; //Hardcode for now
   vat_amount: number; //Hardcode for now
   total: number;
   calculate: () => void;
@@ -40,6 +41,7 @@ export const useCartStore = create<CartInterface>((set, get) => ({
     });
   },
   versionState: new Map(),
+  set_delivery: (val) => set({ delivery: val }),
   debounceTime: 400,
   timeoutFunction: (pid) => {
     // Set the debounce version version
@@ -170,6 +172,7 @@ export const useCartStore = create<CartInterface>((set, get) => ({
       const vat_amount = sub_total * 0.13;
       const total = sub_total + vat_amount + s.delivery;
       return {
+        ...s,
         total: Math.round(total),
         sub_total: Math.round(sub_total),
         vat_amount: Math.round(vat_amount),
