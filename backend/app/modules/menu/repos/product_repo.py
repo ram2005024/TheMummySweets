@@ -197,3 +197,10 @@ class ProductRepo:
             await self.db.execute(select(Product).where(Product.id == product_id))
         ).scalar_one_or_none()
         return product
+
+    async def read_product_with_ids(self, product_ids: list[UUID]):
+        products = (
+            await self.db.execute(select(Product).where(Product.id.in_(product_ids)))
+        ).scalars()
+
+        return products

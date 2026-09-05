@@ -31,6 +31,9 @@ class ProductReadBasic(BaseModel):
     main_image: str
     product_name: str
     is_best_seller: bool
+    price: float
+    stock: int
+    is_available: bool
 
 
 class OrderItemBasic(BaseModel):
