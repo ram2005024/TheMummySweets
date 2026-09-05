@@ -24,3 +24,13 @@ class DeliverySchema(BaseModel):
             if now > values.scheduled_time:
                 raise ValueError("Scheduled date is in past")
         return values
+
+
+class DeliveryReadBasic(BaseModel):
+    receiptent_name: str
+    delivery_address: str
+    delivery_timing: DeliveryTimingStatus
+    delivery_note: str | None = None
+    scheduled_time: datetime | None = None
+    receiptent_phone: str
+    delivery_landmark: str
