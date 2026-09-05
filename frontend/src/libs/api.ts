@@ -36,7 +36,7 @@ api.interceptors.response.use(
 
     if (!is_refreshing) {
       is_refreshing = true;
-      refresh = axios
+      refresh = api
         .post(
           `${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/refresh`,
           {},
