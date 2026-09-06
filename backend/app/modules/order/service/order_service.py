@@ -10,6 +10,7 @@ from app.modules.order.repo.order_repo import OrderRepo
 from app.modules.order.schemas.order_schema import (
     CartItems,
     OrderRequest,
+    ProductCalculation,
     ProductReadBasic,
 )
 
@@ -41,17 +42,16 @@ class OrderService:
         ):
             raise ProductUnavailable
         product_info = [
-            ProductReadBasic.model_validate(product).model_dump()
-            for product in products
+            ProductReadBasic.model_validate(product) for product in products
         ]
         return product_info
 
     async def calculate_product(
-        self, products: list[dict], user: User, coupen_code: str | None
+        self, products: list[ProductReadBasic], user: User, coupen_code: str | None
     ):
         sub_total = 0
         for product in products:
-            sub_total += product["price"]
+            sub_total += product.price
         # Later delivery fee according to the location will be implemented here
         has_free_delivery = sub_total > self.DELIVERY_THRESOLD
         total = (
@@ -61,13 +61,13 @@ class OrderService:
         )
         if coupen_code:
             total = await self.apply_coupen(user, coupen_code, total)
-        return {
-            "total": round(total),
-            "sub_total": round(sub_total),
-            "delivery_fee": "FREE" if has_free_delivery else self.DELIVERY_FEE,
-            "vat_amount": round(sub_total * self.VAT_PERCENT_TO_APPLY),
-            "coupen_applied": coupen_code if coupen_code else None,
-        }
+        return ProductCalculation(
+            coupen_applied=coupen_code if coupen_code else None,
+            delivery_fee="FREE" if has_free_delivery else self.DELIVERY_FEE,
+            total=round(total),
+            sub_total=round(sub_total),
+            vat_amount=round(sub_total * self.VAT_PERCENT_TO_APPLY),
+        )
 
     async def apply_coupen(self, user: User, coupen_code: str, total: float):
         coupen = await self.coupen_repo.has_coupen(coupen_code)
@@ -83,3 +83,8 @@ class OrderService:
         )
         total = total - discount_amount
         return total
+
+    async def create_order_for_stripe(
+        self, products: list[ProductReadBasic], calculation_details: ProductCalculation
+    ):
+        pass

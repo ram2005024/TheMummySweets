@@ -42,6 +42,14 @@ class OrderItemBasic(BaseModel):
     product: ProductReadBasic
 
 
+class ProductCalculation(BaseModel):
+    total: int
+    sub_total: int
+    delivery_fee: str | int
+    vat_amount: int
+    coupen_applied: str | None = None
+
+
 class OrderResponse(BaseModel):
     id: UUID
     payment_method: PaymentMethod
