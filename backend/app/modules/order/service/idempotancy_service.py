@@ -1,4 +1,4 @@
-from redis.asyncio import Redis
+import redis.asyncio as redis
 
 from app.modules.order.schemas.order_schema import OrderResponse
 
@@ -8,7 +8,7 @@ class IdempotancyService:
     RES_TTL = 1  # In hours
     KEY_PREFIX = "idempotent:order:"
 
-    def __init__(self, redis: Redis) -> None:
+    def __init__(self, redis: redis.Redis) -> None:
         self.redis = redis
 
     def _key(self, idemp_key: str):
