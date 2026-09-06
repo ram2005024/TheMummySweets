@@ -50,6 +50,12 @@ class ProductCalculation(BaseModel):
     coupen_applied: str | None = None
 
 
+class OrderCreate(BaseModel):
+    order_status: OrderStatus
+    profile_id: UUID
+    payment_id: UUID
+
+
 class OrderResponse(BaseModel):
     id: UUID
     payment_method: PaymentMethod

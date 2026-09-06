@@ -1,5 +1,7 @@
 from app.modules.auth.models.user import User
+from app.modules.cart.cart_schema import CartItemBasic
 from app.modules.menu.repos.product_repo import ProductRepo
+from app.modules.order.models.order_model import OrderStatus
 from app.modules.order.order_exception import (
     CoupenUnavailable,
     InvalidCoupen,
@@ -9,10 +11,11 @@ from app.modules.order.repo.coupen_repo import CoupenRepo
 from app.modules.order.repo.order_repo import OrderRepo
 from app.modules.order.schemas.order_schema import (
     CartItems,
+    OrderCreate,
     OrderRequest,
     ProductCalculation,
-    ProductReadBasic,
 )
+from app.modules.order.service.payment_repo import PaymentRepo
 
 
 class OrderService:
@@ -21,15 +24,20 @@ class OrderService:
     DELIVERY_THRESOLD = 620
 
     def __init__(
-        self, order_repo: OrderRepo, product_repo: ProductRepo, coupen_repo: CoupenRepo
+        self,
+        order_repo: OrderRepo,
+        product_repo: ProductRepo,
+        coupen_repo: CoupenRepo,
+        payment_repo: PaymentRepo,
     ) -> None:
         self.order_repo = order_repo
         self.product_repo = product_repo
         self.coupen_repo = coupen_repo
+        self.payment_repo = payment_repo
 
     async def create_order(self, data: OrderRequest, user: User):
         validated_products = await self.validate_cart_items(data.cart_items)
-        calculation_details = self.calculate_product(
+        calculation_details = await self.calculate_product(
             validated_products, user, data.applied_coupen
         )
 
@@ -41,13 +49,11 @@ class OrderService:
             product.is_available and product.in_stock for product in products
         ):
             raise ProductUnavailable
-        product_info = [
-            ProductReadBasic.model_validate(product) for product in products
-        ]
+        product_info = [CartItemBasic.model_validate(product) for product in products]
         return product_info
 
     async def calculate_product(
-        self, products: list[ProductReadBasic], user: User, coupen_code: str | None
+        self, products: list[CartItemBasic], user: User, coupen_code: str | None
     ):
         sub_total = 0
         for product in products:
@@ -85,6 +91,23 @@ class OrderService:
         return total
 
     async def create_order_for_stripe(
-        self, products: list[ProductReadBasic], calculation_details: ProductCalculation
+        self,
+        products: list[CartItemBasic],
+        calculation_details: ProductCalculation,
+        data: OrderRequest,
+        user: User,
     ):
-        pass
+        if data.applied_coupen:
+            coupen = await self.coupen_repo.has_coupen(data.applied_coupen)
+        payment = await self.payment_repo.create(
+            calculation_details.total, user.profile.id, coupen.id if coupen else None
+        )
+        order = await self.order_repo.create(
+            OrderCreate(
+                payment_id=payment.id,
+                profile_id=user.profile.id,
+                order_status=OrderStatus.PENDING_PAYMENT,
+            )
+        )
+        await self.order_repo.create_order_items(products, order)
+        # Create the payment intent for stripe

@@ -39,6 +39,7 @@ class PaymentModel(BaseModel):
     payment_method: Mapped[PaymentMethod] = mapped_column(
         SQLAlchemyENUM(PaymentMethod, name="payment_method"), default=PaymentMethod.COD
     )
+    payment_intent_id: Mapped[str | None] = mapped_column(unique=True)
     profile_id: Mapped[UUID] = mapped_column(
         ForeignKey("profiles.id", ondelete="CASCADE")
     )
