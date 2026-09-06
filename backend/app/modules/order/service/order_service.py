@@ -26,9 +26,11 @@ class OrderService:
         self.product_repo = product_repo
         self.coupen_repo = coupen_repo
 
-    async def create_order(self, data: OrderRequest):
+    async def create_order(self, data: OrderRequest, user: User):
         validated_products = await self.validate_cart_items(data.cart_items)
-        calculation_details = self.calculate_product(validated_products)
+        calculation_details = self.calculate_product(
+            validated_products, user, data.applied_coupen
+        )
 
     async def validate_cart_items(self, items: list[CartItems]):
         items_ids = [item.id for item in items]
