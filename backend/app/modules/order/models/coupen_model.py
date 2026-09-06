@@ -12,7 +12,7 @@ if TYPE_CHECKING:
 
 class CoupenModel(BaseModel):
     __tablename__ = "coupens"
-    code: Mapped[str]
+    code: Mapped[str] = mapped_column(unique=True, index=True)
     expiry_date: Mapped[datetime.datetime]
     required_amount: Mapped[float]
     discount_percentage: Mapped[int]

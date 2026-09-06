@@ -12,3 +12,25 @@ class ProductUnavailable(AppException):
         details: Any = None,
     ):
         super().__init__(message, status_code, error_code, details)
+
+
+class InvalidCoupen(AppException):
+    def __init__(
+        self,
+        message: str = "Invalid Coupen",
+        status_code: int = 400,
+        error_code: str | None = "INVALID_COUPEN",
+        details: Any = None,
+    ):
+        super().__init__(message, status_code, error_code, details)
+
+
+class CoupenUnavailable(AppException):
+    def __init__(
+        self,
+        message: str = "Coupen unavailable",
+        status_code: int = 400,
+        error_code: str | None = "COUPEN_UNAVAILABLE",
+        details: Any = None,
+    ):
+        super().__init__(message, status_code, error_code, details)

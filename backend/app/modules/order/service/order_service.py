@@ -1,5 +1,11 @@
+from app.modules.auth.models.user import User
 from app.modules.menu.repos.product_repo import ProductRepo
-from app.modules.order.order_exception import ProductUnavailable
+from app.modules.order.order_exception import (
+    CoupenUnavailable,
+    InvalidCoupen,
+    ProductUnavailable,
+)
+from app.modules.order.repo.coupen_repo import CoupenRepo
 from app.modules.order.repo.order_repo import OrderRepo
 from app.modules.order.schemas.order_schema import (
     CartItems,
@@ -13,12 +19,15 @@ class OrderService:
     DELIVERY_FEE = 60
     DELIVERY_THRESOLD = 620
 
-    def __init__(self, order_repo: OrderRepo, product_repo: ProductRepo) -> None:
+    def __init__(
+        self, order_repo: OrderRepo, product_repo: ProductRepo, coupen_repo: CoupenRepo
+    ) -> None:
         self.order_repo = order_repo
         self.product_repo = product_repo
+        self.coupen_repo = coupen_repo
 
     async def create_order(self, data: OrderRequest):
-        validated_products: list[dict] = await self.validate_cart_items(data.cart_items)
+        validated_products = await self.validate_cart_items(data.cart_items)
         calculation_details = self.calculate_product(validated_products)
 
     async def validate_cart_items(self, items: list[CartItems]):
@@ -35,7 +44,9 @@ class OrderService:
         ]
         return product_info
 
-    def calculate_product(self, products: list[dict]):
+    async def calculate_product(
+        self, products: list[dict], user: User, coupen_code: str | None
+    ):
         sub_total = 0
         for product in products:
             sub_total += product["price"]
@@ -46,9 +57,27 @@ class OrderService:
             + self.VAT_PERCENT_TO_APPLY * sub_total
             + (self.DELIVERY_FEE if has_free_delivery else 0)
         )
+        if coupen_code:
+            total = await self.apply_coupen(user, coupen_code, total)
         return {
             "total": round(total),
             "sub_total": round(sub_total),
             "delivery_fee": "FREE" if has_free_delivery else self.DELIVERY_FEE,
             "vat_amount": round(sub_total * self.VAT_PERCENT_TO_APPLY),
+            "coupen_applied": coupen_code if coupen_code else None,
         }
+
+    async def apply_coupen(self, user: User, coupen_code: str, total: float):
+        coupen = await self.coupen_repo.has_coupen(coupen_code)
+        if not coupen:
+            raise InvalidCoupen
+        if not await self.coupen_repo.is_coupen_valid_for_user(user, coupen):
+            raise InvalidCoupen
+        if coupen.required_amount > total or coupen.used_count > coupen.max_use_count:
+            raise CoupenUnavailable
+
+        discount_amount = min(
+            total * coupen.discount_percentage, coupen.max_discount_amount
+        )
+        total = total - discount_amount
+        return total
