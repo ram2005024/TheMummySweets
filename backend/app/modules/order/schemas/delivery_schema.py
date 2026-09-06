@@ -1,6 +1,7 @@
 from datetime import UTC, datetime
+from uuid import UUID
 
-from pydantic import BaseModel, model_validator
+from pydantic import BaseModel, ConfigDict, model_validator
 
 from app.modules.order.models.delivery_details import DeliveryTimingStatus
 
@@ -34,3 +35,9 @@ class DeliveryReadBasic(BaseModel):
     scheduled_time: datetime | None = None
     receiptent_phone: str
     delivery_landmark: str
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class DeliveryCreate(DeliveryReadBasic):
+    order_id: UUID

@@ -34,3 +34,14 @@ class CoupenUnavailable(AppException):
         details: Any = None,
     ):
         super().__init__(message, status_code, error_code, details)
+
+
+class LimitedProductStock(AppException):
+    def __init__(
+        self,
+        message: str = "Product stock is limited",
+        status_code: int = 400,
+        error_code: str | None = "STOCK_LIMITED",
+        details: Any = None,
+    ):
+        super().__init__(message, status_code, error_code, details)

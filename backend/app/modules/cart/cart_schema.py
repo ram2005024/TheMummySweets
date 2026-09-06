@@ -1,6 +1,6 @@
 from uuid import UUID
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 from app.modules.admin.schemas.image_schemas import ImageResponse
 from app.modules.menu.models.product_model import QuantizedUnit
@@ -13,6 +13,7 @@ class CartItemBasic(BaseModel):
     price: float
     main_image: ImageResponse
     quantized_unit: QuantizedUnit
+    model_config = ConfigDict(from_attributes=True)
 
 
 class CartItemsRead(BaseModel):

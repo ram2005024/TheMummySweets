@@ -1,7 +1,7 @@
 from enum import Enum
 from uuid import UUID
 
-from pydantic import BaseModel, Field, model_validator
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from app.modules.order.models.order_model import OrderStatus
 from app.modules.order.models.payment_model import PaymentStatus
@@ -35,11 +35,15 @@ class ProductReadBasic(BaseModel):
     stock: int
     is_available: bool
 
+    model_config = ConfigDict(from_attributes=True)
+
 
 class OrderItemBasic(BaseModel):
     price: int
     quantity: int
     product: ProductReadBasic
+
+    model_config = ConfigDict(from_attributes=True)
 
 
 class ProductCalculation(BaseModel):
@@ -57,12 +61,12 @@ class OrderCreate(BaseModel):
 
 
 class OrderResponse(BaseModel):
-    id: UUID
     payment_method: PaymentMethod
     client_secret: str | None = None
     order_id: UUID
     payment_status: PaymentStatus
     amount: int
+    calculation: ProductCalculation
     order_status: OrderStatus
     order_items: list[OrderItemBasic]
     delivery_details: DeliveryReadBasic

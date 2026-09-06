@@ -2,20 +2,26 @@ from app.modules.auth.models.user import User
 from app.modules.cart.cart_schema import CartItemBasic
 from app.modules.menu.repos.product_repo import ProductRepo
 from app.modules.order.models.order_model import OrderStatus
+from app.modules.order.models.payment_model import PaymentStatus
 from app.modules.order.order_exception import (
     CoupenUnavailable,
     InvalidCoupen,
+    LimitedProductStock,
     ProductUnavailable,
 )
 from app.modules.order.repo.coupen_repo import CoupenRepo
 from app.modules.order.repo.order_repo import OrderRepo
+from app.modules.order.schemas.delivery_schema import DeliveryCreate, DeliveryReadBasic
 from app.modules.order.schemas.order_schema import (
     CartItems,
     OrderCreate,
+    OrderItemBasic,
     OrderRequest,
+    OrderResponse,
     ProductCalculation,
 )
 from app.modules.order.service.payment_repo import PaymentRepo
+from app.services.stripe_service import stripe
 
 
 class OrderService:
@@ -40,6 +46,12 @@ class OrderService:
         calculation_details = await self.calculate_product(
             validated_products, user, data.applied_coupen
         )
+        if data.payment_method.value == "stripe":
+            response = await self.create_order_for_stripe(
+                validated_products, calculation_details, data, user
+            )
+        await self.order_repo.commit()
+        return response
 
     async def validate_cart_items(self, items: list[CartItems]):
         items_ids = [item.id for item in items]
@@ -49,6 +61,11 @@ class OrderService:
             product.is_available and product.in_stock for product in products
         ):
             raise ProductUnavailable
+        product_map = {str(product.id): product for product in products}
+        for item in items:
+            item_product = product_map[str(item.id)]
+            if item.quantity > item_product.stock_quantity:
+                raise LimitedProductStock
         product_info = [CartItemBasic.model_validate(product) for product in products]
         return product_info
 
@@ -109,5 +126,27 @@ class OrderService:
                 order_status=OrderStatus.PENDING_PAYMENT,
             )
         )
-        await self.order_repo.create_order_items(products, order)
+        delivery_details = await self.order_repo.create_delivery(
+            DeliveryCreate(**data.delivery_details.model_dump(), order_id=order.id)
+        )
+        order_items = await self.order_repo.create_order_items(products, order)
         # Create the payment intent for stripe
+        payment_intent = stripe.PaymentIntent.create(
+            currency="npr",
+            amount=calculation_details.total * 100,
+            metadata={"order_id": str(order.id), "payment_id": str(payment.id)},
+        )
+        payment.payment_intent_id = payment_intent.id
+        return OrderResponse(
+            payment_method=data.payment_method,
+            client_secret=payment_intent.client_secret,
+            order_id=order.id,
+            payment_status=PaymentStatus.PENDING,
+            amount=calculation_details.total,
+            calculation=calculation_details,
+            order_status=OrderStatus.PENDING_PAYMENT,
+            order_items=[
+                OrderItemBasic.model_validate(order_item) for order_item in order_items
+            ],
+            delivery_details=DeliveryReadBasic.model_validate(delivery_details),
+        )

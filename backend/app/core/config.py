@@ -57,6 +57,9 @@ class Settings(BaseSettings):
     MINIO_ACCESS: str = ""
     MINIO_SECRET: str = ""
 
+    # Stripe
+    STRIPE_SECRET_KEY: str = ""
+
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
 

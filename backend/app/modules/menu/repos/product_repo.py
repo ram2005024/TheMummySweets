@@ -200,7 +200,9 @@ class ProductRepo:
 
     async def read_product_with_ids(self, product_ids: list[UUID]):
         products = (
-            await self.db.execute(select(Product).where(Product.id.in_(product_ids)))
+            await self.db.execute(
+                select(Product).where(Product.id.in_(product_ids)).with_for_update()
+            )
         ).scalars()
 
         return products
