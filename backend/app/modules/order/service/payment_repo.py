@@ -2,7 +2,7 @@ from uuid import UUID
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.modules.order.models.payment_model import PaymentMethod, PaymentModel
+from app.modules.order.models.payment_model import PaymentModel
 
 
 class PaymentRepo:
@@ -14,7 +14,7 @@ class PaymentRepo:
         amount: int,
         profile_id: UUID,
         coupen_id: UUID | None,
-        payment_method=PaymentMethod,
+        payment_method: str,
     ):
         payment = PaymentModel(
             amount=amount,
@@ -23,5 +23,5 @@ class PaymentRepo:
             coupen_id=coupen_id,
         )
         self.db.add(payment)
-        await self.db.flush(payment)
+        await self.db.flush()
         return payment

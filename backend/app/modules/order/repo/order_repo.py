@@ -1,11 +1,10 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.modules.cart.cart_schema import CartItemBasic
 from app.modules.order.models.delivery_details import DeliveryDetails
 from app.modules.order.models.order_item_model import OrderItem
 from app.modules.order.models.order_model import OrderModel
 from app.modules.order.schemas.delivery_schema import DeliveryCreate
-from app.modules.order.schemas.order_schema import OrderCreate
+from app.modules.order.schemas.order_schema import OrderCreate, ProductReadWithCartValue
 
 
 class OrderRepo:
@@ -22,10 +21,12 @@ class OrderRepo:
             payment_id=data.payment_id,
         )
         self.db.add(order)
-        await self.db.flush(order)
+        await self.db.flush()
         return order
 
-    async def create_order_items(self, items: list[CartItemBasic], order: OrderModel):
+    async def create_order_items(
+        self, items: list[ProductReadWithCartValue], order: OrderModel
+    ):
         order_items: list[OrderItem] = []
         for item in items:
             order_item = OrderItem(
@@ -35,7 +36,7 @@ class OrderRepo:
                 order_id=order.id,
             )
             self.db.add(order_item)
-            await self.db.flush(order_item)
+            await self.db.flush()
             await self.db.refresh(order_item, attribute_names=["product"])
             order_items.append(order_item)
         return order_items
@@ -45,5 +46,5 @@ class OrderRepo:
         for key, value in data.model_dump(exclude_unset=True).items():
             setattr(delivery, key, value)
         self.db.add(delivery)
-        await self.db.flush(delivery)
+        await self.db.flush()
         return delivery

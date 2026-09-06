@@ -1,17 +1,11 @@
-from enum import Enum
 from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
+from app.modules.admin.schemas.image_schemas import ImageResponse
 from app.modules.order.models.order_model import OrderStatus
-from app.modules.order.models.payment_model import PaymentStatus
+from app.modules.order.models.payment_model import PaymentMethod, PaymentStatus
 from app.modules.order.schemas.delivery_schema import DeliveryReadBasic, DeliverySchema
-
-
-class PaymentMethod(Enum):
-    ESEWA = "esewa"  # will be implemented later
-    STRIPE = "stripe"
-    COD = "cod"
 
 
 class CartItems(BaseModel):
@@ -28,14 +22,18 @@ class OrderRequest(BaseModel):
 
 class ProductReadBasic(BaseModel):
     id: UUID
-    main_image: str
+    main_image: ImageResponse
     product_name: str
     is_best_seller: bool
     price: float
-    stock: int
+    stock_quantity: int
     is_available: bool
 
     model_config = ConfigDict(from_attributes=True)
+
+
+class ProductReadWithCartValue(ProductReadBasic):
+    quantity: int
 
 
 class OrderItemBasic(BaseModel):

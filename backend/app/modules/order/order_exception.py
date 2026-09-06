@@ -45,3 +45,25 @@ class LimitedProductStock(AppException):
         details: Any = None,
     ):
         super().__init__(message, status_code, error_code, details)
+
+
+class OrderIdempotancyKeyMissing(AppException):
+    def __init__(
+        self,
+        message: str = "Order idempotancy key is missing",
+        status_code: int = 400,
+        error_code: str | None = "ORDER_IDEMPOTANCY_KEY_MISSING",
+        details: Any = None,
+    ):
+        super().__init__(message, status_code, error_code, details)
+
+
+class OrderIsAlreadyProcessing(AppException):
+    def __init__(
+        self,
+        message: str = "Order already processing",
+        status_code: int = 409,
+        error_code: str | None = "ORDER_PROCESSING",
+        details: Any = None,
+    ):
+        super().__init__(message, status_code, error_code, details)

@@ -1,5 +1,5 @@
 from app.modules.auth.models.user import User
-from app.modules.cart.cart_schema import CartItemBasic
+from app.modules.menu.models.product_model import Product
 from app.modules.menu.repos.product_repo import ProductRepo
 from app.modules.order.models.order_model import OrderStatus
 from app.modules.order.models.payment_model import PaymentStatus
@@ -19,6 +19,7 @@ from app.modules.order.schemas.order_schema import (
     OrderRequest,
     OrderResponse,
     ProductCalculation,
+    ProductReadWithCartValue,
 )
 from app.modules.order.service.payment_repo import PaymentRepo
 from app.services.stripe_service import stripe
@@ -57,6 +58,7 @@ class OrderService:
         items_ids = [item.id for item in items]
         products = await self.product_repo.read_product_with_ids(items_ids)
         product_ids = [product.id for product in products]
+
         if not all(id in product_ids for id in items_ids) and all(
             product.is_available and product.in_stock for product in products
         ):
@@ -66,15 +68,30 @@ class OrderService:
             item_product = product_map[str(item.id)]
             if item.quantity > item_product.stock_quantity:
                 raise LimitedProductStock
-        product_info = [CartItemBasic.model_validate(product) for product in products]
+        product_info = [
+            ProductReadWithCartValue.model_validate(
+                {
+                    **product.__dict__,
+                    "quantity": self.find_product_quantity(items, product),
+                }
+            )
+            for product in products
+        ]
         return product_info
 
+    def find_product_quantity(self, items: list[CartItems], product: Product):
+        quantity = next((item.quantity for item in items if item.id == product.id), 0)
+        return quantity
+
     async def calculate_product(
-        self, products: list[CartItemBasic], user: User, coupen_code: str | None
+        self,
+        products: list[ProductReadWithCartValue],
+        user: User,
+        coupen_code: str | None,
     ):
         sub_total = 0
         for product in products:
-            sub_total += product.price
+            sub_total += product.price * product.quantity
         # Later delivery fee according to the location will be implemented here
         has_free_delivery = sub_total > self.DELIVERY_THRESOLD
         total = (
@@ -109,15 +126,19 @@ class OrderService:
 
     async def create_order_for_stripe(
         self,
-        products: list[CartItemBasic],
+        products: list[ProductReadWithCartValue],
         calculation_details: ProductCalculation,
         data: OrderRequest,
         user: User,
     ):
+        coupen = None
         if data.applied_coupen:
             coupen = await self.coupen_repo.has_coupen(data.applied_coupen)
         payment = await self.payment_repo.create(
-            calculation_details.total, user.profile.id, coupen.id if coupen else None
+            calculation_details.total,
+            user.profile.id,
+            coupen.id if coupen else None,
+            data.payment_method.name,
         )
         order = await self.order_repo.create(
             OrderCreate(
