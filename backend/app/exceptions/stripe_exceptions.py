@@ -56,3 +56,14 @@ class PaymentNotFound(AppException):
         details: Any = None,
     ):
         super().__init__(message, status_code, error_code, details)
+
+
+class AmountMismatched(AppException):
+    def __init__(
+        self,
+        message: str = "Payment amount mismatched",
+        status_code: int = 409,
+        error_code: str | None = "PAYMENT_AMOUNT_MISMATCHED",
+        details: Any = None,
+    ):
+        super().__init__(message, status_code, error_code, details)
