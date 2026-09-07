@@ -19,7 +19,6 @@ const CartDialog = () => {
     vat_amount,
     delivery,
     open,
-    calculate,
     onOpenChange,
     delivery_thresold,
   } = useCartStore();
@@ -245,6 +244,10 @@ const CartDialog = () => {
                   </div>
 
                   <button
+                    onClick={() => {
+                      navigate.push("/checkout");
+                      onOpenChange(false);
+                    }}
                     type="button"
                     className="w-full rounded-xl bg-orange-500 py-3 text-sm font-semibold text-white transition hover:bg-orange-600 active:scale-[0.99]"
                   >
