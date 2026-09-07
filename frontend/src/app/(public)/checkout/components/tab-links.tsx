@@ -16,7 +16,7 @@ const TabLinks = () => {
   ];
 
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex max-sm:items-center sm:gap-2">
       {links.map((item) => {
         const isActive = activeLink === item.tabCount;
         const isCompleted = activeLink > item.tabCount;
@@ -25,16 +25,16 @@ const TabLinks = () => {
           <div className="flex items-center mt-3" key={item.tabCount}>
             <span
               className={cn(
-                "flex items-center gap-2 px-3 py-2 text-xs rounded-full transition-colors",
+                "flex items-center gap-1 px-3 py-2 text-xs rounded-full transition-colors max-sm:px-2  max-sm:text-[10px]",
                 isCompleted && "bg-success text-white",
                 isActive && "bg-orange-500 text-white",
                 !isActive && !isCompleted && "bg-muted text-gray-600",
               )}
             >
               {isCompleted ? (
-                <Check className="size-4" />
+                <Check className="size-4 max-sm:size-2" />
               ) : (
-                <item.icon className="size-4" />
+                <item.icon className="size-4 max-sm:size-2" />
               )}
               <span>{item.name}</span>
             </span>
