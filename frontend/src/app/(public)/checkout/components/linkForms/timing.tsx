@@ -3,6 +3,7 @@
 import { deliverySchema } from "@/schemas/order/delivery_schema";
 import { useCheckoutStore } from "@/store/checkout.store";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { ArrowLeft, ArrowRight, CalendarClock } from "lucide-react";
 import { useForm } from "react-hook-form";
 import z from "zod";
 
@@ -12,7 +13,6 @@ const Timing = () => {
   );
 
   const setCheckoutData = useCheckoutStore((state) => state.setCheckoutData);
-
   const setActiveLink = useCheckoutStore((state) => state.setActiveLink);
 
   const {
@@ -43,39 +43,175 @@ const Timing = () => {
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
-      <div>
-        <label>
-          <input type="radio" value="ASAP" {...register("delivery_timing")} />
-          As soon as possible
-        </label>
+    <form onSubmit={handleSubmit(onSubmit)} className="sm:max-w-[50%] w-full ">
+      <div className="surface-card overflow-hidden">
+        <div className="border-b border-border px-5 py-5 sm:px-7">
+          <div className="flex items-center gap-3">
+            <div className="flex size-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
+              <CalendarClock className="size-5" />
+            </div>
 
-        <label>
-          <input
-            type="radio"
-            value="SCHEDULED"
-            {...register("delivery_timing")}
-          />
-          Schedule delivery
-        </label>
-
-        {errors.delivery_timing && <p>{errors.delivery_timing.message}</p>}
-      </div>
-
-      {deliveryTiming === "SCHEDULED" && (
-        <div>
-          <input type="datetime-local" {...register("scheduled_time")} />
-
-          {errors.scheduled_time && <p>{errors.scheduled_time.message}</p>}
+            <div>
+              <h2 className="text-xl font-semibold text-ink">
+                Delivery Timing
+              </h2>
+              <p className="mt-0.5 text-sm text-ink-muted">
+                When would you like us to deliver your order?
+              </p>
+            </div>
+          </div>
         </div>
-      )}
 
-      <div>
-        <button type="button" onClick={() => setActiveLink(1)}>
-          Back
-        </button>
+        <div className="space-y-6 p-5 sm:p-7">
+          <div className="space-y-3">
+            <p className="text-sm font-medium text-ink">Choose delivery time</p>
 
-        <button type="submit">Continue</button>
+            <div className="grid gap-3 sm:grid-cols-2">
+              <label
+                className={`cursor-pointer rounded-xl border p-4 transition ${
+                  deliveryTiming === "ASAP"
+                    ? "border-primary bg-primary/5"
+                    : "border-border bg-card hover:border-primary/40"
+                }`}
+              >
+                <input
+                  type="radio"
+                  value="ASAP"
+                  {...register("delivery_timing")}
+                  className="sr-only"
+                />
+
+                <div className="flex items-start justify-between gap-4">
+                  <div>
+                    <h3 className="text-sm font-semibold text-ink">
+                      As soon as possible
+                    </h3>
+
+                    <p className="mt-1 text-sm leading-5 text-ink-muted">
+                      We'll deliver your order at the earliest possible time.
+                    </p>
+                  </div>
+
+                  <span
+                    className={`mt-0.5 flex size-4 shrink-0 items-center justify-center rounded-full border-2 ${
+                      deliveryTiming === "ASAP"
+                        ? "border-primary"
+                        : "border-border"
+                    }`}
+                  >
+                    {deliveryTiming === "ASAP" && (
+                      <span className="size-2 rounded-full bg-primary" />
+                    )}
+                  </span>
+                </div>
+              </label>
+
+              <label
+                className={`cursor-pointer rounded-xl border p-4 transition ${
+                  deliveryTiming === "SCHEDULED"
+                    ? "border-primary bg-primary/5"
+                    : "border-border bg-card hover:border-primary/40"
+                }`}
+              >
+                <input
+                  type="radio"
+                  value="SCHEDULED"
+                  {...register("delivery_timing")}
+                  className="sr-only"
+                />
+
+                <div className="flex items-start justify-between gap-4">
+                  <div>
+                    <h3 className="text-sm font-semibold text-ink">
+                      Schedule delivery
+                    </h3>
+
+                    <p className="mt-1 text-sm leading-5 text-ink-muted">
+                      Choose a date and time that works for you.
+                    </p>
+                  </div>
+
+                  <span
+                    className={`mt-0.5 flex size-4 shrink-0 items-center justify-center rounded-full border-2 ${
+                      deliveryTiming === "SCHEDULED"
+                        ? "border-primary"
+                        : "border-border"
+                    }`}
+                  >
+                    {deliveryTiming === "SCHEDULED" && (
+                      <span className="size-2 rounded-full bg-primary" />
+                    )}
+                  </span>
+                </div>
+              </label>
+            </div>
+
+            {errors.delivery_timing && (
+              <p className="text-xs font-medium text-destructive">
+                {errors.delivery_timing.message}
+              </p>
+            )}
+          </div>
+
+          {deliveryTiming === "SCHEDULED" && (
+            <div className="rounded-xl border border-border bg-surface/50 p-4">
+              <div className="mb-4">
+                <h3 className="text-sm font-semibold text-ink">
+                  Select delivery date & time
+                </h3>
+                <p className="mt-1 text-xs text-ink-muted">
+                  Choose when you would like your order delivered.
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                <label
+                  htmlFor="scheduled_time"
+                  className="text-sm font-medium text-ink"
+                >
+                  Delivery date & time
+                </label>
+
+                <input
+                  id="scheduled_time"
+                  type="datetime-local"
+                  {...register("scheduled_time")}
+                  className="h-11 w-full rounded-xl border border-border bg-background px-4 text-sm text-ink outline-none transition focus:border-primary focus:ring-4 focus:ring-primary/10"
+                />
+
+                {errors.scheduled_time && (
+                  <p className="text-xs font-medium text-destructive">
+                    {errors.scheduled_time.message}
+                  </p>
+                )}
+              </div>
+            </div>
+          )}
+
+          <p className="text-xs leading-5 text-ink-muted">
+            Scheduled deliveries should allow enough time for us to prepare and
+            dispatch your order.
+          </p>
+        </div>
+
+        <div className="flex flex-col gap-3 border-t border-border bg-surface/50 p-5 sm:flex-row sm:items-center sm:justify-between sm:px-7">
+          <button
+            type="button"
+            onClick={() => setActiveLink(1)}
+            className="inline-flex h-11 items-center justify-center gap-2 rounded-xl border border-border bg-card px-5 text-sm font-semibold text-ink transition hover:bg-surface-2"
+          >
+            <ArrowLeft className="size-4" />
+            Back
+          </button>
+
+          <button
+            type="submit"
+            className="gradient-warm inline-flex h-11 items-center justify-center gap-2 rounded-xl px-6 text-sm font-semibold text-primary-foreground shadow-warm-sm transition hover:-translate-y-0.5 hover:shadow-warm"
+          >
+            Continue
+            <ArrowRight className="size-4" />
+          </button>
+        </div>
       </div>
     </form>
   );

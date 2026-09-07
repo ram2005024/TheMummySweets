@@ -1,14 +1,13 @@
 import {
   CartItems,
   DeliverySchema,
-  PaymentMethod,
 } from "@/schemas/order/order_request_schema";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 
 interface CheckoutData {
   delivery_details?: DeliverySchema;
-  payment_method?: PaymentMethod;
+  payment_method?: PaymentMethodData;
   applied_coupen?: string | null;
   cart_items?: CartItems[];
 }

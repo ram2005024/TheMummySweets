@@ -5,10 +5,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { ArrowRight, Minus, Plus, ShoppingBag, Trash2, X } from "lucide-react";
 
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
 import { SummaryRow } from "./SummaryRow";
-
-const DELIVERY_THRESHOLD = 620;
 
 const CartDialog = () => {
   const navigate = useRouter();
@@ -24,22 +21,14 @@ const CartDialog = () => {
     open,
     calculate,
     onOpenChange,
-    set_delivery,
+    delivery_thresold,
   } = useCartStore();
 
-  const remaining = Math.round(Math.max(0, DELIVERY_THRESHOLD - total)).toFixed(
+  const remaining = Math.round(Math.max(0, delivery_thresold - total)).toFixed(
     0,
   );
-  const deliveryProgress = Math.min((total / DELIVERY_THRESHOLD) * 100, 100);
-  const isFreeDelivery = total >= DELIVERY_THRESHOLD;
-  useEffect(() => {
-    if (isFreeDelivery) {
-      set_delivery(0);
-    } else {
-      set_delivery(60);
-    }
-    calculate();
-  }, [total, set_delivery]);
+  const deliveryProgress = Math.min((total / delivery_thresold) * 100, 100);
+  const isFreeDelivery = total >= delivery_thresold;
   return (
     <AnimatePresence>
       {open && (

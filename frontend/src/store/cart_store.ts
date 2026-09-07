@@ -18,7 +18,7 @@ interface CartInterface {
   onOpenChange: (val: boolean) => void;
   sub_total: number;
   delivery: number;
-  set_delivery: (val: number) => void; //Hardcode for now
+  delivery_thresold: number;
   vat_amount: number; //Hardcode for now
   total: number;
   calculate: () => void;
@@ -41,7 +41,7 @@ export const useCartStore = create<CartInterface>((set, get) => ({
     });
   },
   versionState: new Map(),
-  set_delivery: (val) => set({ delivery: val }),
+  delivery_thresold: 600,
   debounceTime: 400,
   timeoutFunction: (pid) => {
     // Set the debounce version version
@@ -176,6 +176,7 @@ export const useCartStore = create<CartInterface>((set, get) => ({
         total: Math.round(total),
         sub_total: Math.round(sub_total),
         vat_amount: Math.round(vat_amount),
+        delivery: sub_total >= s.delivery_thresold ? 0 : 60,
       };
     }),
   decrease_cart_quantity: (id) => {
