@@ -14,3 +14,4 @@ export const orderRequestSchema = z.object({
 export type DeliverySchema = z.infer<typeof deliverySchema>;
 export type CartItems = z.infer<typeof cartItemSchema>;
 export type OrderRequest = z.infer<typeof orderRequestSchema>;
+export type PaymentMethodType = z.infer<typeof PaymentMethod>;

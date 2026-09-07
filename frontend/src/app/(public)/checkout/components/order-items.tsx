@@ -12,7 +12,7 @@ const OrderItems = () => {
   const total = useCartStore((state) => state.total);
 
   return (
-    <div className="surface-card overflow-hidden h-fit">
+    <div className="surface-card w-[500px] mr-auto overflow-hidden h-fit">
       <div className="px-5 pt-5 sm:px-6 sm:pt-6">
         <h2 className="text-lg font-semibold text-ink">Order summary</h2>
       </div>

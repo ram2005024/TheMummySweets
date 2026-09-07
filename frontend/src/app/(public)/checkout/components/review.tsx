@@ -70,7 +70,7 @@ const Review = () => {
   };
 
   return (
-    <div className="w-full overflow-hidden surface-card sm:max-w-[50%]">
+    <div className="overflow-hidden surface-card ">
       <div className="border-b border-border px-5 py-5 sm:px-7">
         <h2 className="text-xl font-semibold text-ink">Review Order</h2>
         <p className="mt-1 text-sm text-ink-muted">
@@ -222,7 +222,7 @@ const Review = () => {
                 <button
                   type="button"
                   onClick={handleApplyCoupon}
-                  className="h-10 rounded-lg border border-border bg-surface-2 px-4 text-sm font-semibold text-ink transition hover:border-primary/40 hover:bg-primary/5"
+                  className="bg-surface-2 h-10 rounded-lg border border-border  px-4 text-sm font-semibold text-ink transition hover:border-primary/40 hover:bg-primary/5"
                 >
                   Apply
                 </button>
@@ -251,7 +251,7 @@ const Review = () => {
         <button
           type="button"
           onClick={handleSubmit}
-          className="gradient-warm inline-flex h-11 items-center justify-center gap-2 rounded-xl px-6 text-sm font-semibold text-primary-foreground shadow-warm-sm transition hover:-translate-y-0.5 hover:shadow-warm"
+          className="bg-accent-foreground inline-flex h-11 items-center justify-center gap-2 rounded-xl px-6 text-sm font-semibold text-primary-foreground shadow-warm-sm transition hover:-translate-y-0.5 hover:shadow-warm"
         >
           Place Order
           <ArrowRight className="size-4" />

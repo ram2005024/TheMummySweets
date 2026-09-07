@@ -1,5 +1,6 @@
 "use client";
 
+import { cn } from "@/lib/utils";
 import { deliverySchema } from "@/schemas/order/delivery_schema";
 import { useCheckoutStore } from "@/store/checkout.store";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -19,7 +20,7 @@ const Timing = () => {
     register,
     handleSubmit,
     watch,
-    formState: { errors },
+    formState: { errors, isValid },
   } = useForm<
     z.input<typeof deliverySchema>,
     unknown,
@@ -27,6 +28,7 @@ const Timing = () => {
   >({
     resolver: zodResolver(deliverySchema),
     defaultValues: delivery,
+    mode: "onChange",
   });
 
   const deliveryTiming = watch("delivery_timing");
@@ -43,7 +45,7 @@ const Timing = () => {
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="sm:max-w-[50%] w-full ">
+    <form onSubmit={handleSubmit(onSubmit)}>
       <div className="surface-card overflow-hidden">
         <div className="border-b border-border px-5 py-5 sm:px-7">
           <div className="flex items-center gap-3">
@@ -206,7 +208,13 @@ const Timing = () => {
 
           <button
             type="submit"
-            className="gradient-warm inline-flex h-11 items-center justify-center gap-2 rounded-xl px-6 text-sm font-semibold text-primary-foreground shadow-warm-sm transition hover:-translate-y-0.5 hover:shadow-warm"
+            disabled={!isValid}
+            className={cn(
+              "inline-flex h-11 items-center justify-center gap-2 rounded-xl px-6 text-sm font-semibold text-primary-foreground shadow-warm-sm transition",
+              !isValid
+                ? "bg-muted-foreground"
+                : "bg-accent-foreground  hover:-translate-y-0.5 hover:shadow-warm",
+            )}
           >
             Continue
             <ArrowRight className="size-4" />

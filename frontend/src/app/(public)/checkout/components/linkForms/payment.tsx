@@ -63,7 +63,7 @@ const Payment = () => {
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="sm:max-w-[50%] w-full ">
+    <form onSubmit={handleSubmit(onSubmit)}>
       <div className="surface-card overflow-hidden">
         {/* Header */}
         <div className="border-b border-border px-5 py-5 sm:px-7">
@@ -157,7 +157,7 @@ const Payment = () => {
 
           <button
             type="submit"
-            className="gradient-warm inline-flex h-11 items-center justify-center gap-2 rounded-xl px-6 text-sm font-semibold text-primary-foreground shadow-warm-sm transition hover:-translate-y-0.5 hover:shadow-warm"
+            className="bg-accent-foreground inline-flex h-11 items-center justify-center gap-2 rounded-xl px-6 text-sm font-semibold text-primary-foreground shadow-warm-sm transition hover:-translate-y-0.5 hover:shadow-warm"
           >
             Continue
             <ArrowRight className="size-4" />

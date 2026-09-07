@@ -1,5 +1,7 @@
 "use client";
+
 import { useCheckoutStore } from "@/store/checkout.store";
+import { AnimatePresence, motion } from "framer-motion";
 import OrderItems from "../order-items";
 import Review from "../review";
 import DeliveryForm from "./delivery";
@@ -9,12 +11,28 @@ import Timing from "./timing";
 const FormTree = () => {
   const activeLink = useCheckoutStore((state) => state.activeLink);
 
+  const steps = {
+    1: <DeliveryForm />,
+    2: <Timing />,
+    3: <Payment />,
+    4: <Review />,
+  };
+
   return (
-    <div className="pt-4 flex max-sm:flex-col sm:gap-20">
-      {activeLink === 1 && <DeliveryForm />}
-      {activeLink === 2 && <Timing />}
-      {activeLink === 3 && <Payment />}
-      {activeLink === 4 && <Review />}
+    <div className="flex pt-4 max-sm:flex-col sm:gap-20">
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={activeLink}
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          exit={{ opacity: 0, x: -20 }}
+          transition={{ duration: 0.25, ease: "easeInOut" }}
+          className="flex-1"
+        >
+          {steps[activeLink as keyof typeof steps]}
+        </motion.div>
+      </AnimatePresence>
+
       <OrderItems />
     </div>
   );
