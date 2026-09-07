@@ -26,7 +26,7 @@ const CartDialog = () => {
   const remaining = Math.round(Math.max(0, delivery_thresold - total)).toFixed(
     0,
   );
-  const deliveryProgress = Math.min((total / delivery_thresold) * 100, 100);
+  const deliveryProgress = Math.min((sub_total / delivery_thresold) * 100, 100);
   const isFreeDelivery = total >= delivery_thresold;
   return (
     <AnimatePresence>

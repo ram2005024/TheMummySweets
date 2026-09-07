@@ -176,7 +176,7 @@ export const useCartStore = create<CartInterface>((set, get) => ({
         total: Math.round(total),
         sub_total: Math.round(sub_total),
         vat_amount: Math.round(vat_amount),
-        delivery: sub_total >= s.delivery_thresold ? 0 : 60,
+        delivery: total >= s.delivery_thresold ? 0 : 60,
       };
     }),
   decrease_cart_quantity: (id) => {
