@@ -1,3 +1,6 @@
+from uuid import UUID
+
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.modules.order.models.delivery_details import DeliveryDetails
@@ -48,3 +51,11 @@ class OrderRepo:
         self.db.add(delivery)
         await self.db.flush()
         return delivery
+
+    async def get_order_by_id(self, order_id: str):
+        order = (
+            await self.db.execute(
+                select(OrderModel).where(OrderModel.id == UUID(order_id))
+            )
+        ).scalar_one_or_none()
+        return order
