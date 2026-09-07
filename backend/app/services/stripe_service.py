@@ -1,5 +1,4 @@
 import stripe
-from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import settings
 from app.exceptions.stripe_exceptions import (
@@ -17,10 +16,12 @@ stripe.api_key = settings.STRIPE_SECRET_KEY
 
 
 class StripeService:
-    def __init__(self, db: AsyncSession) -> None:
-        self.stripe_repo = StripeRepo(db)
-        self.payment_repo = PaymentRepo(db)
-        self.order_repo = OrderRepo(db)
+    def __init__(
+        self, stripe_repo: StripeRepo, payment_repo: PaymentRepo, order_repo: OrderRepo
+    ) -> None:
+        self.stripe_repo = stripe_repo
+        self.payment_repo = payment_repo
+        self.order_repo = order_repo
 
     async def handle_webhook_event(self, event):
         # Check the event has already processed
