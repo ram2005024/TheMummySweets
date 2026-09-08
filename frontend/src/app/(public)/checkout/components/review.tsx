@@ -1,8 +1,14 @@
 "use client";
 
+import { useOrderRequest } from "@/hooks/order/useOrder";
 import { OrderRequest } from "@/schemas/order/order_request_schema";
 import { useCartStore } from "@/store/cart_store";
-import { useCheckoutStore } from "@/store/checkout.store";
+import {
+  useCheckoutStore,
+  useEphimeralCheckoutStore,
+} from "@/store/checkout.store";
+import { ErrorResponse } from "@/type/common.type";
+import { AxiosError } from "axios";
 import {
   ArrowLeft,
   ArrowRight,
@@ -14,12 +20,15 @@ import {
   X,
 } from "lucide-react";
 import { useState } from "react";
+import { toast } from "sonner";
 
 const Review = () => {
   const checkoutData = useCheckoutStore((state) => state.checkoutData);
   const setActiveLink = useCheckoutStore((state) => state.setActiveLink);
   const setCheckoutData = useCheckoutStore((state) => state.setCheckoutData);
-
+  const idemp_key = useEphimeralCheckoutStore(
+    (state) => state.orderIdempotancyKey,
+  );
   const cartItems = useCartStore((state) => state.cart_items);
 
   const delivery = checkoutData?.delivery_details;
@@ -34,7 +43,7 @@ const Review = () => {
     esewa: "eSewa",
     stripe: "Card",
   }[payment ?? "cod"];
-
+  const orderMutation = useOrderRequest();
   const handleApplyCoupon = () => {
     const value = coupon.trim();
 
@@ -65,8 +74,26 @@ const Review = () => {
         quantity: item.quantity,
       })),
     };
-
-    console.log(orderData);
+    orderMutation.mutate(
+      { data: orderData, idemp_key },
+      {
+        onError: (err) => {
+          const error = err as AxiosError<ErrorResponse<null>>;
+          toast.error(
+            error.response?.data?.message ||
+              error.message ||
+              "Something went wrong",
+          );
+        },
+        onSuccess: (data) => {
+          if (data.client_secret && data.order_status == "placed") {
+            console.log("Order placed");
+          } else {
+            console.log("Order payment pending");
+          }
+        },
+      },
+    );
   };
 
   return (
