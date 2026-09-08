@@ -5,21 +5,22 @@ import { deliverySchema } from "@/schemas/order/delivery_schema";
 import { useCheckoutStore } from "@/store/checkout.store";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ArrowLeft, ArrowRight, CalendarClock } from "lucide-react";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import z from "zod";
 
 const Timing = () => {
   const delivery = useCheckoutStore(
     (state) => state.checkoutData?.delivery_details,
   );
-
   const setCheckoutData = useCheckoutStore((state) => state.setCheckoutData);
   const setActiveLink = useCheckoutStore((state) => state.setActiveLink);
 
   const {
     register,
     handleSubmit,
-    watch,
+    control,
+    setValue,
+    trigger,
     formState: { errors, isValid },
   } = useForm<
     z.input<typeof deliverySchema>,
@@ -27,11 +28,36 @@ const Timing = () => {
     z.output<typeof deliverySchema>
   >({
     resolver: zodResolver(deliverySchema),
-    defaultValues: delivery,
+    defaultValues: {
+      ...delivery,
+      delivery_timing: delivery?.delivery_timing ?? "asap",
+      scheduled_time: delivery?.scheduled_time ?? null,
+    },
     mode: "onChange",
   });
 
-  const deliveryTiming = watch("delivery_timing");
+  const deliveryTiming = useWatch({
+    control,
+    name: "delivery_timing",
+  });
+
+  const onTimingChange = async (value: "asap" | "scheduled") => {
+    setValue("delivery_timing", value, {
+      shouldDirty: true,
+      shouldTouch: true,
+      shouldValidate: true,
+    });
+
+    if (value === "asap") {
+      setValue("scheduled_time", null, {
+        shouldDirty: true,
+        shouldTouch: true,
+        shouldValidate: true,
+      });
+    }
+
+    await trigger();
+  };
 
   const onSubmit = (data: z.output<typeof deliverySchema>) => {
     setCheckoutData({
@@ -40,7 +66,6 @@ const Timing = () => {
         ...data,
       },
     });
-
     setActiveLink(3);
   };
 
@@ -52,7 +77,6 @@ const Timing = () => {
             <div className="flex size-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
               <CalendarClock className="size-5" />
             </div>
-
             <div>
               <h2 className="text-xl font-semibold text-ink">
                 Delivery Timing
@@ -70,16 +94,18 @@ const Timing = () => {
 
             <div className="grid gap-3 sm:grid-cols-2">
               <label
-                className={`cursor-pointer rounded-xl border p-4 transition ${
-                  deliveryTiming === "ASAP"
+                className={cn(
+                  "cursor-pointer rounded-xl border p-4 transition",
+                  deliveryTiming === "asap"
                     ? "border-primary bg-primary/5"
-                    : "border-border bg-card hover:border-primary/40"
-                }`}
+                    : "border-border bg-card hover:border-primary/40",
+                )}
               >
                 <input
                   type="radio"
-                  value="ASAP"
+                  value="asap"
                   {...register("delivery_timing")}
+                  onChange={() => onTimingChange("asap")}
                   className="sr-only"
                 />
 
@@ -88,20 +114,20 @@ const Timing = () => {
                     <h3 className="text-sm font-semibold text-ink">
                       As soon as possible
                     </h3>
-
                     <p className="mt-1 text-sm leading-5 text-ink-muted">
                       We'll deliver your order at the earliest possible time.
                     </p>
                   </div>
 
                   <span
-                    className={`mt-0.5 flex size-4 shrink-0 items-center justify-center rounded-full border-2 ${
-                      deliveryTiming === "ASAP"
+                    className={cn(
+                      "mt-0.5 flex size-4 shrink-0 items-center justify-center rounded-full border-2",
+                      deliveryTiming === "asap"
                         ? "border-primary"
-                        : "border-border"
-                    }`}
+                        : "border-border",
+                    )}
                   >
-                    {deliveryTiming === "ASAP" && (
+                    {deliveryTiming === "asap" && (
                       <span className="size-2 rounded-full bg-primary" />
                     )}
                   </span>
@@ -109,16 +135,18 @@ const Timing = () => {
               </label>
 
               <label
-                className={`cursor-pointer rounded-xl border p-4 transition ${
-                  deliveryTiming === "SCHEDULED"
+                className={cn(
+                  "cursor-pointer rounded-xl border p-4 transition",
+                  deliveryTiming === "scheduled"
                     ? "border-primary bg-primary/5"
-                    : "border-border bg-card hover:border-primary/40"
-                }`}
+                    : "border-border bg-card hover:border-primary/40",
+                )}
               >
                 <input
                   type="radio"
-                  value="SCHEDULED"
+                  value="scheduled"
                   {...register("delivery_timing")}
+                  onChange={() => onTimingChange("scheduled")}
                   className="sr-only"
                 />
 
@@ -127,20 +155,20 @@ const Timing = () => {
                     <h3 className="text-sm font-semibold text-ink">
                       Schedule delivery
                     </h3>
-
                     <p className="mt-1 text-sm leading-5 text-ink-muted">
                       Choose a date and time that works for you.
                     </p>
                   </div>
 
                   <span
-                    className={`mt-0.5 flex size-4 shrink-0 items-center justify-center rounded-full border-2 ${
-                      deliveryTiming === "SCHEDULED"
+                    className={cn(
+                      "mt-0.5 flex size-4 shrink-0 items-center justify-center rounded-full border-2",
+                      deliveryTiming === "scheduled"
                         ? "border-primary"
-                        : "border-border"
-                    }`}
+                        : "border-border",
+                    )}
                   >
-                    {deliveryTiming === "SCHEDULED" && (
+                    {deliveryTiming === "scheduled" && (
                       <span className="size-2 rounded-full bg-primary" />
                     )}
                   </span>
@@ -155,7 +183,7 @@ const Timing = () => {
             )}
           </div>
 
-          {deliveryTiming === "SCHEDULED" && (
+          {deliveryTiming === "scheduled" && (
             <div className="rounded-xl border border-border bg-surface/50 p-4">
               <div className="mb-4">
                 <h3 className="text-sm font-semibold text-ink">
@@ -210,10 +238,10 @@ const Timing = () => {
             type="submit"
             disabled={!isValid}
             className={cn(
-              "inline-flex h-11 items-center justify-center gap-2 rounded-xl px-6 text-sm font-semibold text-primary-foreground shadow-warm-sm transition",
-              !isValid
-                ? "bg-muted-foreground"
-                : "bg-accent-foreground  hover:-translate-y-0.5 hover:shadow-warm",
+              "inline-flex h-11 items-center justify-center gap-2 rounded-xl px-6 text-sm font-semibold transition",
+              "bg-accent-foreground text-primary-foreground shadow-warm-sm",
+              "hover:-translate-y-0.5 hover:shadow-warm",
+              "disabled:cursor-not-allowed disabled:bg-muted disabled:text-muted-foreground disabled:shadow-none disabled:hover:translate-y-0",
             )}
           >
             Continue
