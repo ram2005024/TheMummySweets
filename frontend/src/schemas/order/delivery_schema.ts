@@ -32,3 +32,4 @@ export const deliverySchema = z
       path: ["scheduled_time"],
     },
   );
+export type DeliverySchemaType = z.infer<typeof deliverySchema>;
