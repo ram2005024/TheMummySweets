@@ -11,7 +11,7 @@ const CartButton = () => {
   const total_quantity = cart_items.reduce((acc, val) => acc + val.quantity, 0);
   useEffect(() => {
     if (cart) setCartItems(cart);
-  }, [cart]);
+  }, [cart, setCartItems]);
   if (isLoading) return null;
   return (
     <div>

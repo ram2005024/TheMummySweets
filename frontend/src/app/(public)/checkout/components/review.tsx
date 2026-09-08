@@ -1,6 +1,7 @@
 "use client";
 
 import { useOrderRequest } from "@/hooks/order/useOrder";
+import queryClient from "@/libs/queryClient";
 import { OrderRequest } from "@/schemas/order/order_request_schema";
 import { useCartStore } from "@/store/cart_store";
 import {
@@ -92,6 +93,8 @@ const Review = () => {
           } else {
             console.log("Order payment pending");
           }
+          //   Invalidate the cart
+          queryClient.invalidateQueries({ queryKey: ["cart"] });
         },
       },
     );
@@ -269,6 +272,7 @@ const Review = () => {
       <div className="flex flex-col gap-3 border-t border-border bg-surface/50 p-5 sm:flex-row sm:items-center sm:justify-between sm:px-7">
         <button
           type="button"
+          disabled={orderMutation.isPending}
           onClick={() => setActiveLink(3)}
           className="inline-flex h-11 items-center justify-center gap-2 rounded-xl border border-border bg-card px-5 text-sm font-semibold text-ink transition hover:bg-surface-2"
         >
@@ -279,6 +283,7 @@ const Review = () => {
         <button
           type="button"
           onClick={handleSubmit}
+          disabled={orderMutation.isPending}
           className="bg-accent-foreground inline-flex h-11 items-center justify-center gap-2 rounded-xl px-6 text-sm font-semibold text-primary-foreground shadow-warm-sm transition hover:-translate-y-0.5 hover:shadow-warm"
         >
           Place Order
