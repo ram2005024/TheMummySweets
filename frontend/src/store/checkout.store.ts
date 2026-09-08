@@ -20,7 +20,12 @@ interface checkoutStoreInterface {
   setCheckoutData: (data: Partial<CheckoutData>) => void;
   clearCheckout: () => void;
 }
-
+interface ephimeralCheckoutStore {
+  orderIdempotancyKey: string;
+}
+export const useEphimeralCheckoutStore = create<ephimeralCheckoutStore>(() => ({
+  orderIdempotancyKey: crypto.randomUUID(),
+}));
 export const useCheckoutStore = create<checkoutStoreInterface>()(
   persist(
     (set) => ({
