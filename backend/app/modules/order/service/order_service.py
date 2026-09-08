@@ -72,6 +72,7 @@ class OrderService:
             ProductReadWithCartValue.model_validate(
                 {
                     **product.__dict__,
+                    "total_amount": product.total_amount,
                     "quantity": self.find_product_quantity(items, product),
                 }
             )
@@ -91,13 +92,13 @@ class OrderService:
     ):
         sub_total = 0
         for product in products:
-            sub_total += product.price * product.quantity
+            sub_total += product.total_amount * product.quantity
         # Later delivery fee according to the location will be implemented here
         has_free_delivery = sub_total > self.DELIVERY_THRESOLD
         total = (
             sub_total
-            + self.VAT_PERCENT_TO_APPLY * sub_total
-            + (self.DELIVERY_FEE if has_free_delivery else 0)
+            + (self.VAT_PERCENT_TO_APPLY * sub_total)
+            + (0 if has_free_delivery else self.DELIVERY_FEE)
         )
         if coupen_code:
             total = await self.apply_coupen(user, coupen_code, total)

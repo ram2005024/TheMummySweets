@@ -66,6 +66,7 @@ class Product(BaseModel):
             "OR (grouped_unit IN ('pcs','ml','ltr') AND grouped_quantity > 0)",
             name="grouped_quantity_positive_for_unit",
         ),
+        CheckConstraint("price > 0", name="Positive price value"),
     )
 
     # Dynamic fields
@@ -77,6 +78,3 @@ class Product(BaseModel):
     def total_amount(self):
         discount_amount = self.price * (self.discount_percentage / 100)
         return self.price - discount_amount
-
-    # Extra args
-    __table_args__ = (CheckConstraint("price > 0", name="Positive price value"),)

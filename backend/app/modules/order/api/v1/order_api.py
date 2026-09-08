@@ -25,12 +25,12 @@ order_api = APIRouter(prefix="/order", tags=["Order Endpoints"])
 @order_api.post("/", response_model=SuccessResponse[OrderResponse])
 async def order_endpoint(
     user: Annotated[User, Depends(RolePermission(["admin", "member"]))],
-    data: OrderRequest,
     order_service: Annotated[OrderService, Depends(get_order_service)],
     request: Request,
     order_idempotancy: Annotated[
         IdempotancyService, Depends(get_order_idempotent_service)
     ],
+    data: OrderRequest,
 ):
     try:
         idemp_key = request.headers.get("x-order-idempotancy-key", None)

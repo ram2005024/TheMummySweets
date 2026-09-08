@@ -1,6 +1,6 @@
 from uuid import UUID
 
-from pydantic import BaseModel, ConfigDict, Field, model_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 from app.modules.admin.schemas.image_schemas import ImageResponse
 from app.modules.order.models.order_model import OrderStatus
@@ -25,7 +25,7 @@ class ProductReadBasic(BaseModel):
     main_image: ImageResponse
     product_name: str
     is_best_seller: bool
-    price: float
+    total_amount: float
     stock_quantity: int
     is_available: bool
 
@@ -40,6 +40,10 @@ class OrderItemBasic(BaseModel):
     price: int
     quantity: int
     product: ProductReadBasic
+
+    @field_validator("price", mode="before")
+    def normalize_price(cls, value):
+        return round(value)
 
     model_config = ConfigDict(from_attributes=True)
 

@@ -35,7 +35,7 @@ class OrderRepo:
             order_item = OrderItem(
                 product_id=item.id,
                 quantity=item.quantity,
-                price=item.price,
+                price=item.total_amount,
                 order_id=order.id,
             )
             self.db.add(order_item)
