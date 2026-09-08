@@ -5,6 +5,8 @@ from redis import Redis
 from redis.asyncio import Redis
 
 from app.core.redis import get_redis
+from app.modules.cart.cart_services import CartService
+from app.modules.cart.factories import get_cart_service
 from app.modules.menu.dependencies.factories_repo import get_product_repo
 from app.modules.menu.repos.product_repo import ProductRepo
 from app.modules.order.dependencies.repo_factory import (
@@ -28,5 +30,8 @@ def get_order_service(
     product_repo: Annotated[ProductRepo, Depends(get_product_repo)],
     coupen_repo: Annotated[CoupenRepo, Depends(get_coupen_repo)],
     payment_repo: Annotated[PaymentRepo, Depends(get_payment_repo)],
+    cart_service: Annotated[CartService, Depends(get_cart_service)],
 ):
-    return OrderService(order_repo, product_repo, coupen_repo, payment_repo)
+    return OrderService(
+        order_repo, product_repo, coupen_repo, payment_repo, cart_service
+    )

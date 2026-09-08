@@ -1,4 +1,5 @@
 from app.modules.auth.models.user import User
+from app.modules.cart.cart_services import CartService
 from app.modules.menu.models.product_model import Product
 from app.modules.menu.repos.product_repo import ProductRepo
 from app.modules.order.models.order_model import OrderStatus
@@ -36,11 +37,13 @@ class OrderService:
         product_repo: ProductRepo,
         coupen_repo: CoupenRepo,
         payment_repo: PaymentRepo,
+        cart_service: CartService,
     ) -> None:
         self.order_repo = order_repo
         self.product_repo = product_repo
         self.coupen_repo = coupen_repo
         self.payment_repo = payment_repo
+        self.cart_service = cart_service
 
     async def create_order(self, data: OrderRequest, user: User):
         validated_products = await self.validate_cart_items(data.cart_items)
@@ -159,6 +162,7 @@ class OrderService:
             metadata={"order_id": str(order.id), "payment_id": str(payment.id)},
         )
         payment.payment_intent_id = payment_intent.id
+        await self.cart_service.delete_entire_cart(str(user.id))
         return OrderResponse(
             payment_method=data.payment_method,
             client_secret=payment_intent.client_secret,
