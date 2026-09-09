@@ -6,7 +6,7 @@ import {
   useElements,
   useStripe,
 } from "@stripe/react-stripe-js";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 interface Props {
   orderId: string;
@@ -15,9 +15,8 @@ interface Props {
 const StripePayment = ({ orderId }: Props) => {
   const stripe = useStripe();
   const elements = useElements();
-  const { checkout_amount, generateNewOrderIdempotancyKey } =
+  const { checkout_amount, generateNewOrderIdempotancyKey, setActiveLink } =
     useEphimeralCheckoutStore();
-  const { setActiveLink } = useEphimeralCheckoutStore();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -39,7 +38,12 @@ const StripePayment = ({ orderId }: Props) => {
       setLoading(false);
     }
   };
-
+  useEffect(() => {
+    return () => {
+      setActiveLink(4);
+      generateNewOrderIdempotancyKey();
+    };
+  }, []);
   return (
     <div className="surface-card w-full overflow-hidden">
       <div className="border-b border-border px-5 py-5 sm:px-7">

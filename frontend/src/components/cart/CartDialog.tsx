@@ -27,7 +27,7 @@ const CartDialog = () => {
     0,
   );
   const deliveryProgress = Math.min((sub_total / delivery_thresold) * 100, 100);
-  const isFreeDelivery = total >= delivery_thresold;
+  const isFreeDelivery = sub_total >= delivery_thresold;
   return (
     <AnimatePresence>
       {open && (

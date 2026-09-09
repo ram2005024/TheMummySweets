@@ -19,9 +19,9 @@ interface CartInterface {
   sub_total: number;
   delivery: number;
   delivery_thresold: number;
+  delivery_fee: number;
   vat_amount: number; //Hardcode for now
   total: number;
-  setDelivery: (val: number) => void;
   calculate: () => void;
   debounceTime: number;
   debounceState: Map<string, ReturnType<typeof setTimeout>>;
@@ -40,10 +40,11 @@ export const useCartStore = create<CartInterface>((set, get) => ({
       delivery: val.delivery_fee,
       vat_amount: val.tax_amount,
     });
+    get().calculate();
   },
-  setDelivery: (val) => set({ delivery: val }),
   versionState: new Map(),
   delivery_thresold: 620,
+  delivery_fee: 60,
   debounceTime: 400,
   timeoutFunction: (pid) => {
     // Set the debounce version version
@@ -110,6 +111,7 @@ export const useCartStore = create<CartInterface>((set, get) => ({
           ],
         };
       });
+      get().calculate();
 
       try {
         await CartService.addCart(id);
@@ -172,8 +174,8 @@ export const useCartStore = create<CartInterface>((set, get) => ({
         0,
       );
       const vat_amount = sub_total * 0.13;
-      const delivery_amount = sub_total >= s.delivery_thresold ? 0 : s.delivery;
-      get().setDelivery(delivery_amount);
+      const delivery_amount =
+        sub_total >= s.delivery_thresold ? 0 : s.delivery_fee;
       const total = sub_total + vat_amount + delivery_amount;
       return {
         ...s,
