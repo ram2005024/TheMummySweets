@@ -98,7 +98,7 @@ const Review = () => {
             set_client_secret(data?.client_secret || "");
             set_order_id(data.order_id);
             setActiveLink(5);
-            set_checkout_amount(data.amount);
+            set_checkout_amount(data.calculation.total);
           }
         },
       },

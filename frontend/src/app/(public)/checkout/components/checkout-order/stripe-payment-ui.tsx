@@ -63,7 +63,7 @@ const StripePayment = ({ orderId }: Props) => {
           onClick={handlePayment}
           className="gradient-warm flex h-11 w-full items-center justify-center rounded-xl px-6 text-sm font-semibold text-primary-foreground shadow-warm-sm transition hover:-translate-y-0.5 hover:shadow-warm disabled:pointer-events-none disabled:opacity-60"
         >
-          {loading ? "Processing..." : `Pay ${checkout_amount}`}
+          {loading ? "Processing..." : `Pay Rs. ${checkout_amount}`}
         </button>
       </div>
     </div>
