@@ -97,7 +97,7 @@ class OrderService:
         for product in products:
             sub_total += product.total_amount * product.quantity
         # Later delivery fee according to the location will be implemented here
-        has_free_delivery = sub_total > self.DELIVERY_THRESOLD
+        has_free_delivery = sub_total >= self.DELIVERY_THRESOLD
         total = (
             sub_total
             + (self.VAT_PERCENT_TO_APPLY * sub_total)
@@ -107,7 +107,7 @@ class OrderService:
             total = await self.apply_coupen(user, coupen_code, total)
         return ProductCalculation(
             coupen_applied=coupen_code if coupen_code else None,
-            delivery_fee="FREE" if has_free_delivery else self.DELIVERY_FEE,
+            delivery_fee=0 if has_free_delivery else self.DELIVERY_FEE,
             total=round(total),
             sub_total=round(sub_total),
             vat_amount=round(sub_total * self.VAT_PERCENT_TO_APPLY),
