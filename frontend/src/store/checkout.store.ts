@@ -22,10 +22,20 @@ interface checkoutStoreInterface {
 }
 interface ephimeralCheckoutStore {
   orderIdempotancyKey: string;
+  client_secret: string | null;
+  order_id: string | null;
+  set_client_secret: (val: string) => void;
+  set_order_id: (val: string) => void;
 }
-export const useEphimeralCheckoutStore = create<ephimeralCheckoutStore>(() => ({
-  orderIdempotancyKey: crypto.randomUUID(),
-}));
+export const useEphimeralCheckoutStore = create<ephimeralCheckoutStore>(
+  (set) => ({
+    orderIdempotancyKey: crypto.randomUUID(),
+    client_secret: null,
+    order_id: null,
+    set_order_id: (val) => set({ order_id: val }),
+    set_client_secret: (val) => set({ client_secret: val }),
+  }),
+);
 export const useCheckoutStore = create<checkoutStoreInterface>()(
   persist(
     (set) => ({

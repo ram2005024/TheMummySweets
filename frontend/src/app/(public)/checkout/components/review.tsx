@@ -30,6 +30,8 @@ const Review = () => {
   const idemp_key = useEphimeralCheckoutStore(
     (state) => state.orderIdempotancyKey,
   );
+  const { set_client_secret, set_order_status } = useEphimeralCheckoutStore();
+
   const cartItems = useCartStore((state) => state.cart_items);
   const { clear_cart } = useCartStore();
   const delivery = checkoutData?.delivery_details;
@@ -88,10 +90,12 @@ const Review = () => {
           );
         },
         onSuccess: (data) => {
-          if (data.client_secret && data.order_status == "placed") {
+          if (data?.client_secret && data?.order_status == "placed") {
             console.log("Order placed");
           } else {
-            console.log("Order payment pending");
+            set_client_secret(data?.client_secret);
+            set_order_status(data?.order_status);
+            setActiveLink(5);
           }
           //   Invalidate the cart
           queryClient.invalidateQueries({ queryKey: ["cart"] });
