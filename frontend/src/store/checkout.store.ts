@@ -28,10 +28,13 @@ interface ephimeralCheckoutStore {
   set_order_id: (val: string) => void;
   checkout_amount: number;
   set_checkout_amount: (val: number) => void;
+  generateNewOrderIdempotancyKey: () => void;
 }
 export const useEphimeralCheckoutStore = create<ephimeralCheckoutStore>(
   (set) => ({
     orderIdempotancyKey: crypto.randomUUID(),
+    generateNewOrderIdempotancyKey: () =>
+      set({ orderIdempotancyKey: crypto.randomUUID() }),
     client_secret: null,
     order_id: null,
     checkout_amount: 0,

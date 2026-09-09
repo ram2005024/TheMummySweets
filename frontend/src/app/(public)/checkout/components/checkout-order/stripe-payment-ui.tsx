@@ -15,7 +15,9 @@ interface Props {
 const StripePayment = ({ orderId }: Props) => {
   const stripe = useStripe();
   const elements = useElements();
-  const { checkout_amount } = useEphimeralCheckoutStore();
+  const { checkout_amount, generateNewOrderIdempotancyKey } =
+    useEphimeralCheckoutStore();
+  const { setActiveLink } = useEphimeralCheckoutStore();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -57,7 +59,13 @@ const StripePayment = ({ orderId }: Props) => {
           <p className="text-sm font-medium text-destructive">{error}</p>
         )}
         <div className="flex max-sm:flex-col gap-2">
-          <button className="bg-destructive flex h-11 w-full items-center justify-center rounded-xl px-6 text-sm font-semibold text-primary-foreground shadow-warm-sm transition hover:-translate-y-0.5 hover:shadow-warm disabled:pointer-events-none disabled:opacity-60">
+          <button
+            onClick={() => {
+              setActiveLink(4);
+              generateNewOrderIdempotancyKey();
+            }}
+            className="bg-destructive flex h-11 w-full items-center justify-center rounded-xl px-6 text-sm font-semibold text-primary-foreground shadow-warm-sm transition hover:-translate-y-0.5 hover:shadow-warm disabled:pointer-events-none disabled:opacity-60"
+          >
             Cancel
           </button>
           <button
