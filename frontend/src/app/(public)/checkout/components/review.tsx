@@ -31,7 +31,7 @@ const Review = () => {
     (state) => state.orderIdempotancyKey,
   );
   const cartItems = useCartStore((state) => state.cart_items);
-
+  const { clear_cart } = useCartStore();
   const delivery = checkoutData?.delivery_details;
   const payment = checkoutData?.payment_method;
   const appliedCoupon = checkoutData?.applied_coupen;
@@ -95,6 +95,7 @@ const Review = () => {
           }
           //   Invalidate the cart
           queryClient.invalidateQueries({ queryKey: ["cart"] });
+          clear_cart();
         },
       },
     );
