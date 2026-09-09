@@ -17,6 +17,8 @@ export const deliverySchema = z
       .regex(/^(97|98)\d{8}$/, "Enter a valid Nepali mobile number"),
 
     delivery_landmark: z.string().min(1, "Delivery landmark is required"),
+
+    delivery_note: z.string().optional(),
   })
   .refine(
     (data) =>

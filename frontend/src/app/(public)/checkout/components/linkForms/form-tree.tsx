@@ -1,9 +1,6 @@
 "use client";
 
-import {
-  useCheckoutStore,
-  useEphimeralCheckoutStore,
-} from "@/store/checkout.store";
+import { useEphimeralCheckoutStore } from "@/store/checkout.store";
 import { AnimatePresence, motion } from "framer-motion";
 import StripePayment from "../checkout-order/stripe-payment-ui";
 import StripeProvider from "../checkout-order/stripe-provider";
@@ -18,7 +15,7 @@ const FormTree = () => {
     (state) => state.client_secret,
   );
   const orderId = useEphimeralCheckoutStore((state) => state.order_id);
-  const activeLink = useCheckoutStore((state) => state.activeLink);
+  const activeLink = useEphimeralCheckoutStore((state) => state.activeLink);
   const steps = {
     1: <DeliveryForm />,
     2: <Timing />,

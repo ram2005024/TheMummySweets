@@ -2,7 +2,10 @@
 
 import { cn } from "@/lib/utils";
 import { deliverySchema } from "@/schemas/order/delivery_schema";
-import { useCheckoutStore } from "@/store/checkout.store";
+import {
+  useCheckoutStore,
+  useEphimeralCheckoutStore,
+} from "@/store/checkout.store";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   ArrowRight,
@@ -23,7 +26,9 @@ const Delivery = () => {
   const router = useRouter();
   const setCheckoutData = useCheckoutStore((state) => state.setCheckoutData);
 
-  const setActiveLink = useCheckoutStore((state) => state.setActiveLink);
+  const setActiveLink = useEphimeralCheckoutStore(
+    (state) => state.setActiveLink,
+  );
 
   const {
     register,

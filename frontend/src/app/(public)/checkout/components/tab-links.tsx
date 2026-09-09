@@ -1,12 +1,12 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import { useCheckoutStore } from "@/store/checkout.store";
+import { useEphimeralCheckoutStore } from "@/store/checkout.store";
 import { BookAudio, Check, Clock, IdCardIcon, MapPin } from "lucide-react";
 import { FaGreaterThan } from "react-icons/fa";
 
 const TabLinks = () => {
-  const { activeLink } = useCheckoutStore();
+  const { activeLink } = useEphimeralCheckoutStore();
 
   const links = [
     { name: "Delivery", tabCount: 1, icon: MapPin },

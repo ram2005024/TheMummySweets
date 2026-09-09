@@ -14,13 +14,13 @@ interface CheckoutData {
 }
 
 interface checkoutStoreInterface {
-  activeLink: number;
   checkoutData: CheckoutData;
-  setActiveLink: (val: number) => void;
   setCheckoutData: (data: Partial<CheckoutData>) => void;
   clearCheckout: () => void;
 }
 interface ephimeralCheckoutStore {
+  activeLink: number;
+  setActiveLink: (val: number) => void;
   orderIdempotancyKey: string;
   client_secret: string | null;
   order_id: string | null;
@@ -34,14 +34,14 @@ export const useEphimeralCheckoutStore = create<ephimeralCheckoutStore>(
     order_id: null,
     set_order_id: (val) => set({ order_id: val }),
     set_client_secret: (val) => set({ client_secret: val }),
+    activeLink: 1,
+    setActiveLink: (val) => set({ activeLink: val }),
   }),
 );
 export const useCheckoutStore = create<checkoutStoreInterface>()(
   persist(
     (set) => ({
-      activeLink: 1,
       checkoutData: {},
-      setActiveLink: (val) => set({ activeLink: val }),
       setCheckoutData: (data) =>
         set((state) => ({
           checkoutData: {
@@ -51,7 +51,6 @@ export const useCheckoutStore = create<checkoutStoreInterface>()(
         })),
       clearCheckout: () =>
         set({
-          activeLink: 1,
           checkoutData: {},
         }),
     }),

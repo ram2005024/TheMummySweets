@@ -1,7 +1,6 @@
 "use client";
 
 import { useOrderRequest } from "@/hooks/order/useOrder";
-import queryClient from "@/libs/queryClient";
 import { OrderRequest } from "@/schemas/order/order_request_schema";
 import { useCartStore } from "@/store/cart_store";
 import {
@@ -25,15 +24,16 @@ import { toast } from "sonner";
 
 const Review = () => {
   const checkoutData = useCheckoutStore((state) => state.checkoutData);
-  const setActiveLink = useCheckoutStore((state) => state.setActiveLink);
+  const setActiveLink = useEphimeralCheckoutStore(
+    (state) => state.setActiveLink,
+  );
   const setCheckoutData = useCheckoutStore((state) => state.setCheckoutData);
   const idemp_key = useEphimeralCheckoutStore(
     (state) => state.orderIdempotancyKey,
   );
-  const { set_client_secret, set_order_status } = useEphimeralCheckoutStore();
+  const { set_client_secret, set_order_id } = useEphimeralCheckoutStore();
 
   const cartItems = useCartStore((state) => state.cart_items);
-  const { clear_cart } = useCartStore();
   const delivery = checkoutData?.delivery_details;
   const payment = checkoutData?.payment_method;
   const appliedCoupon = checkoutData?.applied_coupen;
@@ -91,15 +91,13 @@ const Review = () => {
         },
         onSuccess: (data) => {
           if (data?.client_secret && data?.order_status == "placed") {
-            console.log("Order placed");
+            // queryClient.invalidateQueries({ queryKey: ["cart"] });
+            // clear_cart();
           } else {
-            set_client_secret(data?.client_secret);
-            set_order_status(data?.order_status);
+            set_client_secret(data?.client_secret || "");
+            set_order_id(data.order_id);
             setActiveLink(5);
           }
-          //   Invalidate the cart
-          queryClient.invalidateQueries({ queryKey: ["cart"] });
-          clear_cart();
         },
       },
     );
@@ -165,7 +163,7 @@ const Review = () => {
             <div>
               <p className="text-xs text-ink-muted">Delivery Time</p>
               <p className="mt-1 text-sm font-medium text-ink">
-                {delivery?.delivery_timing === "SCHEDULED"
+                {delivery?.delivery_timing === "scheduled"
                   ? delivery.scheduled_time
                     ? new Date(delivery.scheduled_time).toLocaleString()
                     : "Scheduled"
@@ -173,7 +171,7 @@ const Review = () => {
               </p>
             </div>
 
-            {delivery?.delivery_note && (
+            {delivery?.delivery_landmark && (
               <div>
                 <p className="text-xs text-ink-muted">Note</p>
                 <p className="mt-1 text-sm font-medium text-ink">
@@ -289,10 +287,19 @@ const Review = () => {
           type="button"
           onClick={handleSubmit}
           disabled={orderMutation.isPending}
-          className="bg-accent-foreground inline-flex h-11 items-center justify-center gap-2 rounded-xl px-6 text-sm font-semibold text-primary-foreground shadow-warm-sm transition hover:-translate-y-0.5 hover:shadow-warm"
+          className="group bg-accent-foreground inline-flex h-11 items-center justify-center gap-2 rounded-xl px-6 text-sm font-semibold text-primary-foreground shadow-warm-sm transition hover:-translate-y-0.5 hover:shadow-warm"
         >
-          Place Order
-          <ArrowRight className="size-4" />
+          {orderMutation.isPending ? (
+            <div className="flex items-center gap-2">
+              <span>Placing Order</span>
+              <div className="w-5 h-5 border-3 rounded-full animate-spin border-t-transparent"></div>
+            </div>
+          ) : (
+            <span className="flex  items-center gap-2">
+              Place Order{" "}
+              <ArrowRight className="size-4 transition-transform ease-in-out group-hover:translate-x-3" />
+            </span>
+          )}
         </button>
       </div>
     </div>

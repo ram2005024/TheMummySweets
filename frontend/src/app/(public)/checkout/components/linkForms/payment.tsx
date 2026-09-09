@@ -1,7 +1,10 @@
 "use client";
 
 import { PaymentMethod } from "@/schemas/order/order_request_schema";
-import { useCheckoutStore } from "@/store/checkout.store";
+import {
+  useCheckoutStore,
+  useEphimeralCheckoutStore,
+} from "@/store/checkout.store";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ArrowLeft, ArrowRight, Check } from "lucide-react";
 import { useForm } from "react-hook-form";
@@ -38,7 +41,9 @@ const Payment = () => {
 
   const setCheckoutData = useCheckoutStore((state) => state.setCheckoutData);
 
-  const setActiveLink = useCheckoutStore((state) => state.setActiveLink);
+  const setActiveLink = useEphimeralCheckoutStore(
+    (state) => state.setActiveLink,
+  );
 
   const {
     register,
