@@ -162,7 +162,6 @@ class OrderService:
             metadata={"order_id": str(order.id), "payment_id": str(payment.id)},
         )
         payment.payment_intent_id = payment_intent.id
-        await self.cart_service.delete_entire_cart(str(user.id))
         return OrderResponse(
             payment_method=data.payment_method,
             client_secret=payment_intent.client_secret,
