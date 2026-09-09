@@ -56,15 +56,19 @@ const StripePayment = ({ orderId }: Props) => {
         {error && (
           <p className="text-sm font-medium text-destructive">{error}</p>
         )}
-
-        <button
-          type="button"
-          disabled={!stripe || !elements || loading}
-          onClick={handlePayment}
-          className="gradient-warm flex h-11 w-full items-center justify-center rounded-xl px-6 text-sm font-semibold text-primary-foreground shadow-warm-sm transition hover:-translate-y-0.5 hover:shadow-warm disabled:pointer-events-none disabled:opacity-60"
-        >
-          {loading ? "Processing..." : `Pay Rs. ${checkout_amount}`}
-        </button>
+        <div className="flex max-sm:flex-col gap-2">
+          <button className="bg-destructive flex h-11 w-full items-center justify-center rounded-xl px-6 text-sm font-semibold text-primary-foreground shadow-warm-sm transition hover:-translate-y-0.5 hover:shadow-warm disabled:pointer-events-none disabled:opacity-60">
+            Cancel
+          </button>
+          <button
+            type="button"
+            disabled={!stripe || !elements || loading}
+            onClick={handlePayment}
+            className="bg-accent-foreground flex h-11 w-full items-center justify-center rounded-xl px-6 text-sm font-semibold text-primary-foreground shadow-warm-sm transition hover:-translate-y-0.5 hover:shadow-warm disabled:pointer-events-none disabled:opacity-60"
+          >
+            {loading ? "Processing..." : `Pay Rs. ${checkout_amount}`}
+          </button>
+        </div>
       </div>
     </div>
   );
