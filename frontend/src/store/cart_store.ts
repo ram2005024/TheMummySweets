@@ -21,6 +21,7 @@ interface CartInterface {
   delivery_thresold: number;
   vat_amount: number; //Hardcode for now
   total: number;
+  setDelivery: (val: number) => void;
   calculate: () => void;
   debounceTime: number;
   debounceState: Map<string, ReturnType<typeof setTimeout>>;
@@ -40,8 +41,9 @@ export const useCartStore = create<CartInterface>((set, get) => ({
       vat_amount: val.tax_amount,
     });
   },
+  setDelivery: (val) => set({ delivery: val }),
   versionState: new Map(),
-  delivery_thresold: 600,
+  delivery_thresold: 620,
   debounceTime: 400,
   timeoutFunction: (pid) => {
     // Set the debounce version version
@@ -87,7 +89,7 @@ export const useCartStore = create<CartInterface>((set, get) => ({
   open: false,
   onOpenChange: (val) => set({ open: val }),
   sub_total: 0,
-  delivery: 60, //Hardcode for now
+  delivery: 60,
   vat_amount: 0.13, //Hardcode for now
   total: 0,
   setCartItem: async (id, product) => {
@@ -140,10 +142,10 @@ export const useCartStore = create<CartInterface>((set, get) => ({
     }
   },
   clear_cart: async () => {
-    set({ cart_items: [] });
-    get().calculate();
     const previousValue = get().cart_items;
     if (!previousValue) return;
+    set({ cart_items: [] });
+    get().calculate();
     try {
       await CartService.clearCart();
     } catch (error) {
@@ -170,13 +172,15 @@ export const useCartStore = create<CartInterface>((set, get) => ({
         0,
       );
       const vat_amount = sub_total * 0.13;
-      const total = sub_total + vat_amount + s.delivery;
+      const delivery_amount = sub_total >= s.delivery_thresold ? 0 : s.delivery;
+      get().setDelivery(delivery_amount);
+      const total = sub_total + vat_amount + delivery_amount;
       return {
         ...s,
         total: Math.round(total),
         sub_total: Math.round(sub_total),
         vat_amount: Math.round(vat_amount),
-        delivery: total >= s.delivery_thresold ? 0 : 60,
+        delivery: delivery_amount,
       };
     }),
   decrease_cart_quantity: (id) => {
