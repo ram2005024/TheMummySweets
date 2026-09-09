@@ -1,5 +1,6 @@
 "use client";
 
+import { useEphimeralCheckoutStore } from "@/store/checkout.store";
 import {
   PaymentElement,
   useElements,
@@ -14,7 +15,7 @@ interface Props {
 const StripePayment = ({ orderId }: Props) => {
   const stripe = useStripe();
   const elements = useElements();
-
+  const { checkout_amount } = useEphimeralCheckoutStore();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -62,7 +63,7 @@ const StripePayment = ({ orderId }: Props) => {
           onClick={handlePayment}
           className="gradient-warm flex h-11 w-full items-center justify-center rounded-xl px-6 text-sm font-semibold text-primary-foreground shadow-warm-sm transition hover:-translate-y-0.5 hover:shadow-warm disabled:pointer-events-none disabled:opacity-60"
         >
-          {loading ? "Processing..." : "Pay Now"}
+          {loading ? "Processing..." : `Pay ${checkout_amount}`}
         </button>
       </div>
     </div>

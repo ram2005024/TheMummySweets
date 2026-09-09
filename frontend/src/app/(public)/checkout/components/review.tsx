@@ -31,7 +31,8 @@ const Review = () => {
   const idemp_key = useEphimeralCheckoutStore(
     (state) => state.orderIdempotancyKey,
   );
-  const { set_client_secret, set_order_id } = useEphimeralCheckoutStore();
+  const { set_client_secret, set_order_id, set_checkout_amount } =
+    useEphimeralCheckoutStore();
 
   const cartItems = useCartStore((state) => state.cart_items);
   const delivery = checkoutData?.delivery_details;
@@ -97,6 +98,7 @@ const Review = () => {
             set_client_secret(data?.client_secret || "");
             set_order_id(data.order_id);
             setActiveLink(5);
+            set_checkout_amount(data.amount);
           }
         },
       },
