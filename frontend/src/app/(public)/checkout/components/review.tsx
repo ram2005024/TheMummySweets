@@ -19,7 +19,7 @@ import {
   Tag,
   X,
 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 const Review = () => {
@@ -31,8 +31,12 @@ const Review = () => {
   const idemp_key = useEphimeralCheckoutStore(
     (state) => state.orderIdempotancyKey,
   );
-  const { set_client_secret, set_order_id, set_checkout_amount } =
-    useEphimeralCheckoutStore();
+  const {
+    set_client_secret,
+    set_order_id,
+    set_checkout_amount,
+    generateNewOrderIdempotancyKey,
+  } = useEphimeralCheckoutStore();
 
   const cartItems = useCartStore((state) => state.cart_items);
   const delivery = checkoutData?.delivery_details;
@@ -104,7 +108,9 @@ const Review = () => {
       },
     );
   };
-
+  useEffect(() => {
+    generateNewOrderIdempotancyKey();
+  }, []);
   return (
     <div className="overflow-hidden surface-card ">
       <div className="border-b border-border px-5 py-5 sm:px-7">

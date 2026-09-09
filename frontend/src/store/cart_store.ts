@@ -104,7 +104,7 @@ export const useCartStore = create<CartInterface>((set, get) => ({
               id: product.id,
               main_image: product.main_image,
               name: product.product_name,
-              price: product.price,
+              price: product.total_amount,
               quantity: 1,
               quantized_unit: product.grouped_unit,
             },
@@ -131,7 +131,7 @@ export const useCartStore = create<CartInterface>((set, get) => ({
     set((s) => ({
       cart_items: s.cart_items.filter((val) => val.id !== id),
     }));
-    get().calculate();
+    if (get().cart_items.length === 0) get().clear_cart();
     try {
       await CartService.deleteCart(id);
     } catch (error) {
@@ -146,16 +146,8 @@ export const useCartStore = create<CartInterface>((set, get) => ({
   clear_cart: async () => {
     const previousValue = get().cart_items;
     if (!previousValue) return;
-    set({ cart_items: [] });
+    set({ cart_items: [], total: 0, sub_total: 0, delivery: 0, vat_amount: 0 });
     get().calculate();
-    try {
-      await CartService.clearCart();
-    } catch (error) {
-      console.log(`Something went wrong on the server:${error}`);
-      set({
-        cart_items: previousValue,
-      });
-    }
   },
   increase_cart_quantity: (id) => {
     set((s) => ({
