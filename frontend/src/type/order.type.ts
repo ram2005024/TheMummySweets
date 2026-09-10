@@ -55,3 +55,7 @@ export type OrderResponse = {
   order_items: CartItem[];
   delivery_details: DeliverySchemaType;
 };
+
+export type OrderPaymentStatus = {
+  payment_status: PaymentStatus;
+};

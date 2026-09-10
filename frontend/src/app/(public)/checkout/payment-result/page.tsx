@@ -1,11 +1,18 @@
-interface props {
-  searchParams: Promise<{
-    order_id: string;
-  }>;
-}
-const PaymnentResult = async ({ searchParams }: props) => {
-  const params = await searchParams;
-  return <div></div>;
-};
+import { redirect } from "next/navigation";
+import OrderResult from "./components/order-result";
 
-export default PaymnentResult;
+interface Props {
+  searchParams: {
+    order_id?: string;
+  };
+}
+
+export default async function PaymentResult({ searchParams }: Props) {
+  const orderId = searchParams.order_id;
+
+  if (!orderId) {
+    redirect("/checkout");
+  }
+
+  return <OrderResult order_id={orderId} />;
+}

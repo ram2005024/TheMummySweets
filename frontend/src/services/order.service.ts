@@ -1,6 +1,6 @@
 import api from "@/libs/api";
 import { OrderRequest } from "@/schemas/order/order_request_schema";
-import { OrderResponse } from "@/type/order.type";
+import { OrderPaymentStatus, OrderResponse } from "@/type/order.type";
 
 export class OrderService {
   // Order api call
@@ -14,6 +14,12 @@ export class OrderService {
       },
     });
 
+    return res.data.data;
+  };
+  static findPaymentStatus = async (
+    order_id: string,
+  ): Promise<OrderPaymentStatus> => {
+    const res = await api.get(`order/status/${order_id}`);
     return res.data.data;
   };
 }
