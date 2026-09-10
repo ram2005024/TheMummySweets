@@ -1,4 +1,3 @@
-import json
 import logging
 
 import boto3
@@ -8,60 +7,76 @@ from app.core.config import settings
 
 logger = logging.getLogger(__name__)
 
-BUCKET_NAME = "the-mummy-medias"
+BUCKET_NAME = settings.S3_BUCKET_NAME
 
 s3_client = boto3.client(
     "s3",
-    endpoint_url=settings.MINIO_ENDPOINT,  # Not required in production (real AWS S3)
-    aws_access_key_id=settings.MINIO_ACCESS,  # Replace with real AWS S3 access key
-    aws_secret_access_key=settings.MINIO_SECRET,  # Replace with real AWS S3 secret key
-    region_name="us-east-1",
+    region_name=settings.AWS_REGION,
 )
 
 
-def build_public_read_policy(bucket_name: str) -> str:
-    policy = {
-        "Version": "2012-10-17",
-        "Statement": [
-            {
-                "Sid": "PublicReadGetObject",
-                "Effect": "Allow",
-                "Principal": "*",
-                "Action": ["s3:GetObject"],
-                "Resource": [f"arn:aws:s3:::{bucket_name}/*"],
-            }
-        ],
-    }
-    return json.dumps(policy)
+def upload_file(
+    file_obj,
+    object_name: str,
+    content_type: str | None = None,
+) -> str:
+    extra_args = {}
 
+    if content_type:
+        extra_args["ContentType"] = content_type
 
-def ensure_bucket(bucket_name: str) -> None:
     try:
-        s3_client.head_bucket(Bucket=bucket_name)
-        logger.info("Bucket '%s' already exists", bucket_name)
-    except ClientError as exc:
-        error_code = exc.response.get("Error", {}).get("Code", "")
-        if error_code in ("404", "NoSuchBucket"):
-            s3_client.create_bucket(Bucket=bucket_name)
-            logger.info("Created bucket '%s'", bucket_name)
-        else:
-            logger.error("Failed to check bucket '%s': %s", bucket_name, exc)
-            raise
-
-    apply_bucket_policy(bucket_name)
-
-
-def apply_bucket_policy(bucket_name: str) -> None:
-    try:
-        s3_client.put_bucket_policy(
-            Bucket=bucket_name,
-            Policy=build_public_read_policy(bucket_name),
+        s3_client.upload_fileobj(
+            file_obj,
+            BUCKET_NAME,
+            object_name,
+            ExtraArgs=extra_args,
         )
-        logger.info("Applied public-read policy to bucket '%s'", bucket_name)
-    except ClientError as exc:
-        logger.error("Failed to apply policy to bucket '%s': %s", bucket_name, exc)
+
+        return object_name
+
+    except ClientError:
+        logger.exception(
+            "Failed to upload '%s' to bucket '%s'",
+            object_name,
+            BUCKET_NAME,
+        )
         raise
 
 
-# Ensure the bucket exists and has the correct policy applied
-ensure_bucket(BUCKET_NAME)
+def delete_file(object_name: str) -> None:
+    try:
+        s3_client.delete_object(
+            Bucket=BUCKET_NAME,
+            Key=object_name,
+        )
+
+    except ClientError:
+        logger.exception(
+            "Failed to delete '%s' from bucket '%s'",
+            object_name,
+            BUCKET_NAME,
+        )
+        raise
+
+
+def generate_presigned_url(
+    object_name: str,
+    expires_in: int = 3600,
+) -> str:
+    try:
+        return s3_client.generate_presigned_url(
+            "get_object",
+            Params={
+                "Bucket": BUCKET_NAME,
+                "Key": object_name,
+            },
+            ExpiresIn=expires_in,
+        )
+
+    except ClientError:
+        logger.exception(
+            "Failed to generate presigned URL for '%s'",
+            object_name,
+        )
+        raise

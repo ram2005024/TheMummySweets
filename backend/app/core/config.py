@@ -61,6 +61,9 @@ class Settings(BaseSettings):
     STRIPE_SECRET_KEY: str = ""
     STRIPE_WEBHOOK_SECRET: str = ""
 
+    # AWS S3
+    AWS_REGION: str = ""
+    S3_BUCKET_NAME: str = ""
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
 
