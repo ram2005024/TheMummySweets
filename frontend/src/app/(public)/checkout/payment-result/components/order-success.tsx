@@ -67,7 +67,7 @@ const OrderSuccess = ({ orderId }: Props) => {
   }, []);
 
   return (
-    <div className="flex min-h-[520px] w-full items-center justify-center px-4 py-10">
+    <div className="flex min-h-130 w-full items-center justify-center px-4 py-10">
       <div
         ref={containerRef}
         className="surface-card w-full max-w-lg overflow-hidden"

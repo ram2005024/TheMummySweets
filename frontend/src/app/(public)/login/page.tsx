@@ -1,18 +1,18 @@
 "use client";
 
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
 import {
   Card,
-  CardHeader,
-  CardTitle,
   CardContent,
   CardFooter,
+  CardHeader,
+  CardTitle,
 } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Image from "next/image";
-import PhoneLoginForm from "../../../components/auth/login/PhoneLoginForm";
-import EmailLoginForm from "../../../components/auth/login/EmailLoginForm";
 import { useRouter } from "next/navigation";
+import EmailLoginForm from "../../../components/auth/login/EmailLoginForm";
+import PhoneLoginForm from "../../../components/auth/login/PhoneLoginForm";
 
 export default function Login() {
   let device_id = localStorage.getItem("device_id");
