@@ -31,16 +31,17 @@ class StripeService:
         # Create the event
         await self.stripe_repo.create(event["id"], event["type"])
         # Check the event type
+        intent_obj = event["data"]["object"].to_dict()
         if event["type"] == "payment_intent.succeeded":
-            await self.handle_succeed_event(event["data"]["object"])
-        elif event["type"] == "payment_intent.failed":
-            await self.handle_failed_event(event["data"]["object"])
+            await self.handle_succeed_event(intent_obj)
+        elif event["type"] == "payment_intent.payment_failed":
+            await self.handle_failed_event(intent_obj)
         await self.stripe_repo.commit()
         return
 
     async def handle_succeed_event(self, intent_object: dict):
         intent_id = intent_object.get("id", "")
-        meta: dict = intent_object.get("meta", {})
+        meta: dict = intent_object.get("metadata", {})
         order_id = meta.get("order_id", "")
         payment = await self.payment_repo.get_payment_by_intent_id(intent_id)
         order = await self.order_repo.get_order_by_id(order_id)
@@ -57,7 +58,7 @@ class StripeService:
 
     async def handle_failed_event(self, intent_object: dict):
         intent_id = intent_object.get("id", "")
-        meta: dict = intent_object.get("meta", {})
+        meta: dict = intent_object.get("metadata", {})
         order_id = meta.get("order_id", "")
         payment = await self.payment_repo.get_payment_by_intent_id(intent_id)
         order = await self.order_repo.get_order_by_id(order_id)

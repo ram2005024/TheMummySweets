@@ -14,8 +14,14 @@ class StripeRepo:
         ).scalar_one_or_none()
         return event
 
-    async def create(self, event_id: str, event_type: str):
-        event = StripeEvent(event_id=event_id, event_type=event_type)
+    async def create(
+        self, event_id: str, event_type: str, payment_intent_id: str | None = None
+    ):
+        event = StripeEvent(
+            event_id=event_id,
+            event_type=event_type,
+            payment_intent_id=payment_intent_id,
+        )
         self.db.add(event)
         await self.db.flush()
 

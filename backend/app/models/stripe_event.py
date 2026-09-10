@@ -7,4 +7,4 @@ class StripeEvent(BaseModel):
     __tablename__ = "stripe_events"
     event_id: Mapped[str] = mapped_column(unique=True)
     event_type: Mapped[str]
-    payment_intent_id: Mapped[str] = mapped_column(unique=True)
+    payment_intent_id: Mapped[str] = mapped_column(unique=False, nullable=True)

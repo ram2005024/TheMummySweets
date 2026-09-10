@@ -5,7 +5,6 @@ from fastapi import APIRouter, Depends, Header, Request
 from app.core.config import settings
 from app.dependencies.get_service_factories import get_stripe_service
 from app.exceptions.stripe_exceptions import (
-    InvalidPayload,
     InvalidSignature,
     MissingSignature,
 )
@@ -30,7 +29,7 @@ async def check_stripe(
             secret=settings.STRIPE_WEBHOOK_SECRET,
         )
     except ValueError:
-        raise InvalidPayload
+        print("Invalid payload")
 
     except stripe.SignatureVerificationError:
         raise InvalidSignature
