@@ -1,8 +1,7 @@
 from typing import Annotated
 
+import redis.asyncio as redis
 from fastapi import Depends
-from redis import Redis
-from redis.asyncio import Redis
 
 from app.core.redis import get_redis
 from app.modules.cart.cart_services import CartService
@@ -16,12 +15,12 @@ from app.modules.order.dependencies.repo_factory import (
 )
 from app.modules.order.repo.coupen_repo import CoupenRepo
 from app.modules.order.repo.order_repo import OrderRepo
+from app.modules.order.repo.payment_repo import PaymentRepo
 from app.modules.order.service.idempotancy_service import IdempotancyService
 from app.modules.order.service.order_service import OrderService
-from app.modules.order.service.payment_repo import PaymentRepo
 
 
-def get_order_idempotent_service(redis: Annotated[Redis, Depends(get_redis)]):
+def get_order_idempotent_service(redis: Annotated[redis.Redis, Depends(get_redis)]):
     return IdempotancyService(redis)
 
 

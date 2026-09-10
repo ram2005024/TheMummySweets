@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.db import get_db
 from app.modules.order.repo.coupen_repo import CoupenRepo
 from app.modules.order.repo.order_repo import OrderRepo
-from app.modules.order.service.payment_repo import PaymentRepo
+from app.modules.order.repo.payment_repo import PaymentRepo
 
 
 def get_order_repo(db: Annotated[AsyncSession, Depends(get_db)]):

@@ -78,3 +78,7 @@ class OrderResponse(BaseModel):
         if values.payment_method != PaymentMethod.COD and values.client_secret is None:
             raise ValueError("Client secret key missing")
         return values
+
+
+class OrderPaymentStatusSchema(BaseModel):
+    payment_status: str

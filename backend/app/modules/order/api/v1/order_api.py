@@ -1,5 +1,6 @@
 import json
 from typing import Annotated
+from uuid import UUID
 
 from fastapi import APIRouter, Depends, Request
 
@@ -13,7 +14,11 @@ from app.modules.order.order_exception import (
     OrderIdempotancyKeyMissing,
     OrderIsAlreadyProcessing,
 )
-from app.modules.order.schemas.order_schema import OrderRequest, OrderResponse
+from app.modules.order.schemas.order_schema import (
+    OrderPaymentStatusSchema,
+    OrderRequest,
+    OrderResponse,
+)
 from app.modules.order.service.idempotancy_service import IdempotancyService
 from app.modules.order.service.order_service import OrderService
 from app.schemas.common import SuccessResponse
@@ -50,3 +55,17 @@ async def order_endpoint(
         if idemp_key is not None:
             await order_idempotancy.unlock_key(idemp_key)
     return SuccessResponse(data=response, message="Order created successfully")
+
+
+@order_api.get(
+    "/status/{order_id}", response_model=SuccessResponse[OrderPaymentStatusSchema]
+)
+async def order_payment_status(
+    user: Annotated[User, Depends(RolePermission(["admin", "member"]))],
+    order_service: Annotated[OrderService, Depends(get_order_service)],
+    order_id: UUID,
+):
+    payment_status = await order_service.find_order_payment_status(str(order_id))
+    return SuccessResponse(
+        data=OrderPaymentStatusSchema(payment_status=payment_status.value)
+    )
