@@ -110,7 +110,7 @@ const ReviewCommentRead = ({ initial_data, product_id }: Props) => {
         </div>
       ) : (
         <div className="space-y-4">
-          {reviews.map((review) => {
+          {reviews.map((review, index) => {
             const userName = review.user.profile.full_name || "Anonymous";
 
             const userImage = review.user.profile.image;
@@ -119,7 +119,7 @@ const ReviewCommentRead = ({ initial_data, product_id }: Props) => {
 
             return (
               <article
-                key={review.id}
+                key={index}
                 className="rounded-xl border bg-card p-4 sm:p-5"
               >
                 {/* Review Header */}
