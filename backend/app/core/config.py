@@ -37,7 +37,7 @@ class Settings(BaseSettings):
     WHATSAPP_TOKEN: str = ""
     WHATSAPP_PHONE_NUMBER_ID: str = ""
 
-    DEBUG: bool = True
+    DEBUG: bool
     ACCESS_EXPIRY: int = 10
     REFRESH_EXPIRY: int = 7
     JWT_SECRET_KEY: str = ""
