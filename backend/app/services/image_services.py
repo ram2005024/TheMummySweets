@@ -3,11 +3,12 @@ import io
 from typing import BinaryIO
 
 import sentry_sdk
-from app.core.aws_s3 import generate_presigned_url, upload_file
-from app.core.config import settings
-from app.exceptions.image_exceptions import InvalidImageFormat
 from fastapi import UploadFile
 from PIL import Image
+
+from app.core.aws_s3 import upload_file
+from app.core.config import settings
+from app.exceptions.image_exceptions import InvalidImageFormat
 
 
 class ImageService:
@@ -76,6 +77,9 @@ class ImageService:
     async def _original(self, image: Image.Image):
         return image.convert("RGB")
 
+    def get_public_url(self, key: str):
+        return f"https://{self.BUCKET}.s3.{settings.AWS_REGION}.amazonaws.com/{key}"
+
     async def upload_image(
         self,
         buffer: BinaryIO,
@@ -88,7 +92,7 @@ class ImageService:
             "image/jpeg",
         )
 
-        return generate_presigned_url(key)
+        return self.get_public_url(key)
 
     async def process_image_upload(
         self,

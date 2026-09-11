@@ -1,6 +1,7 @@
 import logging
 
 import boto3
+from botocore.config import Config
 from botocore.exceptions import ClientError
 
 from app.core.config import settings
@@ -10,8 +11,7 @@ logger = logging.getLogger(__name__)
 BUCKET_NAME = settings.S3_BUCKET_NAME
 
 s3_client = boto3.client(
-    "s3",
-    region_name=settings.AWS_REGION,
+    "s3", region_name=settings.AWS_REGION, config=Config(signature_version="s3v4")
 )
 
 
