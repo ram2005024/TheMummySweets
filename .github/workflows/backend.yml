@@ -51,7 +51,7 @@ jobs:
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            cd ~/TheMummySweets/backend
+            cd ~/TheMummySweets
 
             git pull origin main
 
