@@ -50,7 +50,7 @@ services:
     depends_on:
       - postgres
       - redis
-    command: uv run celery -A app.tasks.celery_app.celery_app worker --loglevel=info
+    command: uv run celery -A app.core.celery_app.celery_app worker --loglevel=info
     networks:
       - app_network
 
