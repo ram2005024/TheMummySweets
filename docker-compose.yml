@@ -2,7 +2,7 @@ services:
   postgres:
     image: postgres:17
     container_name: postgres
-    restart: unless-stopped
+    restart: always
     env_file:
       - ./backend/.env
     volumes:
@@ -13,16 +13,17 @@ services:
   redis:
     image: redis:8
     container_name: redis
-    restart: unless-stopped
+    restart: always
     volumes:
       - redis_data:/data
     networks:
       - app_network
 
   fastapi_app:
-    image: ghcr.io/ram2005024/themummysweets-backend:${IMAGE_TAG:-latest}
+    build:
+      context: ./backend
     container_name: fastapi_app
-    restart: unless-stopped
+    restart: always
     env_file:
       - ./backend/.env
     ports:
@@ -34,28 +35,37 @@ services:
       uv run uvicorn app.main:app
       --host 0.0.0.0
       --port 8000
-      --proxy-headers
-      --forwarded-allow-ips="*"
+      --reload
+    volumes:
+      - ./backend:/app
     networks:
       - app_network
 
   celery:
-    image: ghcr.io/ram2005024/themummysweets-backend:${IMAGE_TAG:-latest}
+    build:
+      context: ./backend
     container_name: celery_container
-    restart: unless-stopped
+    restart: always
     env_file:
       - ./backend/.env
     depends_on:
       - postgres
       - redis
-    command: uv run celery -A app.tasks.celery_app.celery_app worker --loglevel=info
+    command: >
+      uv run celery
+      -A app.tasks.celery_app.celery_app
+      worker
+      --loglevel=info
+    volumes:
+      - ./backend:/app
     networks:
       - app_network
 
   frontend:
-    image: ghcr.io/ram2005024/themummysweets-frontend:${IMAGE_TAG:-latest}
+    build:
+      context: ./frontend
     container_name: frontend
-    restart: unless-stopped
+    restart: always
     env_file:
       - ./frontend/.env
     ports:
