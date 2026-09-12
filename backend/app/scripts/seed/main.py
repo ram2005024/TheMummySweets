@@ -13,6 +13,7 @@ from app.modules.menu.models.product_model import Product, QuantizedUnit
 from app.modules.menu.models.review_model import Comment, Review
 from app.modules.menu.models.wishlist_model import WishList  # noqa
 from app.modules.order.models.coupen_model import CoupenModel
+from app.modules.order.models.delivery_details import DeliveryDetails  # noqa
 from app.modules.order.models.order_item_model import OrderItem
 from app.modules.order.models.order_model import OrderModel, OrderStatus
 from app.modules.order.models.payment_model import (

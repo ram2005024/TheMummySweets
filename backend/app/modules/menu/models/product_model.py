@@ -62,8 +62,8 @@ class Product(BaseModel):
     )
     __table_args__ = (
         CheckConstraint(
-            "(grouped_unit = 'na' AND grouped_quantity = 0) "
-            "OR (grouped_unit IN ('pcs','ml','ltr') AND grouped_quantity > 0)",
+            "(grouped_unit = 'NA' AND grouped_quantity = 0) "
+            "OR (grouped_unit IN ('PCS','ML','LTR') AND grouped_quantity > 0)",
             name="grouped_quantity_positive_for_unit",
         ),
         CheckConstraint("price > 0", name="Positive price value"),
