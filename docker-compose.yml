@@ -5,19 +5,19 @@ services:
     restart: always
     env_file:
       - ./backend/.env
+    ports:
+      - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-    networks:
-      - app_network
 
   redis:
     image: redis:8
     container_name: redis
     restart: always
+    ports:
+      - "6379:6379"
     volumes:
       - redis_data:/data
-    networks:
-      - app_network
 
   fastapi_app:
     build:
@@ -38,8 +38,6 @@ services:
       --reload
     volumes:
       - ./backend:/app
-    networks:
-      - app_network
 
   celery:
     build:
@@ -58,12 +56,12 @@ services:
       --loglevel=info
     volumes:
       - ./backend:/app
-    networks:
-      - app_network
 
   frontend:
     build:
       context: ./frontend
+      args:
+        NEXT_PUBLIC_BACKEND_URL: http://localhost:8000/api/v1
     container_name: frontend
     restart: always
     env_file:
@@ -72,11 +70,6 @@ services:
       - "3000:3000"
     depends_on:
       - fastapi_app
-    networks:
-      - app_network
-
-networks:
-  app_network:
 
 volumes:
   postgres_data:
