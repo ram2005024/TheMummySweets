@@ -1,6 +1,5 @@
-import Image from "next/image";
-import React from "react";
 import { Poppins } from "next/font/google";
+import Image from "next/image";
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -34,7 +33,7 @@ const Hero = () => {
         <h1
           className={`${poppins.className} leading-20 max-sm:leading-15 text-6xl max-sm:text-4xl max-sm:max-w-xs w-full max-w-md font-bold text-black`}
         >
-          The Mummy <span className="text-orange-600">Sweets and Corner</span>
+          The Mummies <span className="text-orange-600">Sweets and Corner</span>
         </h1>
         <h2 className="text-sm text-gray-600 font-light">
           Taste Good Feel Good <br />
