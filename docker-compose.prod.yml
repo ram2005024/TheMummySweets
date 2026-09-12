@@ -1,0 +1,71 @@
+
+services:
+  postgres:
+    image: postgres:17
+    container_name: postgres
+    restart: unless-stopped
+    env_file:
+      - ./backend/.env
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - app_network
+
+  redis:
+    image: redis:8
+    container_name: redis
+    restart: unless-stopped
+    networks:
+      - app_network
+
+  fastapi_app:
+    image: ghcr.io/ram2005024/themummysweets-backend:${IMAGE_TAG:-latest}
+    container_name: fastapi_app
+    restart: unless-stopped
+    env_file:
+      - ./backend/.env
+    ports:
+      - "8000:8000"
+    depends_on:
+      - postgres
+      - redis
+    command: >
+      uv run uvicorn app.main:app
+      --host 0.0.0.0
+      --port 8000
+      --proxy-headers
+      --forwarded-allow-ips="*"
+    networks:
+      - app_network
+
+  celery:
+    image: ghcr.io/ram2005024/themummysweets-backend:${IMAGE_TAG:-latest}
+    container_name: celery_container
+    restart: unless-stopped
+    env_file:
+      - ./backend/.env
+    depends_on:
+      - postgres
+      - redis
+    command: uv run celery -A app.tasks.celery_app.celery_app worker --loglevel=info
+    networks:
+      - app_network
+
+  frontend:
+    image: ghcr.io/ram2005024/themummysweets-frontend:${IMAGE_TAG:-latest}
+    container_name: frontend
+    restart: unless-stopped
+    env_file:
+      - ./frontend/.env
+    ports:
+      - "3000:3000"
+    depends_on:
+      - fastapi_app
+    networks:
+      - app_network
+
+networks:
+  app_network:
+
+volumes:
+  postgres_data:
