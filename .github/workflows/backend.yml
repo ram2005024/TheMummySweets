@@ -1,4 +1,4 @@
-name: Backend CI/CD
+name:  CI/CD
 
 on:
   push:
@@ -6,6 +6,8 @@ on:
       - main
     paths:
       - "backend/**"
+      - "frontend/**"
+      - "docker-compose.prod.yml"
       - ".github/workflows/backend.yml"
 
 jobs:
