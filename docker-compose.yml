@@ -67,7 +67,7 @@ services:
     container_name: frontend
     restart: always
     env_file:
-      - ./frontend/.env
+      - ./frontend/.env.local
     ports:
       - "3000:3000"
     depends_on:
