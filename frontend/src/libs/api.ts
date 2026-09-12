@@ -73,7 +73,7 @@ api.interceptors.response.use(
 export default api;
 
 export const serverapi = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_BACKEND_URL,
+  baseURL: process.env.BACKEND_URL || process.env.NEXT_PUBLIC_BACKEND_URL,
   withCredentials: true,
 });
 
