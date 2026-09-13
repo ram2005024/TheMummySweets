@@ -61,7 +61,9 @@ services:
     build:
       context: ./frontend
       args:
-        NEXT_PUBLIC_BACKEND_URL: http://localhost:8000/api/v1
+        NEXT_PUBLIC_BACKEND_URL: ${NEXT_PUBLIC_BACKEND_URL}
+        NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL}
+        NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: ${NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY}
     container_name: frontend
     restart: always
     env_file:
