@@ -1,3 +1,5 @@
+version: "3.9"
+
 services:
   postgres:
     image: postgres:17
@@ -32,10 +34,7 @@ services:
       - postgres
       - redis
     command: >
-      uv run uvicorn app.main:app
-      --host 0.0.0.0
-      --port 8000
-      --reload
+      uv run uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
     volumes:
       - ./backend:/app
 
@@ -50,16 +49,14 @@ services:
       - postgres
       - redis
     command: >
-      uv run celery
-      -A app.core.celery_app.celery_app
-      worker
-      --loglevel=info
+      uv run celery -A app.core.celery_app.celery_app worker --loglevel=info
     volumes:
       - ./backend:/app
 
   frontend:
     build:
       context: ./frontend
+      dockerfile: Dockerfile
       args:
         NEXT_PUBLIC_BACKEND_URL: ${NEXT_PUBLIC_BACKEND_URL}
         NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL}
@@ -71,8 +68,7 @@ services:
     ports:
       - "3000:3000"
     depends_on:
-      - fastapi_app
-
+    - fastapi_app
 volumes:
   postgres_data:
   redis_data:
