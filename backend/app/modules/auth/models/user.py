@@ -28,7 +28,12 @@ class User(BaseModel):
     password: Mapped[str] = mapped_column(nullable=True)
     phone_no: Mapped[str] = mapped_column(unique=True, nullable=True)
     role: Mapped[UserRole] = mapped_column(
-        SQLEnum(UserRole, name="user role"), default=UserRole.MEMBER
+        SQLEnum(
+            UserRole,
+            name="user role",
+            values_callable=lambda enum: [item.value for item in enum],
+        ),
+        default=UserRole.MEMBER,
     )
     is_active: Mapped[bool] = mapped_column(default=True)
     is_authenticated: Mapped[bool] = mapped_column(default=False)

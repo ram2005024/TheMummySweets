@@ -28,7 +28,12 @@ class OrderStatus(Enum):
 class OrderModel(BaseModel):
     __tablename__ = "orders"
     order_status: Mapped[OrderStatus] = mapped_column(
-        SQLEnum(OrderStatus, name="order_status"), default=OrderStatus.PREPARING
+        SQLEnum(
+            OrderStatus,
+            name="order_status",
+            values_callable=lambda enum: [item.value for item in enum],
+        ),
+        default=OrderStatus.PREPARING,
     )
     profile_id: Mapped[UUID] = mapped_column(
         ForeignKey("profiles.id", ondelete="CASCADE")

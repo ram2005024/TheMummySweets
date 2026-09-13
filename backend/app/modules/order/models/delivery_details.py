@@ -26,7 +26,11 @@ class DeliveryDetails(BaseModel):
     delivery_address: Mapped[str]
     delivery_landmark: Mapped[str | None]
     delivery_timing: Mapped[DeliveryTimingStatus] = mapped_column(
-        SQLEnum(DeliveryTimingStatus, name="delivery_timing_status"),
+        SQLEnum(
+            DeliveryTimingStatus,
+            name="delivery_timing_status",
+            values_callable=lambda enum: [item.value for item in enum],
+        ),
         default=DeliveryTimingStatus.ASAP,
     )
     delivery_note: Mapped[str | None]

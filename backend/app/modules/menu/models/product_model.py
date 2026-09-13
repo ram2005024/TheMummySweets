@@ -2,7 +2,8 @@ from enum import Enum
 from typing import TYPE_CHECKING
 
 from sqlalchemy import ARRAY, CheckConstraint, String
-from sqlalchemy.dialects.postgresql import ENUM, JSONB
+from sqlalchemy import Enum as SQLEnum
+from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -36,7 +37,11 @@ class Product(BaseModel):
     discount_percentage: Mapped[float] = mapped_column(default=0)
     average_preparation_time: Mapped[int] = mapped_column(default=15)
     grouped_unit: Mapped[QuantizedUnit] = mapped_column(
-        ENUM(QuantizedUnit), default=QuantizedUnit.NA
+        SQLEnum(
+            QuantizedUnit,
+            values_callable=lambda enum: [item.value for item in enum],
+        ),
+        default=QuantizedUnit.NA,
     )
     grouped_quantity: Mapped[int] = mapped_column(default=0)
     ingredients: Mapped[list[str]] = mapped_column(

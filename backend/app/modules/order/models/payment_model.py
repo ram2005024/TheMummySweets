@@ -33,11 +33,20 @@ class PaymentModel(BaseModel):
     amount: Mapped[float]
     payment_reference: Mapped[dict | None] = mapped_column(JSON, nullable=True)
     payment_status: Mapped[PaymentStatus] = mapped_column(
-        SQLAlchemyENUM(PaymentStatus, name="payment_status"),
+        SQLAlchemyENUM(
+            PaymentStatus,
+            name="payment_status",
+            values_callable=lambda enum: [item.value for item in enum],
+        ),
         default=PaymentStatus.PENDING,
     )
     payment_method: Mapped[PaymentMethod] = mapped_column(
-        SQLAlchemyENUM(PaymentMethod, name="payment_method"), default=PaymentMethod.COD
+        SQLAlchemyENUM(
+            PaymentMethod,
+            name="payment_method",
+            values_callable=lambda enum: [item.value for item in enum],
+        ),
+        default=PaymentMethod.COD,
     )
     payment_intent_id: Mapped[str | None] = mapped_column(unique=True)
     profile_id: Mapped[UUID] = mapped_column(
