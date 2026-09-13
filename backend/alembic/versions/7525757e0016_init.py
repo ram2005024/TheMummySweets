@@ -1,8 +1,8 @@
 """init
 
-Revision ID: 8eebd11bb29e
+Revision ID: 7525757e0016
 Revises:
-Create Date: 2026-09-12 10:10:16.780806
+Create Date: 2026-09-13 08:11:56.876781
 
 """
 
@@ -14,7 +14,7 @@ from sqlalchemy.dialects import postgresql
 from alembic import op
 
 # revision identifiers, used by Alembic.
-revision: str = "8eebd11bb29e"
+revision: str = "7525757e0016"
 down_revision: str | Sequence[str] | None = None
 branch_labels: str | Sequence[str] | None = None
 depends_on: str | Sequence[str] | None = None
@@ -66,7 +66,7 @@ def upgrade() -> None:
         sa.Column("average_preparation_time", sa.Integer(), nullable=False),
         sa.Column(
             "grouped_unit",
-            postgresql.ENUM("LTR", "ML", "PCS", "NA", name="quantizedunit"),
+            sa.Enum("ltr", "ml", "pcs", "na", name="quantizedunit"),
             nullable=False,
         ),
         sa.Column("grouped_quantity", sa.Integer(), nullable=False),
@@ -139,7 +139,7 @@ def upgrade() -> None:
         sa.Column("phone_no", sa.String(), nullable=True),
         sa.Column(
             "role",
-            sa.Enum("ADMIN", "MEMBER", "RIDER", name="user role"),
+            sa.Enum("admin", "member", "rider", name="user role"),
             nullable=False,
         ),
         sa.Column("is_active", sa.Boolean(), nullable=False),
@@ -246,18 +246,18 @@ def upgrade() -> None:
         sa.Column(
             "payment_status",
             sa.Enum(
-                "FAILED",
-                "PENDING",
-                "CANCELED",
-                "PAID",
-                "REFUNDED",
+                "failed",
+                "pending",
+                "canceled",
+                "paid",
+                "refunded",
                 name="payment_status",
             ),
             nullable=False,
         ),
         sa.Column(
             "payment_method",
-            sa.Enum("STRIPE", "ESEWA", "COD", name="payment_method"),
+            sa.Enum("stripe", "esewa", "cod", name="payment_method"),
             nullable=False,
         ),
         sa.Column("payment_intent_id", sa.String(), nullable=True),
@@ -293,13 +293,13 @@ def upgrade() -> None:
         sa.Column(
             "order_status",
             sa.Enum(
-                "PLACED",
-                "PENDING_PAYMENT",
-                "PREPARING",
-                "SHIPPED",
-                "ARRIVING",
-                "DELIVERED",
-                "CANCELED",
+                "placed",
+                "pending_payment",
+                "preparing",
+                "shipped",
+                "arriving",
+                "delivered",
+                "canceled",
                 name="order_status",
             ),
             nullable=False,
@@ -334,7 +334,7 @@ def upgrade() -> None:
         sa.Column("delivery_landmark", sa.String(), nullable=True),
         sa.Column(
             "delivery_timing",
-            sa.Enum("ASAP", "SCHEDULED", name="delivery_timing_status"),
+            sa.Enum("asap", "scheduled", name="delivery_timing_status"),
             nullable=False,
         ),
         sa.Column("delivery_note", sa.String(), nullable=True),
