@@ -1,11 +1,3 @@
-"""init
-
-Revision ID: 7525757e0016
-Revises:
-Create Date: 2026-09-13 08:11:56.876781
-
-"""
-
 from collections.abc import Sequence
 
 import sqlalchemy as sa
