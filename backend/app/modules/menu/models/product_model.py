@@ -74,7 +74,6 @@ class Product(BaseModel):
         CheckConstraint("price > 0", name="Positive price value"),
     )
 
-    # Dynamic fields
     @hybrid_property
     def in_stock(self):
         return self.stock_quantity > 0
