@@ -29,7 +29,7 @@ async def check_stripe(
             secret=settings.STRIPE_WEBHOOK_SECRET,
         )
     except ValueError:
-        print("Invalid payload")
+        print("Invalid payload provided")
 
     except stripe.SignatureVerificationError:
         raise InvalidSignature
