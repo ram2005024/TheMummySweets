@@ -17,7 +17,10 @@ stripe.api_key = settings.STRIPE_SECRET_KEY
 
 class StripeService:
     def __init__(
-        self, stripe_repo: StripeRepo, payment_repo: PaymentRepo, order_repo: OrderRepo
+        self,
+        stripe_repo: StripeRepo,
+        payment_repo: PaymentRepo,
+        order_repo: OrderRepo,
     ) -> None:
         self.stripe_repo = stripe_repo
         self.payment_repo = payment_repo

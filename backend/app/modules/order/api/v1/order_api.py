@@ -66,6 +66,4 @@ async def order_payment_status(
     order_id: UUID,
 ):
     payment_status = await order_service.find_order_payment_status(str(order_id))
-    return SuccessResponse(
-        data=OrderPaymentStatusSchema(payment_status=payment_status.value)
-    )
+    return SuccessResponse(data=OrderPaymentStatusSchema(payment_status=payment_status))
