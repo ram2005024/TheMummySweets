@@ -125,16 +125,36 @@ jobs:
             git pull origin main
 
             echo "========================================"
+            echo "Stopping old containers"
+            echo "========================================"
+
+            docker compose -f docker-compose.prod.yml down --remove-orphans
+
+            echo "========================================"
+            echo "Cleaning unused Docker resources"
+            echo "========================================"
+
+            docker image prune -af
+            docker container prune -f
+            docker builder prune -af
+
+            echo "========================================"
             echo "Deploying image: $IMAGE_TAG"
             echo "========================================"
 
             export IMAGE_TAG="$IMAGE_TAG"
 
-            echo "Pulling exact images..."
+            echo "========================================"
+            echo "Pulling exact images"
+            echo "========================================"
+
             docker compose -f docker-compose.prod.yml pull
 
-            echo "Recreating containers..."
-            docker compose -f docker-compose.prod.yml up -d --force-recreate
+            echo "========================================"
+            echo "Starting containers"
+            echo "========================================"
+
+            docker compose -f docker-compose.prod.yml up -d
 
             echo "========================================"
             echo "Deployment status"
@@ -143,10 +163,10 @@ jobs:
             docker compose -f docker-compose.prod.yml ps
 
             echo "========================================"
-            echo "Cleaning unused Docker images"
+            echo "Disk usage"
             echo "========================================"
 
-            docker image prune -af
+            docker system df
 
             echo "========================================"
             echo "Deployment completed successfully"
