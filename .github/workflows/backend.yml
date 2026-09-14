@@ -1,3 +1,4 @@
+
 name: CI/CD
 
 on:
@@ -95,6 +96,7 @@ jobs:
           GHCR_USERNAME: ${{ github.actor }}
           GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           IMAGE_TAG: ${{ github.sha }}
+
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
@@ -106,31 +108,55 @@ jobs:
 
             cd ~/TheMummySweets
 
-            echo "Logging into GHCR..."
+            echo "========================================"
+            echo "Logging into GHCR"
+            echo "========================================"
+
             echo "$GHCR_TOKEN" | docker login ghcr.io \
               -u "$GHCR_USERNAME" \
               --password-stdin
 
-            echo "Pulling latest code..."
+            echo "========================================"
+            echo "Pulling latest deployment configuration"
+            echo "========================================"
+
             git pull origin main
 
-            echo "Deploying image: $IMAGE_TAG"
             export IMAGE_TAG="$IMAGE_TAG"
 
-            echo "Pulling new Docker images..."
-            docker compose -f docker-compose.prod.yml pull
+            echo "Deploying image: $IMAGE_TAG"
 
-            echo "Running database migrations..."
+            echo "========================================"
+            echo "Pulling Docker images"
+            echo "========================================"
+
+            docker compose -f docker-compose.prod.yml pull \
+              fastapi_app celery frontend
+
+            echo "========================================"
+            echo "Running database migrations"
+            echo "========================================"
+
             docker compose -f docker-compose.prod.yml run --rm fastapi_app \
               uv run alembic upgrade head
 
-            echo "Starting new containers..."
-            docker compose -f docker-compose.prod.yml up -d --force-recreate
+            echo "========================================"
+            echo "Starting application"
+            echo "========================================"
 
-            echo "Removing unused Docker images..."
+            docker compose -f docker-compose.prod.yml up -d \
+              --force-recreate \
+              fastapi_app celery frontend
+
+            echo "========================================"
+            echo "Removing unused Docker images"
+            echo "========================================"
+
             docker image prune -af
 
-            echo "Deployment complete!"
+            echo "========================================"
+            echo "Deployment complete"
+            echo "========================================"
 
             echo "Current containers:"
             docker compose -f docker-compose.prod.yml ps
