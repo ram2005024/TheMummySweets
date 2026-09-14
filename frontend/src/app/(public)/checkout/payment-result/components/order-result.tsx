@@ -1,6 +1,8 @@
 "use client";
 
 import { useOrderPaymentStatus } from "@/hooks/order/useOrder";
+import queryClient from "@/libs/queryClient";
+import { CartService } from "@/services/cart.service";
 import gsap from "gsap";
 import { useEffect, useRef } from "react";
 import OrderSuccess from "./order-success";
@@ -19,7 +21,14 @@ const OrderResult = ({ order_id }: { order_id: string }) => {
       );
     }
   }, [isLoading, error, data]);
-
+  useEffect(() => {
+    (async () => {
+      if (data?.payment_status == "paid") {
+        await CartService.clearCart();
+        queryClient.invalidateQueries({ queryKey: ["cart"] });
+      }
+    })();
+  }, [data?.payment_status]);
   if (isLoading || data?.payment_status === "pending") {
     return (
       <div

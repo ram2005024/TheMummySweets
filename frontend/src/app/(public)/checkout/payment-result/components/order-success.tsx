@@ -104,7 +104,7 @@ const OrderSuccess = ({ orderId }: Props) => {
                   <p className="text-xs text-ink-muted">Order reference</p>
 
                   <p className="mt-0.5 truncate text-sm font-semibold text-ink">
-                    {orderId}
+                    {orderId.split("-")[0].toUpperCase()}
                   </p>
                 </div>
               </div>

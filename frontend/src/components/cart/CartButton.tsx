@@ -7,12 +7,12 @@ import { useEffect } from "react";
 
 const CartButton = () => {
   const { cart_items, onOpenChange, setCartItems } = useCartStore();
-  const { data: cart, isLoading } = useGetCart();
+  const { data: cart, isFetching } = useGetCart();
   const total_quantity = cart_items.reduce((acc, val) => acc + val.quantity, 0);
   useEffect(() => {
     if (cart) setCartItems(cart);
   }, [cart, setCartItems]);
-  if (isLoading) return null;
+  if (isFetching) return null;
   return (
     <div>
       <button
