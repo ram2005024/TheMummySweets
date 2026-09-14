@@ -143,7 +143,7 @@ class OrderService:
             calculation_details.total,
             user.profile.id,
             coupen.id if coupen else None,
-            data.payment_method.name,
+            data.payment_method.value,
         )
         order = await self.order_repo.create(
             OrderCreate(
@@ -184,4 +184,4 @@ class OrderService:
         payment = await self.payment_repo.get_payment_by_id(payment_id=order.payment_id)
         if not payment:
             raise PaymentNotFound
-        return payment.payment_status
+        return payment.payment_status.value

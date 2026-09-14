@@ -37,6 +37,8 @@ services:
       uv run uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
     volumes:
       - ./backend:/app
+      - /app/.venv
+    working_dir: /app
 
   celery:
     build:
@@ -52,6 +54,8 @@ services:
       uv run celery -A app.core.celery_app.celery_app worker --loglevel=info
     volumes:
       - ./backend:/app
+      - /app/.venv
+    working_dir: /app
 
   frontend:
     build:
