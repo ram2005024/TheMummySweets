@@ -36,7 +36,7 @@ const Hero = () => {
           The Mummy <span className="text-orange-600">Sweets and Corner</span>
         </h1>
         <h2 className="text-sm text-gray-600 font-light">
-          Taste Good Feel Good <br />
+          Taste Better Feel Better <br />
           &quot;Pure taste from the hands of Mom &quot;
         </h2>
         <span className="text-gray-800 font-light">
