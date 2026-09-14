@@ -40,7 +40,7 @@ const Hero = () => {
           &quot;Pure taste from the hands of Mom &quot;
         </h2>
         <span className="text-gray-800 font-light">
-          Butwal-15,Semlar,Mahadaiya chowk
+          Butwal-15,Semlar,Mahadaiya Chowk
         </span>
       </div>
     </div>
