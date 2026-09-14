@@ -58,7 +58,7 @@ jobs:
       - name: Login to GHCR
         uses: docker/login-action@v3
         with:
-          registry: ghcr.io
+          registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
@@ -100,22 +100,40 @@ jobs:
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
           envs: GHCR_USERNAME,GHCR_TOKEN,IMAGE_TAG
+
           script: |
+            set -e
+
             cd ~/TheMummySweets
 
+            echo "Logging into GHCR..."
             echo "$GHCR_TOKEN" | docker login ghcr.io \
               -u "$GHCR_USERNAME" \
               --password-stdin
 
+            echo "Pulling latest code..."
             git pull origin main
 
+            echo "Deploying image: $IMAGE_TAG"
             export IMAGE_TAG="$IMAGE_TAG"
 
+            echo "Pulling new Docker images..."
             docker compose -f docker-compose.prod.yml pull
 
+            echo "Running database migrations..."
             docker compose -f docker-compose.prod.yml run --rm fastapi_app \
               uv run alembic upgrade head
 
-            docker compose -f docker-compose.prod.yml up -d
+            echo "Starting new containers..."
+            docker compose -f docker-compose.prod.yml up -d --force-recreate
 
-            docker image prune -f
+            echo "Removing unused Docker images..."
+            docker image prune -af
+
+            echo "Deployment complete!"
+
+            echo "Current containers:"
+            docker compose -f docker-compose.prod.yml ps
+
+            echo "Disk usage:"
+            df -h
