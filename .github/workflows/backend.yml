@@ -75,7 +75,7 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: ./frontend
-          dockerfile: Dockerfile.prod
+          file: ./frontend/Dockerfile.prod
           push: true
           build-args: |
             NEXT_PUBLIC_BACKEND_URL=https://ec2-16-171-43-55.eu-north-1.compute.amazonaws.com/api/v1
