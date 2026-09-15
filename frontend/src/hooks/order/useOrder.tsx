@@ -11,11 +11,9 @@ export const useOrderPaymentStatus = (oid: string) => {
     queryKey: ["payment-status"],
     queryFn: () => OrderService.findPaymentStatus(oid),
     refetchInterval: (query) => {
-      const pmt_status = query.state.data?.payment_status;
+      const order_status = query.state.data;
       if (query.state.error) return false;
-      if (pmt_status == "failed") {
-        return false;
-      } else if (pmt_status == "paid") {
+      if (order_status == "placed") {
         return false;
       } else return 2000;
     },

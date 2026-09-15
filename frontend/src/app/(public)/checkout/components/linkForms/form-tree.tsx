@@ -24,14 +24,13 @@ const FormTree = () => {
     2: <Timing />,
     3: <Payment />,
     4: <Review />,
-    5:
-      clientSecret && order_status == OrderStatus.PENDING_PAYMENT ? (
-        <StripeProvider client_secret={clientSecret}>
-          <StripePayment orderId={orderId ?? ""} />
-        </StripeProvider>
-      ) : (
-        <OrderResult order_id={orderId ?? ""} order_status={order_status} />
-      ),
+    5: clientSecret ? (
+      <StripeProvider client_secret={clientSecret}>
+        <StripePayment orderId={orderId ?? ""} />
+      </StripeProvider>
+    ) : (
+      <OrderResult order_id={orderId ?? ""} />
+    ),
   };
 
   return (

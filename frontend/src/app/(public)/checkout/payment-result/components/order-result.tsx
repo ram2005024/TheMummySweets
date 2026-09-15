@@ -10,13 +10,7 @@ import { useEffect, useRef } from "react";
 import OrderSuccess from "./order-success";
 import PaymentFailed from "./payment-failed";
 
-const OrderResult = ({
-  order_id,
-  order_status,
-}: {
-  order_id: string;
-  order_status?: OrderStatus;
-}) => {
+const OrderResult = ({ order_id }: { order_id: string }) => {
   const { data, isLoading, error } = useOrderPaymentStatus(order_id);
   const containerRef = useRef<HTMLDivElement>(null);
   const { client_secret } = useEphimeralCheckoutStore();
@@ -31,17 +25,17 @@ const OrderResult = ({
   }, [isLoading, error, data]);
   useEffect(() => {
     (async () => {
-      if (order_status == OrderStatus.PLACED) {
+      if (data == OrderStatus.PLACED) {
         await CartService.clearCart();
         queryClient.invalidateQueries({ queryKey: ["cart"] });
       }
     })();
-  }, [data?.payment_status, client_secret]);
-  if (isLoading || order_status === OrderStatus.PENDING_PAYMENT) {
+  }, [data, client_secret, isLoading]);
+  if (isLoading) {
     return (
       <div
         ref={containerRef}
-        className="flex min-h-[520px] w-full items-center justify-center px-4"
+        className="flex min-h-130 w-full items-center justify-center px-4"
       >
         <div className="flex w-full max-w-md flex-col items-center text-center">
           {/* Spinner */}
@@ -98,7 +92,7 @@ const OrderResult = ({
     );
   }
 
-  if (order_status == OrderStatus.PLACED) {
+  if (data == OrderStatus.PLACED) {
     return (
       <div
         ref={containerRef}
