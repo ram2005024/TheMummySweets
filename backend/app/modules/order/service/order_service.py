@@ -1,4 +1,4 @@
-from app.exceptions.stripe_exceptions import OrderNotFound, PaymentNotFound
+from app.exceptions.stripe_exceptions import OrderNotFound
 from app.modules.auth.models.user import User
 from app.modules.cart.cart_services import CartService
 from app.modules.menu.models.product_model import Product
@@ -225,11 +225,8 @@ class OrderService:
             delivery_details=DeliveryReadBasic.model_validate(delivery_details),
         )
 
-    async def find_order_payment_status(self, order_id: str):
+    async def find_order_status(self, order_id: str):
         order = await self.order_repo.get_order_by_id(order_id)
         if not order:
             raise OrderNotFound
-        payment = await self.payment_repo.get_payment_by_id(payment_id=order.payment_id)
-        if not payment:
-            raise PaymentNotFound
-        return payment.payment_status.value
+        return order.order_status

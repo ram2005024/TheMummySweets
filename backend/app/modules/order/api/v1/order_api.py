@@ -10,12 +10,12 @@ from app.modules.order.dependencies.service_factory import (
     get_order_idempotent_service,
     get_order_service,
 )
+from app.modules.order.models.order_model import OrderStatus
 from app.modules.order.order_exception import (
     OrderIdempotancyKeyMissing,
     OrderIsAlreadyProcessing,
 )
 from app.modules.order.schemas.order_schema import (
-    OrderPaymentStatusSchema,
     OrderRequest,
     OrderResponse,
 )
@@ -57,13 +57,11 @@ async def order_endpoint(
     return SuccessResponse(data=response, message="Order created successfully")
 
 
-@order_api.get(
-    "/status/{order_id}", response_model=SuccessResponse[OrderPaymentStatusSchema]
-)
+@order_api.get("/status/{order_id}", response_model=SuccessResponse[OrderStatus])
 async def order_payment_status(
     user: Annotated[User, Depends(RolePermission(["admin", "member"]))],
     order_service: Annotated[OrderService, Depends(get_order_service)],
     order_id: UUID,
 ):
-    payment_status = await order_service.find_order_payment_status(str(order_id))
-    return SuccessResponse(data=OrderPaymentStatusSchema(payment_status=payment_status))
+    order_status = await order_service.find_order_status(str(order_id))
+    return SuccessResponse(data=order_status)
