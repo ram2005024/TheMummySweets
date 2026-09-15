@@ -22,11 +22,11 @@ const paymentOptions = [
     label: "Cash on Delivery",
     description: "Pay in cash when your order arrives",
   },
-  {
-    value: "esewa",
-    label: "eSewa",
-    description: "Pay securely using your eSewa wallet",
-  },
+  //   {
+  //     value: "esewa",
+  //     label: "eSewa",
+  //     description: "Pay securely using your eSewa wallet",
+  //   },
   {
     value: "stripe",
     label: "Card",
