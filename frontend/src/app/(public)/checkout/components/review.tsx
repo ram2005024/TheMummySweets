@@ -28,6 +28,9 @@ const Review = () => {
     (state) => state.setActiveLink,
   );
   const setCheckoutData = useCheckoutStore((state) => state.setCheckoutData);
+  const set_order_status = useEphimeralCheckoutStore(
+    (state) => state.set_order_status,
+  );
   const idemp_key = useEphimeralCheckoutStore(
     (state) => state.orderIdempotancyKey,
   );
@@ -95,15 +98,11 @@ const Review = () => {
           );
         },
         onSuccess: (data) => {
-          if (data?.client_secret && data?.order_status == "placed") {
-            // queryClient.invalidateQueries({ queryKey: ["cart"] });
-            // clear_cart();
-          } else {
-            set_client_secret(data?.client_secret || "");
-            set_order_id(data.order_id);
-            setActiveLink(5);
-            set_checkout_amount(data.calculation.total);
-          }
+          set_client_secret(data?.client_secret || "");
+          set_order_id(data.order_id);
+          set_order_status(data.order_status);
+          setActiveLink(5);
+          set_checkout_amount(data.calculation.total);
         },
       },
     );

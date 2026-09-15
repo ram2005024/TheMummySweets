@@ -3,15 +3,23 @@
 import { useOrderPaymentStatus } from "@/hooks/order/useOrder";
 import queryClient from "@/libs/queryClient";
 import { CartService } from "@/services/cart.service";
+import { useEphimeralCheckoutStore } from "@/store/checkout.store";
+import { OrderStatus } from "@/type/order.type";
 import gsap from "gsap";
 import { useEffect, useRef } from "react";
 import OrderSuccess from "./order-success";
 import PaymentFailed from "./payment-failed";
 
-const OrderResult = ({ order_id }: { order_id: string }) => {
+const OrderResult = ({
+  order_id,
+  order_status,
+}: {
+  order_id: string;
+  order_status?: OrderStatus;
+}) => {
   const { data, isLoading, error } = useOrderPaymentStatus(order_id);
   const containerRef = useRef<HTMLDivElement>(null);
-
+  const { client_secret } = useEphimeralCheckoutStore();
   useEffect(() => {
     if (containerRef.current) {
       gsap.fromTo(
@@ -23,13 +31,13 @@ const OrderResult = ({ order_id }: { order_id: string }) => {
   }, [isLoading, error, data]);
   useEffect(() => {
     (async () => {
-      if (data?.payment_status == "paid") {
+      if (order_status == OrderStatus.PLACED) {
         await CartService.clearCart();
         queryClient.invalidateQueries({ queryKey: ["cart"] });
       }
     })();
-  }, [data?.payment_status]);
-  if (isLoading || data?.payment_status === "pending") {
+  }, [data?.payment_status, client_secret]);
+  if (isLoading || order_status === OrderStatus.PENDING_PAYMENT) {
     return (
       <div
         ref={containerRef}
@@ -90,7 +98,7 @@ const OrderResult = ({ order_id }: { order_id: string }) => {
     );
   }
 
-  if (data?.payment_status === "paid") {
+  if (order_status == OrderStatus.PLACED) {
     return (
       <div
         ref={containerRef}

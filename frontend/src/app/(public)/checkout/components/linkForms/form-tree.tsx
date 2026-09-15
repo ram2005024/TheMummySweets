@@ -2,6 +2,8 @@
 
 import { useEphimeralCheckoutStore } from "@/store/checkout.store";
 import { AnimatePresence, motion } from "framer-motion";
+import { OrderStatus } from "../../../../../type/order.type";
+import OrderResult from "../../payment-result/components/order-result";
 import StripePayment from "../checkout-order/stripe-payment-ui";
 import StripeProvider from "../checkout-order/stripe-provider";
 import OrderItems from "../order-items";
@@ -14,6 +16,7 @@ const FormTree = () => {
   const clientSecret = useEphimeralCheckoutStore(
     (state) => state.client_secret,
   );
+  const order_status = useEphimeralCheckoutStore((state) => state.order_status);
   const orderId = useEphimeralCheckoutStore((state) => state.order_id);
   const activeLink = useEphimeralCheckoutStore((state) => state.activeLink);
   const steps = {
@@ -21,11 +24,14 @@ const FormTree = () => {
     2: <Timing />,
     3: <Payment />,
     4: <Review />,
-    5: clientSecret && orderId && (
-      <StripeProvider client_secret={clientSecret}>
-        <StripePayment orderId={orderId} />
-      </StripeProvider>
-    ),
+    5:
+      clientSecret && order_status == OrderStatus.PENDING_PAYMENT ? (
+        <StripeProvider client_secret={clientSecret}>
+          <StripePayment orderId={orderId ?? ""} />
+        </StripeProvider>
+      ) : (
+        <OrderResult order_id={orderId ?? ""} order_status={order_status} />
+      ),
   };
 
   return (
@@ -43,7 +49,7 @@ const FormTree = () => {
         </motion.div>
       </AnimatePresence>
 
-      <OrderItems />
+      {order_status !== OrderStatus.PLACED && <OrderItems />}
     </div>
   );
 };

@@ -3,6 +3,7 @@ import {
   DeliverySchema,
   PaymentMethodType,
 } from "@/schemas/order/order_request_schema";
+import { OrderStatus } from "@/type/order.type";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 
@@ -24,6 +25,8 @@ interface ephimeralCheckoutStore {
   orderIdempotancyKey: string;
   client_secret: string | null;
   order_id: string | null;
+  order_status: OrderStatus;
+  set_order_status: (val: OrderStatus) => void;
   set_client_secret: (val: string) => void;
   set_order_id: (val: string) => void;
   checkout_amount: number;
@@ -32,6 +35,8 @@ interface ephimeralCheckoutStore {
 }
 export const useEphimeralCheckoutStore = create<ephimeralCheckoutStore>(
   (set) => ({
+    order_status: OrderStatus.PENDING_PAYMENT,
+    set_order_status: (val) => set({ order_status: val }),
     orderIdempotancyKey: crypto.randomUUID(),
     generateNewOrderIdempotancyKey: () =>
       set({ orderIdempotancyKey: crypto.randomUUID() }),
