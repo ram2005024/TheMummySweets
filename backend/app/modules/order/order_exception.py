@@ -67,3 +67,14 @@ class OrderIsAlreadyProcessing(AppException):
         details: Any = None,
     ):
         super().__init__(message, status_code, error_code, details)
+
+
+class NoItemsInCart(AppException):
+    def __init__(
+        self,
+        message: str = "No items inside the cart",
+        status_code: int = 400,
+        error_code: str | None = "CART_EMPTY",
+        details: Any = None,
+    ):
+        super().__init__(message, status_code, error_code, details)

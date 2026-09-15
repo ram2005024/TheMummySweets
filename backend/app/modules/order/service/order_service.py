@@ -9,6 +9,7 @@ from app.modules.order.order_exception import (
     CoupenUnavailable,
     InvalidCoupen,
     LimitedProductStock,
+    NoItemsInCart,
     ProductUnavailable,
 )
 from app.modules.order.repo.coupen_repo import CoupenRepo
@@ -55,10 +56,16 @@ class OrderService:
             response = await self.create_order_for_stripe(
                 validated_products, calculation_details, data, user
             )
+        if data.payment_method.value == "cod":
+            response = await self.create_order_for_cod(
+                validated_products, calculation_details, data, user
+            )
         await self.order_repo.commit()
         return response
 
     async def validate_cart_items(self, items: list[CartItems]):
+        if len(items) <= 0:
+            raise NoItemsInCart()
         items_ids = [item.id for item in items]
         products = await self.product_repo.read_product_with_ids(items_ids)
         product_ids = [product.id for product in products]
@@ -170,7 +177,48 @@ class OrderService:
             payment_status=PaymentStatus.PENDING,
             amount=calculation_details.total,
             calculation=calculation_details,
-            order_status=OrderStatus.PENDING_PAYMENT,
+            order_status=order.order_status,
+            order_items=[
+                OrderItemBasic.model_validate(order_item) for order_item in order_items
+            ],
+            delivery_details=DeliveryReadBasic.model_validate(delivery_details),
+        )
+
+    async def create_order_for_cod(
+        self,
+        products: list[ProductReadWithCartValue],
+        calculation_details: ProductCalculation,
+        data: OrderRequest,
+        user: User,
+    ):
+        coupen = None
+        if data.applied_coupen:
+            coupen = await self.coupen_repo.has_coupen(data.applied_coupen)
+        payment = await self.payment_repo.create(
+            calculation_details.total,
+            user.profile.id,
+            coupen.id if coupen else None,
+            data.payment_method.value,
+        )
+        order = await self.order_repo.create(
+            OrderCreate(
+                payment_id=payment.id,
+                profile_id=user.profile.id,
+                order_status=OrderStatus.PLACED,
+            )
+        )
+        delivery_details = await self.order_repo.create_delivery(
+            DeliveryCreate(**data.delivery_details.model_dump(), order_id=order.id)
+        )
+        order_items = await self.order_repo.create_order_items(products, order)
+
+        return OrderResponse(
+            payment_method=data.payment_method,
+            order_id=order.id,
+            payment_status=PaymentStatus.PENDING,
+            amount=calculation_details.total,
+            calculation=calculation_details,
+            order_status=order.order_status,
             order_items=[
                 OrderItemBasic.model_validate(order_item) for order_item in order_items
             ],
