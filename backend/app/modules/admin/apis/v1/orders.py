@@ -11,7 +11,7 @@ from app.schemas.common import SuccessResponse
 from app.websocket.dependencies import verify_socket_connection
 from app.websocket.manager import manager
 
-admin_order_router = APIRouter(prefix="/api/v1/admin/order")
+admin_order_router = APIRouter(prefix="/admin/order")
 
 
 @admin_order_router.websocket("/ws")
