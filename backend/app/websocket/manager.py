@@ -37,3 +37,6 @@ class SocketConnection:
                 exisiting.discard(connection)
         if not exisiting:
             self.admin_connections.pop(admin_id, None)
+
+
+manager = SocketConnection()
