@@ -3,13 +3,19 @@ from uuid import UUID
 from pydantic import BaseModel
 
 from app.modules.auth.schemas.user_schema import ProfileReadBasic
+from app.modules.order.models.order_model import OrderChannel, OrderStatus
 from app.modules.order.schemas.delivery_schema import DeliverySchema
-from app.modules.order.schemas.order_schema import ProductReadBasic
+
+
+class ProductReadBasicAdmin(BaseModel):
+    id: UUID
+    product_name: str
+    average_preparation_time: int
 
 
 class ReadBasicOrderItem(BaseModel):
     quantity: int
-    product: ProductReadBasic
+    product: ProductReadBasicAdmin
 
 
 class ReadOrdersAdmin(BaseModel):
@@ -17,3 +23,6 @@ class ReadOrdersAdmin(BaseModel):
     user: ProfileReadBasic
     delivery: DeliverySchema
     order_items: list[ReadBasicOrderItem]
+    channel: OrderChannel
+    average_preparation_time: int
+    order_status: OrderStatus
