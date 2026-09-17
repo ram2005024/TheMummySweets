@@ -11,7 +11,7 @@ from app.schemas.common import SuccessResponse
 from app.websocket.dependencies import verify_socket_connection
 from app.websocket.manager import manager
 
-admin_order_router = APIRouter(prefix="/admin/order")
+admin_order_router = APIRouter(prefix="/admin/order", tags=["Admin Order Endpoints"])
 
 
 @admin_order_router.websocket("/ws")
@@ -31,6 +31,6 @@ async def establish_connection(
 
 @admin_order_router.get("/", response_model=SuccessResponse[list[ReadOrdersAdmin]])
 async def get_admin_orders_endpoint(
-    self, user: Annotated[User, Depends(RolePermission(["admin"]))]
+    user: Annotated[User, Depends(RolePermission(["admin"]))],
 ):
     pass
