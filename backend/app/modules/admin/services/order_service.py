@@ -8,6 +8,9 @@ class OrderServiceAdmin:
 
     async def get_order_admin(self):
         values = await self.order_repo.get_orders()
-        orders = [ReadOrdersAdmin.model_validate(order) for order in values]
-
-    async def find_order_avg_prepartion_time(self,order:)
+        orders = []
+        for order, avg_prep in values:
+            validated = ReadOrdersAdmin.model_validate(order)
+            validated.average_preparation_time = avg_prep
+            orders.append(validated)
+        return orders
