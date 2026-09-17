@@ -11,6 +11,6 @@ class OrderServiceAdmin:
         orders = []
         for order, avg_prep in values:
             validated = ReadOrdersAdmin.model_validate(order)
-            validated.average_preparation_time = avg_prep
+            validated.average_preparation_time = int(avg_prep)
             orders.append(validated)
         return orders

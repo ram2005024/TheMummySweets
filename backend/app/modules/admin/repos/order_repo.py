@@ -23,12 +23,12 @@ class OrderRepoAdmin:
                 .join(OrderItem, OrderItem.order_id == OrderModel.id)
                 .join(Product, Product.id == OrderItem.product_id)
             )
-            .group_by(OrderModel.id)
             .options(
                 selectinload(OrderModel.order_items).selectinload(OrderItem.product),
                 selectinload(OrderModel.user),
                 selectinload(OrderModel.delivery),
             )
+            .group_by(OrderModel.id)
         )
         result = await self.db.execute(query)
         return result.all()
