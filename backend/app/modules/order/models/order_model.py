@@ -25,6 +25,12 @@ class OrderStatus(Enum):
     CANCELED = "canceled"
 
 
+class OrderChannel(Enum):
+    APP = "app"
+    PHONE = "phone"
+    WALK_IN = "walk_in"
+
+
 class OrderModel(BaseModel):
     __tablename__ = "orders"
     order_status: Mapped[OrderStatus] = mapped_column(
@@ -41,6 +47,15 @@ class OrderModel(BaseModel):
     payment_id: Mapped[UUID] = mapped_column(
         ForeignKey("payments.id", ondelete="CASCADE")
     )
+    order_channel: Mapped[OrderChannel] = mapped_column(
+        SQLEnum(
+            OrderChannel,
+            name="order_channel",
+            values_callable=lambda enum: [item.value for item in enum],
+        ),
+        default=OrderChannel.APP,
+        nullable=True,
+    )
 
     # relationship
     payment: Mapped["PaymentModel"] = relationship(
@@ -48,6 +63,7 @@ class OrderModel(BaseModel):
         uselist=False,
         back_populates="order",
     )
+
     user: Mapped["Profile"] = relationship(
         "Profile",
         back_populates="orders",

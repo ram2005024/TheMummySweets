@@ -1,6 +1,4 @@
-from typing import Annotated
-
-from fastapi import Depends, WebSocket
+from fastapi import WebSocket
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
