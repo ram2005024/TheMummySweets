@@ -24,5 +24,5 @@ class ReadOrdersAdmin(BaseModel):
     delivery: DeliverySchema
     order_items: list[ReadBasicOrderItem]
     channel: OrderChannel
-    average_preparation_time: int
+    average_preparation_time: int | None = None
     order_status: OrderStatus
