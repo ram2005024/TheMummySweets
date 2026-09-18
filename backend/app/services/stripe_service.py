@@ -11,6 +11,7 @@ from app.modules.order.models.payment_model import PaymentStatus
 from app.modules.order.repo.order_repo import OrderRepo
 from app.modules.order.repo.payment_repo import PaymentRepo
 from app.repos.stripe_repo import StripeRepo
+from app.websocket import manager
 
 stripe.api_key = settings.STRIPE_SECRET_KEY
 
@@ -58,6 +59,9 @@ class StripeService:
             raise AmountMismatched
         payment.payment_status = PaymentStatus.PAID
         order.order_status = OrderStatus.PLACED
+        await manager.manager.broadcast_admin_message(
+            {"type": "ORDER_PLACED", "order_id": str(order.id)}
+        )
 
     async def handle_failed_event(self, intent_object: dict):
         intent_id = intent_object.get("id", "")

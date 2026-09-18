@@ -26,6 +26,7 @@ from app.modules.order.schemas.order_schema import (
     ProductReadWithCartValue,
 )
 from app.services.stripe_service import stripe
+from app.websocket import manager
 
 
 class OrderService:
@@ -211,7 +212,9 @@ class OrderService:
             DeliveryCreate(**data.delivery_details.model_dump(), order_id=order.id)
         )
         order_items = await self.order_repo.create_order_items(products, order)
-
+        await manager.manager.broadcast_admin_message(
+            {"type": "ORDER_PLACED", "order_id": str(order.id)}
+        )
         return OrderResponse(
             payment_method=data.payment_method,
             order_id=order.id,
