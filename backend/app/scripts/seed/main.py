@@ -30,9 +30,9 @@ fake = Faker()
 # ─────────────────────────────────────────────
 #  CONSTANTS
 # ─────────────────────────────────────────────
-USER_COUNT = 100000
-PRODUCT_COUNT = 1000
-COUPON_COUNT = 40
+USER_COUNT = 20
+PRODUCT_COUNT = 120
+COUPON_COUNT = 10
 ORDER_COUNT_RANGE = (0, 5)  # orders per profile
 SEED_PASSWORD = "Password123"
 

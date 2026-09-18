@@ -4,7 +4,7 @@ from sqlalchemy.orm import selectinload
 
 from app.modules.menu.models.product_model import Product
 from app.modules.order.models.order_item_model import OrderItem
-from app.modules.order.models.order_model import OrderModel
+from app.modules.order.models.order_model import OrderModel, OrderStatus
 
 
 class OrderRepoAdmin:
@@ -29,6 +29,7 @@ class OrderRepoAdmin:
                 selectinload(OrderModel.delivery),
             )
             .group_by(OrderModel.id)
+            .where(OrderModel.order_status != OrderStatus.DELIVERED)
         )
         result = await self.db.execute(query)
         return result.all()

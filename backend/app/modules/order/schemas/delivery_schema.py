@@ -34,7 +34,7 @@ class DeliveryReadBasic(BaseModel):
     delivery_note: str | None = None
     scheduled_time: datetime | None = None
     receiptent_phone: str
-    delivery_landmark: str
+    delivery_landmark: str | None
 
     model_config = ConfigDict(from_attributes=True)
 
