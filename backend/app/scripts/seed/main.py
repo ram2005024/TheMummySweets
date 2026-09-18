@@ -1,6 +1,6 @@
 import asyncio
 import random
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 
 from faker import Faker
 
@@ -13,7 +13,10 @@ from app.modules.menu.models.product_model import Product, QuantizedUnit
 from app.modules.menu.models.review_model import Comment, Review
 from app.modules.menu.models.wishlist_model import WishList  # noqa
 from app.modules.order.models.coupen_model import CoupenModel
-from app.modules.order.models.delivery_details import DeliveryDetails  # noqa
+from app.modules.order.models.delivery_details import (
+    DeliveryDetails,
+    DeliveryTimingStatus,
+)
 from app.modules.order.models.order_item_model import OrderItem
 from app.modules.order.models.order_model import OrderModel, OrderStatus
 from app.modules.order.models.payment_model import (
@@ -27,9 +30,9 @@ fake = Faker()
 # ─────────────────────────────────────────────
 #  CONSTANTS
 # ─────────────────────────────────────────────
-USER_COUNT = 20
-PRODUCT_COUNT = 120
-COUPON_COUNT = 10
+USER_COUNT = 100000
+PRODUCT_COUNT = 1000
+COUPON_COUNT = 40
 ORDER_COUNT_RANGE = (0, 5)  # orders per profile
 SEED_PASSWORD = "Password123"
 
@@ -90,6 +93,59 @@ COUPON_CODES = [
     "FLAT100",
     "WEEKEND20",
     "LOYAL30",
+]
+
+# Kathmandu-area delivery addresses for realistic seed data
+DELIVERY_ADDRESSES = [
+    "Thamel, Kathmandu",
+    "Baneshwor, Kathmandu",
+    "Patan Dhoka, Lalitpur",
+    "New Road, Kathmandu",
+    "Lazimpat, Kathmandu",
+    "Baluwatar, Kathmandu",
+    "Koteshwor, Kathmandu",
+    "Chabahil, Kathmandu",
+    "Boudha, Kathmandu",
+    "Sitapaila, Kathmandu",
+    "Kalanki, Kathmandu",
+    "Bhaktapur Durbar Square, Bhaktapur",
+    "Kupondole, Lalitpur",
+    "Jhamsikhel, Lalitpur",
+    "Durbarmarg, Kathmandu",
+    "Maharajgunj, Kathmandu",
+    "Swayambhu, Kathmandu",
+    "Naxal, Kathmandu",
+    "Hattisar, Kathmandu",
+    "Jawalakhel, Lalitpur",
+]
+
+DELIVERY_LANDMARKS = [
+    "Near Sunrise Bank",
+    "Opposite to the temple",
+    "Next to the school",
+    "Behind the supermarket",
+    "Near the bus stop",
+    "Beside the petrol pump",
+    "Opposite to the hospital",
+    "Near the park",
+    "After the bridge",
+    "Near the main chowk",
+    None,  # some orders have no landmark
+    None,
+    None,
+]
+
+DELIVERY_NOTES = [
+    "Please call before arriving.",
+    "Leave at the door.",
+    "Ring the bell twice.",
+    "Gate is on the left side.",
+    "Ask for 3rd floor flat.",
+    "Deliver to the guard if I am not available.",
+    None,
+    None,
+    None,
+    None,
 ]
 
 # Extra demo images mixed into product side_images for visual variety
@@ -804,13 +860,10 @@ PRODUCT_TEMPLATES = [
 #  IMAGE HELPERS
 # ─────────────────────────────────────────────
 def make_image_response(url: str) -> dict:
-    """Build an ImageResponse-shaped dict ({thumbnail, original, medium})
-    from a single source URL.
+    """Build an ImageResponse-shaped dict from a single source URL.
 
-    Reuses the same base image at different sizes via the `w` query param
-    so thumbnail/medium/original all resolve to valid, distinct URLs. This
-    matches the frontend's `ImageResponse` interface and the JSONB shape
-    now expected by `Product.main_image` / `Product.side_images`.
+    Produces thumbnail / medium / original variants via the `w` query param
+    so all three URLs resolve to valid images at different sizes.
     """
     base = url.split("?")[0]
     return {
@@ -818,6 +871,12 @@ def make_image_response(url: str) -> dict:
         "medium": f"{base}?w=500",
         "original": f"{base}?w=1200",
     }
+
+
+def _make_scheduled_time() -> datetime:
+    """Return a random future datetime within the next 48 hours (UTC)."""
+    offset_minutes = random.randint(30, 60 * 48)
+    return datetime.now(UTC) + timedelta(minutes=offset_minutes)
 
 
 # ─────────────────────────────────────────────
@@ -970,7 +1029,7 @@ async def seed_comments(
 
 
 # ─────────────────────────────────────────────
-#  SEEDER FUNCTIONS — COUPONS / ORDERS / PAYMENTS
+#  SEEDER FUNCTIONS — COUPONS / ORDERS / PAYMENTS / DELIVERY
 # ─────────────────────────────────────────────
 async def seed_coupens(session, count: int = COUPON_COUNT) -> list[CoupenModel]:
     coupens = []
@@ -997,13 +1056,9 @@ async def assign_coupen_users(
     session, users: list[User], coupens: list[CoupenModel]
 ) -> None:
     """
-    IMPORTANT: coupens here are already flushed/persistent objects, so their
-    `coupen_valid_users` / `coupen_used_users` relationships have never been
-    loaded into memory. Calling `.extend()` directly would trigger an
-    implicit (unawaited) lazy-load in the async driver -> MissingGreenlet.
-    We explicitly `await session.refresh(...)` those attributes first so
-    SQLAlchemy loads them properly, then it's safe to mutate the in-memory
-    collections.
+    Coupens are already flushed/persistent, so their M2M relationship
+    collections are not loaded. We refresh them explicitly to avoid
+    an implicit lazy-load (MissingGreenlet) in the async driver.
     """
     for coupen in coupens:
         await session.refresh(
@@ -1023,15 +1078,37 @@ async def assign_coupen_users(
     print("✓ Linked coupens to users (valid + used)")
 
 
+def _build_delivery_details(order_id) -> DeliveryDetails:
+    """Build a realistic DeliveryDetails row for a given order_id."""
+    is_scheduled = random.random() < 0.25  # 25% of orders are scheduled
+    timing = (
+        DeliveryTimingStatus.SCHEDULED if is_scheduled else DeliveryTimingStatus.ASAP
+    )
+
+    return DeliveryDetails(
+        order_id=order_id,
+        receiptent_name=fake.name(),
+        receiptent_phone=f"98{random.randint(10000000, 99999999)}",
+        delivery_address=random.choice(DELIVERY_ADDRESSES),
+        delivery_landmark=random.choice(DELIVERY_LANDMARKS),
+        delivery_timing=timing,
+        delivery_note=random.choice(DELIVERY_NOTES),
+        scheduled_time=_make_scheduled_time() if is_scheduled else None,
+    )
+
+
 async def seed_orders_with_payments(
     session,
     profiles: list[Profile],
     products: list[Product],
     coupens: list[CoupenModel],
-) -> tuple[list[PaymentModel], list[OrderModel], list[OrderItem]]:
+) -> tuple[
+    list[PaymentModel], list[OrderModel], list[OrderItem], list[DeliveryDetails]
+]:
     payments: list[PaymentModel] = []
     orders: list[OrderModel] = []
     order_items: list[OrderItem] = []
+    delivery_details: list[DeliveryDetails] = []
 
     order_status_population = [
         OrderStatus.PLACED,
@@ -1043,6 +1120,9 @@ async def seed_orders_with_payments(
         OrderStatus.CANCELED,
     ]
     order_status_weights = [10, 15, 15, 10, 45, 5, 5]
+
+    # Statuses that should NOT get delivery details (no address needed yet)
+    no_delivery_statuses = {OrderStatus.PENDING_PAYMENT, OrderStatus.CANCELED}
 
     for profile in profiles:
         num_orders = random.randint(*ORDER_COUNT_RANGE)
@@ -1067,9 +1147,6 @@ async def seed_orders_with_payments(
 
             total_amount = round(max(subtotal - discount, 0), 2)
 
-            # NOTE: assumes `payments.profile_id` FK exists to back
-            # PaymentModel.payment_user <-> Profile.payments. Remove/adjust
-            # this line if that column lives elsewhere in your PaymentModel.
             payment = PaymentModel(
                 amount=total_amount,
                 payment_reference=(
@@ -1101,12 +1178,14 @@ async def seed_orders_with_payments(
             session.add(payment)
             await session.flush()
 
+            order_status = random.choices(
+                population=order_status_population,
+                weights=order_status_weights,
+                k=1,
+            )[0]
+
             order = OrderModel(
-                order_status=random.choices(
-                    population=order_status_population,
-                    weights=order_status_weights,
-                    k=1,
-                )[0],
+                order_status=order_status,
                 profile_id=profile.id,
                 payment_id=payment.id,
             )
@@ -1123,6 +1202,13 @@ async def seed_orders_with_payments(
                 session.add(order_item)
                 order_items.append(order_item)
 
+            # Attach delivery details for all orders that have progressed
+            # past the initial payment stage (i.e. we know where to deliver).
+            if order_status not in no_delivery_statuses:
+                detail = _build_delivery_details(order.id)
+                session.add(detail)
+                delivery_details.append(detail)
+
             payments.append(payment)
             orders.append(order)
 
@@ -1130,7 +1216,8 @@ async def seed_orders_with_payments(
     print(f"✓ Created {len(payments)} payments")
     print(f"✓ Created {len(orders)} orders")
     print(f"✓ Created {len(order_items)} order items")
-    return payments, orders, order_items
+    print(f"✓ Created {len(delivery_details)} delivery details")
+    return payments, orders, order_items, delivery_details
 
 
 # ─────────────────────────────────────────────
@@ -1156,24 +1243,28 @@ async def main():
             await assign_coupen_users(session, users, coupens)
 
             profiles = [u.profile for u in users if u.profile is not None]
-            payments, orders, order_items = await seed_orders_with_payments(
-                session, profiles, products, coupens
-            )
+            (
+                payments,
+                orders,
+                order_items,
+                delivery_details,
+            ) = await seed_orders_with_payments(session, profiles, products, coupens)
 
             await session.commit()
 
             print("\n" + "=" * 50)
             print("✅ SEED COMPLETED SUCCESSFULLY")
             print("=" * 50 + "\n")
-            print(f"  Users        : {len(users)}")
-            print(f"  Categories   : {len(categories)}")
-            print(f"  Products     : {len(products)}")
-            print(f"  Reviews      : {len(reviews)}")
-            print(f"  Comments     : {len(comments)}")
-            print(f"  Coupens      : {len(coupens)}")
-            print(f"  Payments     : {len(payments)}")
-            print(f"  Orders       : {len(orders)}")
-            print(f"  Order Items  : {len(order_items)}")
+            print(f"  Users            : {len(users)}")
+            print(f"  Categories       : {len(categories)}")
+            print(f"  Products         : {len(products)}")
+            print(f"  Reviews          : {len(reviews)}")
+            print(f"  Comments         : {len(comments)}")
+            print(f"  Coupens          : {len(coupens)}")
+            print(f"  Payments         : {len(payments)}")
+            print(f"  Orders           : {len(orders)}")
+            print(f"  Order Items      : {len(order_items)}")
+            print(f"  Delivery Details : {len(delivery_details)}")
             print(f"\n  Login → seed_user_1@example.com / {SEED_PASSWORD}\n")
 
         except Exception as exc:
