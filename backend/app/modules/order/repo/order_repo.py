@@ -1,11 +1,13 @@
 from uuid import UUID
 
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
+from app.modules.menu.models.product_model import Product
 from app.modules.order.models.delivery_details import DeliveryDetails
 from app.modules.order.models.order_item_model import OrderItem
-from app.modules.order.models.order_model import OrderModel
+from app.modules.order.models.order_model import OrderModel, OrderStatus
 from app.modules.order.schemas.delivery_schema import DeliveryCreate
 from app.modules.order.schemas.order_schema import OrderCreate, ProductReadWithCartValue
 
@@ -58,4 +60,34 @@ class OrderRepo:
                 select(OrderModel).where(OrderModel.id == UUID(order_id))
             )
         ).scalar_one_or_none()
+        return order
+
+    async def get_orders(self):
+        query = (
+            (
+                select(
+                    OrderModel,
+                    func.coalesce(func.avg(Product.average_preparation_time), 0).label(
+                        "avg_preparation_time"
+                    ),
+                )
+                .join(OrderItem, OrderItem.order_id == OrderModel.id)
+                .join(Product, Product.id == OrderItem.product_id)
+            )
+            .options(
+                selectinload(OrderModel.order_items).selectinload(OrderItem.product),
+                selectinload(OrderModel.user),
+                selectinload(OrderModel.delivery),
+            )
+            .group_by(OrderModel.id)
+            .where(OrderModel.order_status != OrderStatus.DELIVERED)
+        )
+        result = await self.db.execute(query)
+        return result.all()
+
+    async def change_user_order_status(
+        self, order: OrderModel, order_status: OrderStatus
+    ):
+        order.order_status = order_status
+        await self.db.refresh(order)
         return order
