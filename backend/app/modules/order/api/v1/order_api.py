@@ -2,8 +2,10 @@ import json
 from typing import Annotated
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, Request
+from fastapi import APIRouter, Depends, Request, WebSocket, WebSocketDisconnect
+from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.db import get_db
 from app.dependencies.permission import RolePermission
 from app.modules.auth.models.user import User
 from app.modules.order.dependencies.service_factory import (
@@ -22,8 +24,26 @@ from app.modules.order.schemas.order_schema import (
 from app.modules.order.service.idempotancy_service import IdempotancyService
 from app.modules.order.service.order_service import OrderService
 from app.schemas.common import SuccessResponse
+from app.websocket.dependencies import verify_socket_connection
+from app.websocket.user_ws_manager import user_manager
 
 order_api = APIRouter(prefix="/order", tags=["Order Endpoints"])
+
+
+# Create the order web socket for live track
+@order_api.websocket("/ws/track")
+async def order_track_websocket(
+    ws: WebSocket, db: Annotated[AsyncSession, Depends(get_db)]
+):
+    user = await verify_socket_connection(["admin", "member"], ws, db)
+    if not user:
+        return
+    await user_manager.connect_user(str(user.id), ws)
+    try:
+        while True:
+            await ws.receive_text()
+    except WebSocketDisconnect:
+        await user_manager.disconnect(str(user.id), ws)
 
 
 # Create order_endpoint
