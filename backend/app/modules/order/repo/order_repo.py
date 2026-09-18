@@ -89,5 +89,6 @@ class OrderRepo:
         self, order: OrderModel, order_status: OrderStatus
     ):
         order.order_status = order_status
-        await self.db.refresh(order)
+        self.db.add(order)
+        await self.commit()
         return order

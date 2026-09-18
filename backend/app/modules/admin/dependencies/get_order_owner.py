@@ -23,7 +23,7 @@ async def get_order_owner(order_id: UUID, db: Annotated[AsyncSession, Depends(ge
         await db.execute(
             select(User)
             .options(joinedload(User.profile))
-            .where(User.profile.id == order.profile_id)
+            .where(User.profile.has(id=order.profile_id))
         )
     ).scalar_one_or_none()
     if not user:

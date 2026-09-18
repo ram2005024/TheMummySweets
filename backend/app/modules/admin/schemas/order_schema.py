@@ -30,3 +30,7 @@ class ReadOrdersAdmin(BaseModel):
     order_status: OrderStatus
 
     model_config = ConfigDict(from_attributes=True)
+
+
+class ChangeOrderStatus(BaseModel):
+    order_status: OrderStatus
