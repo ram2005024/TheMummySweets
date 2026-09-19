@@ -16,10 +16,14 @@ import {
   User,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import z from "zod";
+import MapView from "../map-view";
 
 const Delivery = () => {
+  const [locationEnabled, setLocationEnabled] = useState<boolean>(false);
+  const [enablingLocation, setEnablingLocation] = useState<boolean>(false);
   const delivery = useCheckoutStore(
     (state) => state.checkoutData?.delivery_details,
   );
@@ -33,6 +37,9 @@ const Delivery = () => {
   const {
     register,
     handleSubmit,
+    setValue,
+    getValues,
+    clearErrors,
     formState: { errors, isValid },
   } = useForm<
     z.input<typeof deliverySchema>,
@@ -50,6 +57,26 @@ const Delivery = () => {
     });
 
     setActiveLink(2);
+  };
+  const handleEnableLocation = () => {
+    setEnablingLocation(true);
+    if ("geolocation" in navigator) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          clearErrors(["longitude", "latitude"]);
+          setValue("latitude", position.coords.latitude);
+          setValue("longitude", position.coords.longitude);
+          setLocationEnabled(true);
+          setEnablingLocation(false);
+        },
+        () => {
+          alert("Please turn on permission to access the location");
+        },
+      );
+    } else {
+      alert("Navigation not supported");
+      setEnablingLocation(false);
+    }
   };
 
   return (
@@ -131,12 +158,40 @@ const Delivery = () => {
           <div className="space-y-2">
             <label
               htmlFor="delivery_address"
-              className="text-sm font-medium text-ink"
+              className="text-sm font-medium text-ink inline-flex items-center gap-2"
             >
               Delivery Address
+              {errors.latitude?.message && errors.longitude?.message && (
+                <p className="text-xs text-red-500">
+                  (Location must be enabled)
+                </p>
+              )}
             </label>
-
-            <div className="relative">
+            {/* Map View */}
+            <div className="w-full h-52 border border-b-accent rounded-lg my-3 bg-background">
+              {locationEnabled ? (
+                <div>
+                  <MapView
+                    latitude={getValues("latitude")}
+                    longitude={getValues("longitude")}
+                  />
+                </div>
+              ) : (
+                <div className="size-full flex items-center justify-center">
+                  <button
+                    type="submit"
+                    disabled={enablingLocation}
+                    onClick={() => handleEnableLocation()}
+                    className="px-4 py-2 bg-destructive text-white rounded-lg text-xs font-semibold cursor-pointer
+             transform transition-transform duration-200 ease-in-out
+             hover:scale-105 active:scale-95"
+                  >
+                    {enablingLocation ? "Enabling..." : "Enable"}
+                  </button>
+                </div>
+              )}
+            </div>
+            {/* <div className="relative">
               <MapPin className="pointer-events-none absolute left-3 top-3.5 size-4 text-ink-muted" />
 
               <textarea
@@ -152,7 +207,7 @@ const Delivery = () => {
               <p className="text-xs font-medium text-destructive">
                 {errors.delivery_address.message}
               </p>
-            )}
+            )} */}
           </div>
 
           <div className="space-y-2">
