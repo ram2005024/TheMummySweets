@@ -17,7 +17,11 @@ def include_apis(app: FastAPI):
     # Admin router
     app.include_router(admin_apis_v1.image_api, prefix="/api/v1")
     app.include_router(admin_apis_v1.admin_order_router, prefix="/api/v1")
+
+    app.include_router(admin_apis_v1.delivery_rule_router, prefix="/api/v1")
+
     # Order api
     app.include_router(order_apis_v1.order_api, prefix="/api/v1")
+
     # Stripe route
     app.include_router(stripe_route, prefix="/api/v1")

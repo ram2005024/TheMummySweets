@@ -12,3 +12,14 @@ class OrderUserDoesnotExist(AppException):
         details: Any = None,
     ):
         super().__init__(message, status_code, error_code, details)
+
+
+class DeliveryRuleNotFound(AppException):
+    def __init__(
+        self,
+        message: str = "Delivery rule doesn't exist",
+        status_code: int = 404,
+        error_code: str | None = "DELIVERY_RULE_NOT_FOUND",
+        details: Any = None,
+    ):
+        super().__init__(message, status_code, error_code, details)
