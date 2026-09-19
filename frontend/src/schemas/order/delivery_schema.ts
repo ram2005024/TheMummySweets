@@ -6,7 +6,12 @@ export const deliverySchema = z
   .object({
     receiptent_name: z.string().min(1, "Recipient name is required"),
 
-    delivery_address: z.string().min(1, "Delivery address is required"),
+    latitude: z.number().refine((val) => val !== undefined, {
+      message: "Latitude is required",
+    }),
+    longitude: z.number().refine((val) => val !== undefined, {
+      message: "Latitude is required",
+    }),
 
     delivery_timing: DeliveryTimingStatus.default("asap"),
 
