@@ -22,14 +22,13 @@ import z from "zod";
 import MapView from "../map-view";
 
 const Delivery = () => {
-  const [locationEnabled, setLocationEnabled] = useState<boolean>(false);
   const [enablingLocation, setEnablingLocation] = useState<boolean>(false);
   const delivery = useCheckoutStore(
     (state) => state.checkoutData?.delivery_details,
   );
   const router = useRouter();
   const setCheckoutData = useCheckoutStore((state) => state.setCheckoutData);
-
+  const { locationEnabled, setLocationEnabled } = useCheckoutStore();
   const setActiveLink = useEphimeralCheckoutStore(
     (state) => state.setActiveLink,
   );
@@ -38,7 +37,7 @@ const Delivery = () => {
     register,
     handleSubmit,
     setValue,
-    getValues,
+    watch,
     clearErrors,
     formState: { errors, isValid },
   } = useForm<
@@ -64,8 +63,12 @@ const Delivery = () => {
       navigator.geolocation.getCurrentPosition(
         (position) => {
           clearErrors(["longitude", "latitude"]);
-          setValue("latitude", position.coords.latitude);
-          setValue("longitude", position.coords.longitude);
+          setValue("latitude", position.coords.latitude, {
+            shouldValidate: true,
+          });
+          setValue("longitude", position.coords.longitude, {
+            shouldValidate: true,
+          });
           setLocationEnabled(true);
           setEnablingLocation(false);
         },
@@ -78,7 +81,8 @@ const Delivery = () => {
       setEnablingLocation(false);
     }
   };
-
+  const latitude = watch("latitude");
+  const longitude = watch("longitude");
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
       <div className="surface-card overflow-hidden">
@@ -168,23 +172,16 @@ const Delivery = () => {
               )}
             </label>
             {/* Map View */}
-            <div className="w-full h-52 border border-b-accent rounded-lg my-3 bg-background">
+            <div className="w-full h-96 border border-b-accent rounded-lg my-3 bg-background">
               {locationEnabled ? (
-                <div>
-                  <MapView
-                    latitude={getValues("latitude")}
-                    longitude={getValues("longitude")}
-                  />
-                </div>
+                <MapView latitude={latitude} longitude={longitude} />
               ) : (
                 <div className="size-full flex items-center justify-center">
                   <button
-                    type="submit"
+                    type="button"
+                    onClick={handleEnableLocation}
                     disabled={enablingLocation}
-                    onClick={() => handleEnableLocation()}
-                    className="px-4 py-2 bg-destructive text-white rounded-lg text-xs font-semibold cursor-pointer
-             transform transition-transform duration-200 ease-in-out
-             hover:scale-105 active:scale-95"
+                    className="rounded-lg bg-destructive px-4 py-2 text-xs font-semibold text-white transition-transform duration-200 hover:scale-105 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
                   >
                     {enablingLocation ? "Enabling..." : "Enable"}
                   </button>

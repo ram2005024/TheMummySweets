@@ -18,6 +18,8 @@ interface checkoutStoreInterface {
   checkoutData: CheckoutData;
   setCheckoutData: (data: Partial<CheckoutData>) => void;
   clearCheckout: () => void;
+  locationEnabled: boolean;
+  setLocationEnabled: (val: boolean) => void;
 }
 interface ephimeralCheckoutStore {
   activeLink: number;
@@ -53,6 +55,8 @@ export const useEphimeralCheckoutStore = create<ephimeralCheckoutStore>(
 export const useCheckoutStore = create<checkoutStoreInterface>()(
   persist(
     (set) => ({
+      locationEnabled: false,
+      setLocationEnabled: (val) => set({ locationEnabled: val }),
       checkoutData: {},
       setCheckoutData: (data) =>
         set((state) => ({

@@ -1,7 +1,7 @@
 import CartDialog from "@/components/cart/CartDialog";
 import Footer from "@/components/Footer";
 import NavBar from "@/components/NavBar";
-
+import "leaflet/dist/leaflet.css";
 export default function PublicLayout({
   children,
 }: Readonly<{
