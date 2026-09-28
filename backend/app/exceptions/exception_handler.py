@@ -36,9 +36,7 @@ def exception_handler(app: FastAPI):
         return JSONResponse(
             status_code=exc.status_code,
             content=ErrorResponse(
-                error_code=exc.error_code,
-                message=exc.message,
-                details=exc.details
+                error_code=exc.error_code, message=exc.message, details=exc.details
             ).model_dump(),
         )
 
@@ -65,6 +63,7 @@ def exception_handler(app: FastAPI):
                 message=exc.detail,
             ).model_dump(),
         )
+
     # ── SQLALCHEMY Integrity  Error─────────────────────────────────────────
     @app.exception_handler(IntegrityError)
     async def integrity_errro_handler_sqlalchemy(request: Request, exc: IntegrityError):
@@ -85,10 +84,11 @@ def exception_handler(app: FastAPI):
             status_code=422,
             content=ErrorResponse(
                 error_code="INTEGRITY_ERROR",
-                message="Integrity error happened in the database",
-                details=str(exc)
+                message="Integrity error happened in  database",
+                details=str(exc),
             ).model_dump(),
         )
+
     # ── SQLALCHEMY ERROR ─────────────────────────────────────────
     @app.exception_handler(SQLAlchemyError)
     async def sql_alchemy_error(request: Request, exc: SQLAlchemyError):
@@ -110,7 +110,7 @@ def exception_handler(app: FastAPI):
             content=ErrorResponse(
                 error_code="SQLALCHEMY_ERROR",
                 message="Some error occur in the database",
-                details=str(exc._message)
+                details=str(exc._message),
             ).model_dump(),
         )
 
@@ -182,9 +182,9 @@ def exception_handler(app: FastAPI):
         )
 
     @app.exception_handler(ValueError)
-    async def handle_value_error(request:Request,exc:ValueError):
-         rid = _req_id(request)
-         console.print(
+    async def handle_value_error(request: Request, exc: ValueError):
+        rid = _req_id(request)
+        console.print(
             Panel(
                 f"[warning]🌐  Value Error[/]\n\n"
                 f"[bold white]Route  :[/]  {request.method} {request.url.path}\n"
@@ -196,11 +196,11 @@ def exception_handler(app: FastAPI):
                 expand=False,
             )
         )
-         return JSONResponse(
+        return JSONResponse(
             status_code=400,
             content=ErrorResponse(
                 error_code="VALUE_ERROR",
                 message="Invalid input provided",
-                details={"reason":f"{exc!s}"}
+                details={"reason": f"{exc!s}"},
             ).model_dump(),
         )
