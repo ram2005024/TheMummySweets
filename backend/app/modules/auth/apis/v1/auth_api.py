@@ -45,7 +45,7 @@ async def login_endpoint(
     return response
 
 
-# For verification
+# For verification of the otp
 @auth_router.post("/verify/otp", response_model=SuccessResponse[None])
 async def verify_user_token(
     data: OtpVerifySchema, service: Annotated[AuthService, Depends(get_auth_service)]
