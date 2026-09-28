@@ -69,8 +69,11 @@ async def refresh_endpoint(
 ):
     return await service.refresh(request)
 
+    """
+  Forget Password Endpoint
+    """
 
-# For forget-password
+
 @auth_router.post(
     "/forget", response_model=SuccessResponse[RegisterSuccessResponseSchema]
 )
