@@ -62,8 +62,6 @@ async def resend_otp_endpoint(
     return await service.resend_otp(data)
 
 
-
-
 # Refresh endpoint
 @auth_router.post("/refresh", response_model=SuccessResponse[dict])
 async def refresh_endpoint(
