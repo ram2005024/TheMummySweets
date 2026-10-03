@@ -17,7 +17,7 @@ export function StatsCard({ label, value, icon: Icon, trend }: StatsCardProps) {
         </div>
       </div>
       <p className="mt-3 text-2xl font-bold text-neutral-900">{value}</p>
-      {trend && <p className="mt-1 text-xs text-neutral-400">{trend}</p>}
+      {trend && <p className="mt-2 text-xs text-neutral-400">{trend}</p>}
     </div>
   );
 }
