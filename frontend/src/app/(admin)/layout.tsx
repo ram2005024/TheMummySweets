@@ -12,7 +12,7 @@ export default function AdminLayout({
       <AdminSidebar />
 
       {/* Content area — pushed right on desktop */}
-      <div className="lg:ml-56 flex flex-col min-h-screen">
+      <div className="lg:ml-57 flex flex-col min-h-screen">
         <AdminTopbar />
         <main className="flex-1 p-4 md:p-6">{children}</main>
       </div>
