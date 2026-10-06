@@ -17,7 +17,7 @@ class InvalidSignature(AppException):
 class MissingSignature(AppException):
     def __init__(
         self,
-        message: str = "Missing zxdfsd",
+        message: str = "Missing zxdfsds",
         status_code: int = 404,
         error_code: str | None = "MISSING_SIGNATURE",
         details: Any = None,
