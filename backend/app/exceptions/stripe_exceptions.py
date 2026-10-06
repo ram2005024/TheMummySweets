@@ -17,7 +17,7 @@ class InvalidSignature(AppException):
 class MissingSignature(AppException):
     def __init__(
         self,
-        message: str = "Missing Signature",
+        message: str = "Missing Signaturee",
         status_code: int = 404,
         error_code: str | None = "MISSING_SIGNATURE",
         details: Any = None,
