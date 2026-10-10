@@ -20,7 +20,7 @@ export default function Error({ error, reset }: Props) {
         aria-live="polite"
       >
         <h2 className="text-xl font-bold text-red-600 mb-2">
-          Something went wrongfdsf
+          Something went wrong
         </h2>
 
         <p className="text-sm text-red-500 mb-4 whitespace-pre-wrap">
