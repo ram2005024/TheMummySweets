@@ -88,7 +88,7 @@ const CartDialog = () => {
                   Your basket is empty
                 </h3>
                 <p className="mt-2 text-sm text-gray-600">
-                  Add some sweets and we'll get baking.asd
+                  Add some sweets and we'll get baking.
                 </p>
 
                 <button
