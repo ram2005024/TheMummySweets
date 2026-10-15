@@ -22,7 +22,7 @@ const NotFound = () => {
           className="inline-flex items-center gap-2 rounded-lg bg-neutral-900 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-neutral-800"
         >
           <Home className="h-4 w-4" />
-          Back to homesadsdsdf
+          Back to homesadsdsdffc
         </Link>
 
         <button
