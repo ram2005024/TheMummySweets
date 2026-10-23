@@ -126,7 +126,7 @@ export default function NavBar() {
                hover:bg-orange-600 hover:shadow-lg active:scale-95"
                 >
                   <User size={20} />
-                  Logindg
+                  Login
                 </button>
               )}
             </div>
