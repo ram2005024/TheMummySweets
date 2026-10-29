@@ -78,7 +78,7 @@ export default function Footer() {
       <p className="pt-6 text-center text-xs md:text-sm text-gray-500">
         © 2024 The Mummy Sweets House. All Rights
         Reserved.sdfdfgbdfsdsfsdfsdfsafsdfsdfsdfdfgdfgdfdgdfgsfsdsdfgurtsdfgut
-        addgit add , dfg{" "}
+        addgit add , dfg fdsf{" "}
       </p>
     </footer>
   );
