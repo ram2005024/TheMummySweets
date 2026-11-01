@@ -1,4 +1,4 @@
-Mummy Sweets
+Mummy Sweet
 
 A modern web platform for Mummy Sweets, built to showcase products and provide customers with a seamless online shopping experience.
 
