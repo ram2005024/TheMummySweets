@@ -76,7 +76,7 @@ export default function Footer() {
 
       {/* Bottom copyright */}
       <p className="pt-6 text-center text-xs md:text-sm text-gray-500">
-        dfgsdf`dfdfg` 2024 The Mummy Sweets House. All Rights Reserved.gf
+        dfgsdf`dfdfgdfg` 2024 The Mummy Sweets House. All Rights Reserved.gf
       </p>
     </footer>
   );
