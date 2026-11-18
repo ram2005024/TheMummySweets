@@ -2,13 +2,13 @@ import { FaFacebookF, FaInstagram, FaTwitter } from "react-icons/fa";
 
 export default function Footer() {
   return (
-    <footer className="px-6 md:px-16 lg:px-24 xl:px-32 pt-10 w-full text-gray-600 bg-gray-50 border-t border-gray-200">
-      <div className="flex flex-col md:flex-row justify-between w-full gap-12 pb-8 border-b border-gray-300">
+    <footer className="w-full px-6 pt-10 text-gray-600 border-t border-gray-200 md:px-16 lg:px-24 xl:px-32 bg-gray-50">
+      <div className="flex flex-col justify-between w-full gap-12 pb-8 border-b border-gray-300 md:flex-row">
         {/* Logo + description */}
         <div className="md:max-w-90">
           <div className="flex items-center gap-2">
             {/* Replace with your actual logo */}
-            <div className="w-10 h-10 rounded-full bg-indigo-600 flex items-center justify-center text-white font-bold">
+            <div className="flex items-center justify-center w-10 h-10 font-bold text-white bg-indigo-600 rounded-full">
               M
             </div>
             <span className="text-lg font-semibold text-gray-800">
@@ -21,15 +21,15 @@ export default function Footer() {
             go‑to destination for irresistible mithai, crunchy snacks, and
             delightful treats. Whether it’s a festive celebration or a casual
             craving, we serve happiness in every bite. Easy to find, impossible
-            to forget — Butwal’s sweetest corner awaits you!dsfsdf
+            to forget — Butwal’s sweetest corner awaits you!dsfsdfsdfsdf
           </p>
         </div>
 
         {/* Links + contact */}
-        <div className="flex-1 flex items-start md:justify-end gap-16">
+        <div className="flex items-start flex-1 gap-16 md:justify-end">
           <div>
-            <h2 className="font-semibold mb-5 text-gray-800">Company</h2>
-            <ul className="text-sm space-y-2">
+            <h2 className="mb-5 font-semibold text-gray-800">Company</h2>
+            <ul className="space-y-2 text-sm">
               <li>
                 <a href="#" className="hover:text-indigo-600">
                   Home
@@ -53,8 +53,8 @@ export default function Footer() {
             </ul>
           </div>
           <div>
-            <h2 className="font-semibold mb-5 text-gray-800">Get in touch</h2>
-            <div className="text-sm space-y-2">
+            <h2 className="mb-5 font-semibold text-gray-800">Get in touch</h2>
+            <div className="space-y-2 text-sm">
               <p className="hover:text-indigo-600">+1-212-456-7890</p>
               <p className="hover:text-indigo-600">contact@example.com</p>
               {/* Social icons */}
@@ -75,7 +75,7 @@ export default function Footer() {
       </div>
 
       {/* Bottom copyright */}
-      <p className="pt-6 text-center text-xs md:text-sm text-gray-500">
+      <p className="pt-6 text-xs text-center text-gray-500 md:text-sm">
         2024 The Mummy Sweets House. All Rights Reserved.
       </p>
     </footer>
