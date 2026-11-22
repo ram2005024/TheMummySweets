@@ -21,7 +21,8 @@ export default function Footer() {
             go‑to destination for irresistible mithai, crunchy snacks, and
             delightful treats. Whether it’s a festive celebration or a casual
             craving, we serve happiness in every bite. Easy to find, impossible
-            to forget — Butwal’s sweetest corner awaits you!dgesdfesdfsdfsdfsdf
+            to forget — Butwal’s sweetest corner awaits
+            you!dgesdfesdfsdfsdfsdfsdf
           </p>
         </div>
 
