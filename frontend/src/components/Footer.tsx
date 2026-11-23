@@ -23,7 +23,7 @@ export default function Footer() {
             craving, we serve happiness in every bite. Easy to find, impossible
             to forget — Butwal’s sweetest corner awaits
             you!sdfsdfsdfdsfgsdfsdfsdfsdfdsfsdfsdfgit push git push git push
-            push push push push push push push push push push []
+            push push push push push push push push push push [git add]
           </p>
         </div>
 
