@@ -22,7 +22,8 @@ export default function Footer() {
             delightful treats. Whether it’s a festive celebration or a casual
             craving, we serve happiness in every bite. Easy to find, impossible
             to forget — Butwal’s sweetest corner awaits
-            you!sdfsdfsdfdsfgsdfsdfsdfsdfdsfsdfsdf
+            you!sdfsdfsdfdsfgsdfsdfsdfsdfdsfsdfsdfgit push git push git push
+            push push push push push push push push push push []
           </p>
         </div>
 
