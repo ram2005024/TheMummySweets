@@ -25,7 +25,7 @@ export default function Footer() {
           </p>
         </div>
         {/* Links + contact */}
-        dsfdsfdsfdsfsdfsdfsdfsadfasfdsdfsdfdsfdsfasdf
+        dsfdsfdsfdsfsdfsdfsdfsadfasfdsdfsdfdsfdsfasdfsdgf
         <div className="flex items-start flex-1 gap-16 md:justify-end">
           <div>
             <h2 className="mb-5 font-semibold text-gray-800">Company</h2>
