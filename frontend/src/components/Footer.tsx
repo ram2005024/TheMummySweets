@@ -21,11 +21,11 @@ export default function Footer() {
             go‑to destination for irresistible mithai, crunchy snacks, and
             delightful treats. Whether it’s a festive celebration or a casual
             craving, we serve happiness in every bite. Easy to find, impossible
-            to forget — Butwal’s sweetest corner awaits you!dsfdsfsdfdsf
+            to forget — Butwal’s sweetest corner awaits you!
           </p>
         </div>
+
         {/* Links + contact */}
-        dsfdsfdsfdsfsdfsdfsdfsadfasfdsdfsdfdsfdsfasdfsdgfadfssdfsdf
         <div className="flex items-start flex-1 gap-16 md:justify-end">
           <div>
             <h2 className="mb-5 font-semibold text-gray-800">Company</h2>
