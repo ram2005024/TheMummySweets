@@ -24,7 +24,7 @@ export default function Footer() {
             to forget — Butwal’s sweetest corner awaits you!dsfdsfsdfdsf
           </p>
         </div>
-        {/* Links + contact */}dsf
+        {/* Links + contact */}dsfsdf
         <div className="flex items-start flex-1 gap-16 md:justify-end">
           <div>
             <h2 className="mb-5 font-semibold text-gray-800">Company</h2>
