@@ -23,6 +23,7 @@ export default function Footer() {
             craving, we serve happiness in every bite. Easy to find, impossible
             to forget — Butwal’s sweetest corner awaits
             you!sdfadsfsdfsdfsdfsdfsdfsdfsdsfdfgsdfsdfdsfsdfdsfsdfsdfsdfssdfdsf
+            dfg{" "}
           </p>
         </div>
 
